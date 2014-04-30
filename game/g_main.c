@@ -38,10 +38,12 @@ cvar_t	*dmflags;
 cvar_t	*skill;
 cvar_t	*fraglimit;
 cvar_t	*timelimit;
+//ZOID
+cvar_t	*capturelimit;
+cvar_t	*instantweap;
+//ZOID
 cvar_t	*password;
-cvar_t	*spectator_password;
 cvar_t	*maxclients;
-cvar_t	*maxspectators;
 cvar_t	*maxentities;
 cvar_t	*g_select_empty;
 cvar_t	*dedicated;
@@ -145,7 +147,8 @@ void Sys_Error (char *error, ...)
 	char		text[1024];
 
 	va_start (argptr, error);
-	vsprintf (text, error, argptr);
+//	vsprintf (text, error, argptr);
+	Q_vsnprintf (text, sizeof(text), error, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 
 	gi.error (ERR_FATAL, "%s", text);
@@ -157,7 +160,8 @@ void Com_Printf (char *msg, ...)
 	char		text[1024];
 
 	va_start (argptr, msg);
-	vsprintf (text, msg, argptr);
+//	vsprintf (text, msg, argptr);
+	Q_vsnprintf (text, sizeof(text), msg, argptr);	// Knightmare- buffer overflow fix
 	va_end (argptr);
 
 	gi.dprintf ("%s", text);
@@ -228,6 +232,11 @@ void EndDMLevel (void)
 		return;
 	}
 
+	if (*level.forcemap) {
+		BeginIntermission (CreateTargetChangeLevel (level.forcemap) );
+		return;
+	}
+
 	// see if it's in the map list
 	if (*sv_maplist->string) {
 		s = strdup(sv_maplist->string);
@@ -284,6 +293,15 @@ void CheckDMRules (void)
 	if (!deathmatch->value)
 		return;
 
+//ZOID
+	if (ctf->value && CTFCheckRules()) {
+		EndDMLevel ();
+		return;
+	}
+	if (CTFInMatch())
+		return; // no checking in match mode
+//ZOID
+
 	if (timelimit->value)
 	{
 		if (level.time >= timelimit->value*60)
@@ -295,7 +313,6 @@ void CheckDMRules (void)
 	}
 
 	if (fraglimit->value)
-	{
 		for (i=0 ; i<maxclients->value ; i++)
 		{
 			cl = game.clients + i;
@@ -309,7 +326,6 @@ void CheckDMRules (void)
 				return;
 			}
 		}
-	}
 }
 
 
@@ -324,12 +340,17 @@ void ExitLevel (void)
 	edict_t	*ent;
 	char	command [256];
 
-	Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.changemap);
-	gi.AddCommandString (command);
-	level.changemap = NULL;
 	level.exitintermission = 0;
 	level.intermissiontime = 0;
+
+	if (CTFNextMap())
+		return;
+
+	Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.changemap);
+	gi.AddCommandString (command);
 	ClientEndServerFrames ();
+
+	level.changemap = NULL;
 
 	// clear some things before going to next level
 	for (i=0 ; i<maxclients->value ; i++)
@@ -340,7 +361,6 @@ void ExitLevel (void)
 		if (ent->health > ent->client->pers.max_health)
 			ent->health = ent->client->pers.max_health;
 	}
-
 }
 
 /*
