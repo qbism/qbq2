@@ -38,12 +38,11 @@ cvar_t	*dmflags;
 cvar_t	*skill;
 cvar_t	*fraglimit;
 cvar_t	*timelimit;
-//ZOID
-cvar_t	*capturelimit;
-cvar_t	*instantweap;
-//ZOID
 cvar_t	*password;
+cvar_t	*spectator_password;
+cvar_t	*needpass;
 cvar_t	*maxclients;
+cvar_t	*maxspectators;
 cvar_t	*maxentities;
 cvar_t	*g_select_empty;
 cvar_t	*dedicated;
@@ -232,11 +231,6 @@ void EndDMLevel (void)
 		return;
 	}
 
-	if (*level.forcemap) {
-		BeginIntermission (CreateTargetChangeLevel (level.forcemap) );
-		return;
-	}
-
 	// see if it's in the map list
 	if (*sv_maplist->string) {
 		s = strdup(sv_maplist->string);
@@ -277,6 +271,33 @@ void EndDMLevel (void)
 	}
 }
 
+
+/*
+=================
+CheckNeedPass
+=================
+*/
+void CheckNeedPass (void)
+{
+	int need;
+
+	// if password or spectator_password has changed, update needpass
+	// as needed
+	if (password->modified || spectator_password->modified) 
+	{
+		password->modified = spectator_password->modified = false;
+
+		need = 0;
+
+		if (*password->string && Q_stricmp(password->string, "none"))
+			need |= 1;
+		if (*spectator_password->string && Q_stricmp(spectator_password->string, "none"))
+			need |= 2;
+
+		gi.cvar_set("needpass", va("%d", need));
+	}
+}
+
 /*
 =================
 CheckDMRules
@@ -293,15 +314,6 @@ void CheckDMRules (void)
 	if (!deathmatch->value)
 		return;
 
-//ZOID
-	if (ctf->value && CTFCheckRules()) {
-		EndDMLevel ();
-		return;
-	}
-	if (CTFInMatch())
-		return; // no checking in match mode
-//ZOID
-
 	if (timelimit->value)
 	{
 		if (level.time >= timelimit->value*60)
@@ -313,6 +325,7 @@ void CheckDMRules (void)
 	}
 
 	if (fraglimit->value)
+	{
 		for (i=0 ; i<maxclients->value ; i++)
 		{
 			cl = game.clients + i;
@@ -326,6 +339,7 @@ void CheckDMRules (void)
 				return;
 			}
 		}
+	}
 }
 
 
@@ -340,17 +354,12 @@ void ExitLevel (void)
 	edict_t	*ent;
 	char	command [256];
 
-	level.exitintermission = 0;
-	level.intermissiontime = 0;
-
-	if (CTFNextMap())
-		return;
-
 	Com_sprintf (command, sizeof(command), "gamemap \"%s\"\n", level.changemap);
 	gi.AddCommandString (command);
-	ClientEndServerFrames ();
-
 	level.changemap = NULL;
+	level.exitintermission = 0;
+	level.intermissiontime = 0;
+	ClientEndServerFrames ();
 
 	// clear some things before going to next level
 	for (i=0 ; i<maxclients->value ; i++)
@@ -361,6 +370,7 @@ void ExitLevel (void)
 		if (ent->health > ent->client->pers.max_health)
 			ent->health = ent->client->pers.max_health;
 	}
+
 }
 
 /*
@@ -424,6 +434,9 @@ void G_RunFrame (void)
 
 	// see if it is time to end a deathmatch
 	CheckDMRules ();
+
+	// see if needpass needs updated
+	CheckNeedPass ();
 
 	// build the playerstate_t structures for all players
 	ClientEndServerFrames ();

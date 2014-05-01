@@ -350,7 +350,12 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 	VectorNormalize (dir);
 
 	bolt = G_Spawn();
-	bolt->svflags = SVF_PROJECTILE; // special net code is used for projectiles
+	bolt->svflags = SVF_DEADMONSTER;
+	// yes, I know it looks weird that projectiles are deadmonsters
+	// what this means is that when prediction is used against the object
+	// (blaster/hyperblaster shots), the player won't be solid clipped against
+	// the object.  Right now trying to run into a firing hyperblaster
+	// is very jerky since you are predicted 'against' the shots.
 	VectorCopy (start, bolt->s.origin);
 	VectorCopy (start, bolt->s.old_origin);
 	vectoangles (dir, bolt->s.angles);
@@ -829,14 +834,6 @@ void bfg_think (edict_t *self)
 
 		if (!(ent->svflags & SVF_MONSTER) && (!ent->client) && (strcmp(ent->classname, "misc_explobox") != 0))
 			continue;
-
-//ZOID
-		//don't target players in CTF
-		if (ctf->value && ent->client &&
-			self->owner->client &&
-			ent->client->resp.ctf_team == self->owner->client->resp.ctf_team)
-			continue;
-//ZOID
 
 		VectorMA (ent->absmin, 0.5, ent->size, point);
 

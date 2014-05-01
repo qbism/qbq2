@@ -118,7 +118,7 @@ ri.Con_Printf( PRINT_ALL, "Initializing DirectDraw\n");
 	/*
 	** if no linear mode found, go for modex if we're trying 320x240
 	*/
-	else if ( ( sw_mode->value == 0 ) && sw_allow_modex->value )
+	else if ( ( sw_mode->value == 0 ) /* && sw_allow_modex->value */ )
 	{
 		ri.Con_Printf( PRINT_ALL, "failed\n" );
 		ri.Con_Printf( PRINT_ALL, "...attempting ModeX 320x240: ");

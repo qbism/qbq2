@@ -107,7 +107,7 @@ void IN_JoyMove (usercmd_t *cmd);
 // mouse variables
 cvar_t	*m_filter;
 
-qboolean	mlooking;
+qboolean	mlooking = true; //qb: true by default
 
 void IN_MLookDown (void) { mlooking = true; }
 void IN_MLookUp (void) {

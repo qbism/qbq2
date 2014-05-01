@@ -44,7 +44,7 @@ Usually enclosed in the middle of a door.
 void SP_func_areaportal (edict_t *ent)
 {
 	ent->use = Use_Areaportal;
-	ent->count = 0;		// allways start closed;
+	ent->count = 0;		// always start closed;
 }
 
 //=====================================================
@@ -263,6 +263,11 @@ void ThrowClientHead (edict_t *self, int damage)
 		self->client->anim_priority = ANIM_DEATH;
 		self->client->anim_end = self->s.frame;
 	}
+	else
+	{
+		self->think = NULL;
+		self->nextthink = 0;
+	}
 
 	gi.linkentity (self);
 }
@@ -308,27 +313,6 @@ void ThrowDebris (edict_t *self, char *modelname, float speed, vec3_t origin)
 
 void BecomeExplosion1 (edict_t *self)
 {
-//ZOID
-	//flags are important
-	if (strcmp(self->classname, "item_flag_team1") == 0) {
-		CTFResetFlag(CTF_TEAM1); // this will free self!
-		gi.bprintf(PRINT_HIGH, "The %s flag has returned!\n",
-			CTFTeamName(CTF_TEAM1));
-		return;
-	}
-	if (strcmp(self->classname, "item_flag_team2") == 0) {
-		CTFResetFlag(CTF_TEAM2); // this will free self!
-		gi.bprintf(PRINT_HIGH, "The %s flag has returned!\n",
-			CTFTeamName(CTF_TEAM1));
-		return;
-	}
-	// techs are important too
-	if (self->item && (self->item->flags & IT_TECH)) {
-		CTFRespawnTech(self); // this frees self!
-		return;
-	}
-//ZOID
-
 	gi.WriteByte (svc_temp_entity);
 	gi.WriteByte (TE_EXPLOSION1);
 	gi.WritePosition (self->s.origin);
@@ -388,6 +372,7 @@ void path_corner_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface
 		v[2] -= other->mins[2];
 		VectorCopy (v, other->s.origin);
 		next = G_PickTarget(next->target);
+		other->s.event = EV_OTHER_TELEPORT;
 	}
 
 	other->goalentity = other->movetarget = next;
@@ -505,23 +490,10 @@ void SP_point_combat (edict_t *self)
 /*QUAKED viewthing (0 .5 .8) (-8 -8 -8) (8 8 8)
 Just for the debugging level.  Don't use
 */
-static int robotron[4];
-
 void TH_viewthing(edict_t *ent)
 {
 	ent->s.frame = (ent->s.frame + 1) % 7;
-//	ent->s.frame = (ent->s.frame + 1) % 9;
 	ent->nextthink = level.time + FRAMETIME;
-//	return;
-
-	if (ent->spawnflags)
-	{
-		if (ent->s.frame == 0)
-		{
-			ent->spawnflags = (ent->spawnflags + 1) % 4 + 1;
-			ent->s.modelindex = robotron[ent->spawnflags - 1];
-		}
-	}
 }
 
 void SP_viewthing(edict_t *ent)
@@ -533,7 +505,6 @@ void SP_viewthing(edict_t *ent)
 	ent->s.renderfx = RF_FRAMELERP;
 	VectorSet (ent->mins, -16, -16, -24);
 	VectorSet (ent->maxs, 16, 16, 32);
-//	ent->s.modelindex = gi.modelindex ("models/player_y/tris.md2");
 	ent->s.modelindex = gi.modelindex ("models/objects/banner/tris.md2");
 	gi.linkentity (ent);
 	ent->nextthink = level.time + 0.5;
@@ -1676,10 +1647,10 @@ If START_OFF, this entity must be used before it starts
 
 // Skuller's hack to fix crash on exiting biggun
 typedef struct zhead_s {
-   struct zhead_s   *prev, *next;
-   short   magic;
-   short   tag;         // for group free
-   int      size;
+   struct zhead_s	*prev, *next;
+   short			magic;
+   short			tag;         // for group free
+   int				size;
 } zhead_t;
 
 /*static*/ void func_clock_format_countdown (edict_t *self)
@@ -1841,10 +1812,6 @@ void teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_
 		return;
 	}
 
-//ZOID
-	CTFPlayerResetGrapple(other);
-//ZOID
-
 	// unlink to make sure it can't possibly interfere with KillBox
 	gi.unlinkentity (other);
 
@@ -1863,7 +1830,9 @@ void teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_
 
 	// set angles
 	for (i=0 ; i<3 ; i++)
+	{
 		other->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(dest->s.angles[i] - other->client->resp.cmd_angles[i]);
+	}
 
 	VectorClear (other->s.angles);
 	VectorClear (other->client->ps.viewangles);

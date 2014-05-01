@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -34,28 +34,28 @@ static qboolean s_systemcolors_saved;
 
 static HGDIOBJ previously_selected_GDI_obj;
 
-static int s_syspalindices[] = 
+static int s_syspalindices[] =
 {
-  COLOR_ACTIVEBORDER,
-  COLOR_ACTIVECAPTION,
-  COLOR_APPWORKSPACE,
-  COLOR_BACKGROUND,
-  COLOR_BTNFACE,
-  COLOR_BTNSHADOW,
-  COLOR_BTNTEXT,
-  COLOR_CAPTIONTEXT,
-  COLOR_GRAYTEXT,
-  COLOR_HIGHLIGHT,
-  COLOR_HIGHLIGHTTEXT,
-  COLOR_INACTIVEBORDER,
+	COLOR_ACTIVEBORDER,
+	COLOR_ACTIVECAPTION,
+	COLOR_APPWORKSPACE,
+	COLOR_BACKGROUND,
+	COLOR_BTNFACE,
+	COLOR_BTNSHADOW,
+	COLOR_BTNTEXT,
+	COLOR_CAPTIONTEXT,
+	COLOR_GRAYTEXT,
+	COLOR_HIGHLIGHT,
+	COLOR_HIGHLIGHTTEXT,
+	COLOR_INACTIVEBORDER,
 
-  COLOR_INACTIVECAPTION,
-  COLOR_MENU,
-  COLOR_MENUTEXT,
-  COLOR_SCROLLBAR,
-  COLOR_WINDOW,
-  COLOR_WINDOWFRAME,
-  COLOR_WINDOWTEXT
+	COLOR_INACTIVECAPTION,
+	COLOR_MENU,
+	COLOR_MENUTEXT,
+	COLOR_SCROLLBAR,
+	COLOR_WINDOW,
+	COLOR_WINDOWFRAME,
+	COLOR_WINDOWTEXT
 };
 
 #define NUM_SYS_COLORS ( sizeof( s_syspalindices ) / sizeof( int ) )
@@ -77,40 +77,43 @@ typedef struct
 
 static identitypalette_t s_ipal;
 
-static void DIB_SaveSystemColors( void );
-static void DIB_RestoreSystemColors( void );
+static void DIB_SaveSystemColors(void);
+static void DIB_RestoreSystemColors(void);
 
 /*
 ** DIB_Init
 **
 ** Builds our DIB section
 */
-qboolean DIB_Init( unsigned char **ppbuffer, int *ppitch )
+qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 {
 	dibinfo_t   dibheader;
-	BITMAPINFO *pbmiDIB = ( BITMAPINFO * ) &dibheader;
+	BITMAPINFO *pbmiDIB = (BITMAPINFO *)&dibheader;
+	DEVMODE	gdevmode;  //qb: for fullscreen
+	RECT		WindowRect;  //qb: for fullscreen
+	DWORD		WindowStyle, ExWindowStyle;  //qb: for fullscreen
 	int i;
 
-	memset( &dibheader, 0, sizeof( dibheader ) );
+	memset(&dibheader, 0, sizeof(dibheader));
 
 	/*
 	** grab a DC
 	*/
-	if ( !sww_state.hDC )
+	if (!sww_state.hDC)
 	{
-		if ( ( sww_state.hDC = GetDC( sww_state.hWnd ) ) == NULL )
+		if ((sww_state.hDC = GetDC(sww_state.hWnd)) == NULL)
 			return false;
 	}
 
 	/*
 	** figure out if we're running in an 8-bit display mode
 	*/
- 	if ( GetDeviceCaps( sww_state.hDC, RASTERCAPS ) & RC_PALETTE )
+	if (GetDeviceCaps(sww_state.hDC, RASTERCAPS) & RC_PALETTE)
 	{
 		sww_state.palettized = true;
 
 		// save system colors
-		if ( !s_systemcolors_saved )
+		if (!s_systemcolors_saved)
 		{
 			DIB_SaveSystemColors();
 			s_systemcolors_saved = true;
@@ -121,82 +124,209 @@ qboolean DIB_Init( unsigned char **ppbuffer, int *ppitch )
 		sww_state.palettized = false;
 	}
 
+	vid.width = (int)(vid.width / 4) * 4; //qb: multiple of 4 still required for DIB after all these years...
+
 	/*
 	** fill in the BITMAPINFO struct
 	*/
-	pbmiDIB->bmiHeader.biSize          = sizeof(BITMAPINFOHEADER);
-	pbmiDIB->bmiHeader.biWidth         = vid.width;
-	pbmiDIB->bmiHeader.biHeight        = vid.height;
-	pbmiDIB->bmiHeader.biPlanes        = 1;
-	pbmiDIB->bmiHeader.biBitCount      = 8;
-	pbmiDIB->bmiHeader.biCompression   = BI_RGB;
-	pbmiDIB->bmiHeader.biSizeImage     = 0;
+	pbmiDIB->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	pbmiDIB->bmiHeader.biWidth = vid.width;
+	pbmiDIB->bmiHeader.biHeight = vid.height;
+	pbmiDIB->bmiHeader.biPlanes = 1;
+	pbmiDIB->bmiHeader.biBitCount = 8;
+	pbmiDIB->bmiHeader.biCompression = BI_RGB;
+	pbmiDIB->bmiHeader.biSizeImage = 0;
 	pbmiDIB->bmiHeader.biXPelsPerMeter = 0;
 	pbmiDIB->bmiHeader.biYPelsPerMeter = 0;
-	pbmiDIB->bmiHeader.biClrUsed       = 256;
-	pbmiDIB->bmiHeader.biClrImportant  = 256;
+	pbmiDIB->bmiHeader.biClrUsed = 256;
+	pbmiDIB->bmiHeader.biClrImportant = 256;
 
 	/*
 	** fill in the palette
 	*/
-	for ( i = 0; i < 256; i++ )
+	for (i = 0; i < 256; i++)
 	{
-		dibheader.acolors[i].rgbRed   = ( d_8to24table[i] >> 0 )  & 0xff;
-		dibheader.acolors[i].rgbGreen = ( d_8to24table[i] >> 8 )  & 0xff;
-		dibheader.acolors[i].rgbBlue  = ( d_8to24table[i] >> 16 ) & 0xff;
+		dibheader.acolors[i].rgbRed = (d_8to24table[i] >> 0) & 0xff;
+		dibheader.acolors[i].rgbGreen = (d_8to24table[i] >> 8) & 0xff;
+		dibheader.acolors[i].rgbBlue = (d_8to24table[i] >> 16) & 0xff;
 	}
 
 	/*
 	** create the DIB section
 	*/
-	sww_state.hDIBSection = CreateDIBSection( sww_state.hDC,
-		                                     pbmiDIB,
-											 DIB_RGB_COLORS,
-											 &sww_state.pDIBBase,
-											 NULL,
-											 0 );
+	sww_state.hDIBSection = CreateDIBSection(sww_state.hDC,
+		pbmiDIB,
+		DIB_RGB_COLORS,
+		&sww_state.pDIBBase,
+		NULL,
+		0);
 
-	if ( sww_state.hDIBSection == NULL )
+	if (sww_state.hDIBSection == NULL)
 	{
-		ri.Con_Printf( PRINT_ALL, "DIB_Init() - CreateDIBSection failed\n" );
+		ri.Con_Printf(PRINT_ALL, "DIB_Init() - CreateDIBSection failed\n");
 		goto fail;
 	}
 
-	if ( pbmiDIB->bmiHeader.biHeight > 0 )
-    {
+	if (pbmiDIB->bmiHeader.biHeight > 0)
+	{
 		// bottom up
-		*ppbuffer	= sww_state.pDIBBase + ( vid.height - 1 ) * vid.width;
-		*ppitch		= -vid.width;
-    }
-    else
-    {
+		*ppbuffer = sww_state.pDIBBase + (vid.height - 1) * vid.width;
+		*ppitch = -vid.width;
+	}
+	else
+	{
 		// top down
-		*ppbuffer	= sww_state.pDIBBase;
-		*ppitch		= vid.width;
-    }
+		*ppbuffer = sww_state.pDIBBase;
+		*ppitch = vid.width;
+	}
+
+
+
+
+
+
+	/*  qb: temporarily here for reference from super8...
+
+	qboolean VID_SetFullDIBMode(int modenum)
+	{
+	HDC				hdc;
+	VID_DestroyWindow();
+
+	gdevmode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
+	gdevmode.dmPelsWidth = modelist[modenum].width;
+	gdevmode.dmPelsHeight = modelist[modenum].height;
+	gdevmode.dmSize = sizeof (gdevmode);
+
+	if (ChangeDisplaySettings(&gdevmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+	Sys_Error("Couldn't set fullscreen DIB mode");
+
+	modestate = MS_FULLDIB;
+	vid_fulldib_on_focus_mode = modenum;
+	WindowRect.top = WindowRect.left = 0;
+
+	WindowRect.right = modelist[modenum].width;
+	WindowRect.bottom = modelist[modenum].height;
+
+	DIBWidth = ((int)modelist[modenum].width / 4) * 4; //qb: multiple of 4
+	DIBHeight = modelist[modenum].height;
+
+	WindowStyle = WS_POPUP | WS_SYSMENU | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	ExWindowStyle = 0;
+
+	AdjustWindowRectEx(&WindowRect, WindowStyle, FALSE, 0);
+
+	SetWindowLong(hWndWinQuake, GWL_STYLE, WindowStyle | WS_VISIBLE);
+	SetWindowLong(hWndWinQuake, GWL_EXSTYLE, ExWindowStyle);
+
+	if (!SetWindowPos(hWnd,
+	NULL,
+	0, 0,
+	WindowRect.right - WindowRect.left,
+	WindowRect.bottom - WindowRect.top,
+	SWP_NOCOPYBITS | SWP_NOZORDER))
+	{
+	Sys_Error("Couldn't resize DIB window");
+	}
+
+	// position and show the DIB window
+	//VID_CheckWindowXY();
+	CenterWindow(hWndWinQuake); //qb:
+	UpdateWindow(hWndWinQuake);
+
+	vid.numpages = 1;
+	//	vid.maxwarpwidth = WARP_WIDTH; //qb: from Manoel Kasimier - hi-res waterwarp - removed
+	//	vid.maxwarpheight = WARP_HEIGHT; //qb: from Manoel Kasimier - hi-res waterwarp - removed
+
+	vid.height = vid.conheight = DIBHeight;
+	vid.width = vid.conwidth = DIBWidth;
+
+	vid.maxwarpwidth = vid.width; //qb: from  Manoel Kasimier - hi-res waterwarp
+	vid.maxwarpheight = vid.height; //qb: from  Manoel Kasimier - hi-res waterwarp
+	Sbar_SizeScreen(); //qb: calc sbar scale from MQ 1.6
+
+	// needed because we're not getting WM_MOVE messages fullscreen on NT
+	window_x = 0;
+	window_y = 0;
+
+	return true;
+	}
+
+	*/
+
+	ChangeDisplaySettings(NULL, 0);
+
+	if (vid_fullscreen->value) //qb: fullscreen dib
+	{
+
+		int			DIBWidth, DIBHeight;
+		RECT		WindowRect;
+		DWORD		WindowStyle, ExWindowStyle;
+
+		int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
+		RECT		window_rect;
+
+		WindowRect.top = WindowRect.left = 0;
+
+		WindowRect.right = vid.width;
+		WindowRect.bottom = vid.height;
+		gdevmode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
+		gdevmode.dmPelsWidth = vid.width;
+		gdevmode.dmPelsHeight = vid.height;
+		gdevmode.dmSize = sizeof (gdevmode);
+
+		if (ChangeDisplaySettings(&gdevmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+		{
+			//ri.Sys_Error(ERR_FATAL, "Couldn't set fullscreen DIB mode");
+			vid_fullscreen->value = 0;
+			vid_fullscreen->modified = true;
+			goto windowmode;  //qb:  goto a windowed mode rather than error.
+		}
+
+		if (!SetWindowPos(sww_state.hWnd,
+			NULL,
+			0, 0,
+			WindowRect.right - WindowRect.left,
+			WindowRect.bottom - WindowRect.top,
+			SWP_NOCOPYBITS | SWP_NOZORDER))
+		{
+			//ri.Sys_Error(ERR_FATAL, "Couldn't resize DIB window");
+			vid_fullscreen->value = 0;
+			vid_fullscreen->modified = true;
+			goto windowmode; //qb:  goto a windowed mode rather than error.
+		}
+
+		WindowStyle = WS_POPUP | WS_SYSMENU | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+		ExWindowStyle = 0;
+
+		AdjustWindowRectEx(&WindowRect, WindowStyle, FALSE, 0);
+
+		SetWindowLong(sww_state.hWnd, GWL_STYLE, WindowStyle | WS_VISIBLE);
+		SetWindowLong(sww_state.hWnd, GWL_EXSTYLE, ExWindowStyle);
+	}
 
 	/*
 	** clear the DIB memory buffer
 	*/
-	memset( sww_state.pDIBBase, 0xff, vid.width * vid.height );
+windowmode:
+	memset(sww_state.pDIBBase, 0x00, vid.width * vid.height);  //qb: do black, was 0xff
 
-	if ( ( sww_state.hdcDIBSection = CreateCompatibleDC( sww_state.hDC ) ) == NULL )
+	if ((sww_state.hdcDIBSection = CreateCompatibleDC(sww_state.hDC)) == NULL)
 	{
-		ri.Con_Printf( PRINT_ALL, "DIB_Init() - CreateCompatibleDC failed\n" );
+		ri.Con_Printf(PRINT_ALL, "DIB_Init() - CreateCompatibleDC failed\n");
 		goto fail;
 	}
-	if ( ( previously_selected_GDI_obj = SelectObject( sww_state.hdcDIBSection, sww_state.hDIBSection ) ) == NULL )
+	if ((previously_selected_GDI_obj = SelectObject(sww_state.hdcDIBSection, sww_state.hDIBSection)) == NULL)
 	{
-		ri.Con_Printf( PRINT_ALL, "DIB_Init() - SelectObject failed\n" );
 		goto fail;
 	}
 
 	return true;
 
 fail:
+	ri.Con_Printf(PRINT_ALL, "DIB_Init() - SelectObject failed\n");
 	DIB_Shutdown();
 	return false;
-	
+
 }
 
 /*
@@ -212,10 +342,10 @@ fail:
 ** B = offset 2
 ** A = offset 3
 */
-void DIB_SetPalette( const unsigned char *_pal )
+void DIB_SetPalette(const unsigned char *_pal)
 {
 	const unsigned char *pal = _pal;
-  	LOGPALETTE		*pLogPal = ( LOGPALETTE * ) &s_ipal;
+	LOGPALETTE		*pLogPal = (LOGPALETTE *)&s_ipal;
 	RGBQUAD			colors[256];
 	int				i;
 	int				ret;
@@ -224,13 +354,13 @@ void DIB_SetPalette( const unsigned char *_pal )
 	/*
 	** set the DIB color table
 	*/
-	if ( sww_state.hdcDIBSection )
+	if (sww_state.hdcDIBSection)
 	{
-		for ( i = 0; i < 256; i++, pal += 4 )
+		for (i = 0; i < 256; i++, pal += 4)
 		{
-			colors[i].rgbRed   = pal[0];
+			colors[i].rgbRed = pal[0];
 			colors[i].rgbGreen = pal[1];
-			colors[i].rgbBlue  = pal[2];
+			colors[i].rgbBlue = pal[2];
 			colors[i].rgbReserved = 0;
 		}
 
@@ -242,9 +372,9 @@ void DIB_SetPalette( const unsigned char *_pal )
 		colors[255].rgbGreen = 0xff;
 		colors[255].rgbBlue = 0xff;
 
-		if ( SetDIBColorTable( sww_state.hdcDIBSection, 0, 256, colors ) == 0 )
+		if (SetDIBColorTable(sww_state.hdcDIBSection, 0, 256, colors) == 0)
 		{
-			ri.Con_Printf( PRINT_ALL, "DIB_SetPalette() - SetDIBColorTable failed\n" );
+			ri.Con_Printf(PRINT_ALL, "DIB_SetPalette() - SetDIBColorTable failed\n");
 		}
 	}
 
@@ -252,22 +382,22 @@ void DIB_SetPalette( const unsigned char *_pal )
 	** for 8-bit color desktop modes we set up the palette for maximum
 	** speed by going into an identity palette mode.
 	*/
-	if ( sww_state.palettized )
+	if (sww_state.palettized)
 	{
 		int i;
 		HPALETTE hpalOld;
 
-		if ( SetSystemPaletteUse( hDC, SYSPAL_NOSTATIC ) == SYSPAL_ERROR )
+		if (SetSystemPaletteUse(hDC, SYSPAL_NOSTATIC) == SYSPAL_ERROR)
 		{
-			ri.Sys_Error( ERR_FATAL, "DIB_SetPalette() - SetSystemPaletteUse() failed\n" );
+			ri.Sys_Error(ERR_FATAL, "DIB_SetPalette() - SetSystemPaletteUse() failed\n");
 		}
 
 		/*
 		** destroy our old palette
 		*/
-		if ( sww_state.hPal )
+		if (sww_state.hPal)
 		{
-			DeleteObject( sww_state.hPal );
+			DeleteObject(sww_state.hPal);
 			sww_state.hPal = 0;
 		}
 
@@ -275,41 +405,41 @@ void DIB_SetPalette( const unsigned char *_pal )
 		** take up all physical palette entries to flush out anything that's currently
 		** in the palette
 		*/
-		pLogPal->palVersion		= 0x300;
-		pLogPal->palNumEntries	= 256;
+		pLogPal->palVersion = 0x300;
+		pLogPal->palNumEntries = 256;
 
-		for ( i = 0, pal = _pal; i < 256; i++, pal += 4 )
+		for (i = 0, pal = _pal; i < 256; i++, pal += 4)
 		{
-			pLogPal->palPalEntry[i].peRed	= pal[0];
-			pLogPal->palPalEntry[i].peGreen	= pal[1];
-			pLogPal->palPalEntry[i].peBlue	= pal[2];
-			pLogPal->palPalEntry[i].peFlags	= PC_RESERVED | PC_NOCOLLAPSE;
+			pLogPal->palPalEntry[i].peRed = pal[0];
+			pLogPal->palPalEntry[i].peGreen = pal[1];
+			pLogPal->palPalEntry[i].peBlue = pal[2];
+			pLogPal->palPalEntry[i].peFlags = PC_RESERVED | PC_NOCOLLAPSE;
 		}
-		pLogPal->palPalEntry[0].peRed		= 0;
-		pLogPal->palPalEntry[0].peGreen		= 0;
-		pLogPal->palPalEntry[0].peBlue		= 0;
-		pLogPal->palPalEntry[0].peFlags		= 0;
-		pLogPal->palPalEntry[255].peRed		= 0xff;
-		pLogPal->palPalEntry[255].peGreen	= 0xff;
-		pLogPal->palPalEntry[255].peBlue	= 0xff;
-		pLogPal->palPalEntry[255].peFlags	= 0;
+		pLogPal->palPalEntry[0].peRed = 0;
+		pLogPal->palPalEntry[0].peGreen = 0;
+		pLogPal->palPalEntry[0].peBlue = 0;
+		pLogPal->palPalEntry[0].peFlags = 0;
+		pLogPal->palPalEntry[255].peRed = 0xff;
+		pLogPal->palPalEntry[255].peGreen = 0xff;
+		pLogPal->palPalEntry[255].peBlue = 0xff;
+		pLogPal->palPalEntry[255].peFlags = 0;
 
-		if ( ( sww_state.hPal = CreatePalette( pLogPal ) ) == NULL )
+		if ((sww_state.hPal = CreatePalette(pLogPal)) == NULL)
 		{
-			ri.Sys_Error( ERR_FATAL, "DIB_SetPalette() - CreatePalette failed(%x)\n", GetLastError() );
-		}
-
-		if ( ( hpalOld = SelectPalette( hDC, sww_state.hPal, FALSE ) ) == NULL )
-		{
-			ri.Sys_Error( ERR_FATAL, "DIB_SetPalette() - SelectPalette failed(%x)\n",GetLastError() );
+			ri.Sys_Error(ERR_FATAL, "DIB_SetPalette() - CreatePalette failed(%x)\n", GetLastError());
 		}
 
-		if ( sww_state.hpalOld == NULL )
+		if ((hpalOld = SelectPalette(hDC, sww_state.hPal, FALSE)) == NULL)
+		{
+			ri.Sys_Error(ERR_FATAL, "DIB_SetPalette() - SelectPalette failed(%x)\n", GetLastError());
+		}
+
+		if (sww_state.hpalOld == NULL)
 			sww_state.hpalOld = hpalOld;
 
-		if ( ( ret = RealizePalette( hDC ) ) != pLogPal->palNumEntries ) 
+		if ((ret = RealizePalette(hDC)) != pLogPal->palNumEntries)
 		{
-			ri.Sys_Error( ERR_FATAL, "DIB_SetPalette() - RealizePalette set %d entries\n", ret );
+			ri.Sys_Error(ERR_FATAL, "DIB_SetPalette() - RealizePalette set %d entries\n", ret);
 		}
 	}
 }
@@ -317,41 +447,41 @@ void DIB_SetPalette( const unsigned char *_pal )
 /*
 ** DIB_Shutdown
 */
-void DIB_Shutdown( void )
+void DIB_Shutdown(void)
 {
-	if ( sww_state.palettized && s_systemcolors_saved )
+	if (sww_state.palettized && s_systemcolors_saved)
 		DIB_RestoreSystemColors();
 
-	if ( sww_state.hPal )
+	if (sww_state.hPal)
 	{
-		DeleteObject( sww_state.hPal );
+		DeleteObject(sww_state.hPal);
 		sww_state.hPal = 0;
 	}
 
-	if ( sww_state.hpalOld )
+	if (sww_state.hpalOld)
 	{
-		SelectPalette( sww_state.hDC, sww_state.hpalOld, FALSE );
-		RealizePalette( sww_state.hDC );
+		SelectPalette(sww_state.hDC, sww_state.hpalOld, FALSE);
+		RealizePalette(sww_state.hDC);
 		sww_state.hpalOld = NULL;
 	}
 
-	if ( sww_state.hdcDIBSection )
+	if (sww_state.hdcDIBSection)
 	{
-		SelectObject( sww_state.hdcDIBSection, previously_selected_GDI_obj );
-		DeleteDC( sww_state.hdcDIBSection );
+		SelectObject(sww_state.hdcDIBSection, previously_selected_GDI_obj);
+		DeleteDC(sww_state.hdcDIBSection);
 		sww_state.hdcDIBSection = NULL;
 	}
 
-	if ( sww_state.hDIBSection )
+	if (sww_state.hDIBSection)
 	{
-		DeleteObject( sww_state.hDIBSection );
+		DeleteObject(sww_state.hDIBSection);
 		sww_state.hDIBSection = NULL;
 		sww_state.pDIBBase = NULL;
 	}
 
-	if ( sww_state.hDC )
+	if (sww_state.hDC)
 	{
-		ReleaseDC( sww_state.hWnd, sww_state.hDC );
+		ReleaseDC(sww_state.hWnd, sww_state.hDC);
 		sww_state.hDC = 0;
 	}
 }
@@ -360,16 +490,16 @@ void DIB_Shutdown( void )
 /*
 ** DIB_Save/RestoreSystemColors
 */
-static void DIB_RestoreSystemColors( void )
+static void DIB_RestoreSystemColors(void)
 {
-    SetSystemPaletteUse( sww_state.hDC, SYSPAL_STATIC );
-    SetSysColors( NUM_SYS_COLORS, s_syspalindices, s_oldsyscolors );
+	SetSystemPaletteUse(sww_state.hDC, SYSPAL_STATIC);
+	SetSysColors(NUM_SYS_COLORS, s_syspalindices, s_oldsyscolors);
 }
 
-static void DIB_SaveSystemColors( void )
+static void DIB_SaveSystemColors(void)
 {
 	int i;
 
-	for ( i = 0; i < NUM_SYS_COLORS; i++ )
-		s_oldsyscolors[i] = GetSysColor( s_syspalindices[i] );
+	for (i = 0; i < NUM_SYS_COLORS; i++)
+		s_oldsyscolors[i] = GetSysColor(s_syspalindices[i]);
 }
