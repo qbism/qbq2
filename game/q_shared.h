@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <time.h>
 
 #if (defined _M_IX86 || defined __i386__) && !defined C_ONLY && !defined __sun__
-#define id386	1
+#define id386	0 //qb: hack, don't use assembly.  was 1
 #else
 #define id386	0
 #endif
@@ -81,6 +81,8 @@ __inline int Q_vsnprintf (char *Dest, size_t Count, const char *Format, va_list 
 #endif
 // end Knightmare
 
+#define OGG_SUPPORT // Knightmare- whether to use Ogg Vorbis soundtrack
+
 // angle indexes
 #define	PITCH				0		// up / down
 #define	YAW					1		// left / right
@@ -97,7 +99,7 @@ __inline int Q_vsnprintf (char *Dest, size_t Count, const char *Format, va_list 
 // per-level limits
 //
 #define	MAX_CLIENTS			256		// absolute limit
-#define	MAX_EDICTS			1024	// must change protocol to increase more
+#define	MAX_EDICTS			4096	//qb: can be up to 8192 w/o protocol change??	// must change protocol to increase more
 #define	MAX_LIGHTSTYLES		256
 #define	MAX_MODELS			256		// these are sent over the net as bytes
 #define	MAX_SOUNDS			256		// so they cannot be blindly increased
@@ -154,6 +156,15 @@ typedef	int	fixed16_t;
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
 #endif
+
+#ifndef M_PI2
+#define M_PI2					6.28318530717958647692	// Matches value in GCC v2 math.h
+#endif
+
+#define SqrtFast(x)				((x) * Q_rsqrt(x))
+
+#define DEG2RAD(a)				(((a) * M_PI) / 180.0F)
+#define RAD2DEG(a)				(((a) * 180.0F) / M_PI)
 
 struct cplane_s;
 
@@ -240,6 +251,10 @@ char *COM_Parse (char **data_p);
 // data is an in/out parm, returns a parsed out token
 
 void Com_sprintf (char *dest, int size, char *fmt, ...);
+// Knightmare added
+void Com_strcpy (char *dest, int destSize, const char *src);
+void Com_strcat (char *dest, int destSize, const char *src);
+long Com_HashFileName (const char *fname, int hashSize, qboolean sized);
 
 void Com_PageInMemory (byte *buffer, int size);
 
@@ -309,6 +324,7 @@ char	*Sys_FindFirst (char *path, unsigned musthave, unsigned canthave );
 char	*Sys_FindNext ( unsigned musthave, unsigned canthave );
 void	Sys_FindClose (void);
 
+void	Sys_Sleep (int msec);	// Knightmare added for CPU usage fix
 
 // this is only here so the functions in q_shared.c and q_shwin.c can link
 void Sys_Error (char *error, ...);
@@ -401,6 +417,7 @@ COLLISION DETECTION
 #define	SURF_FLOWING	0x40	// scroll towards angle
 #define	SURF_NODRAW		0x80	// don't bother referencing the texture
 
+#define SURF_ALPHATEST	0x02000000	// Knightmare- alpha test flag
 
 
 // content masks

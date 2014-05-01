@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <time.h>
 
 #if (defined _M_IX86 || defined __i386__) && !defined C_ONLY && !defined __sun__
-#define id386	1
+#define id386	0 //qb: hack, don't use assembly.  was 1
 #else
 #define id386	0
 #endif
@@ -59,6 +59,27 @@ typedef enum {false, true}	qboolean;
 #define NULL ((void *)0)
 #endif
 
+// Knightmare added
+#ifndef min
+#define min(a,b)        (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a,b)        (((a) > (b)) ? (a) : (b))
+#endif
+
+// from Quake3 source
+#ifdef WIN32
+//#define Q_vsnprintf _vsnprintf
+__inline int Q_vsnprintf (char *Dest, size_t Count, const char *Format, va_list Args) {
+	int ret = _vsnprintf(Dest, Count, Format, Args);
+	Dest[Count-1] = 0;	// null terminate
+	return ret;
+}
+#else
+// TODO: do we need Mac define?
+#define Q_vsnprintf vsnprintf
+#endif
+// end Knightmare
 
 // angle indexes
 #define	PITCH				0		// up / down
@@ -70,13 +91,14 @@ typedef enum {false, true}	qboolean;
 #define	MAX_TOKEN_CHARS		128		// max length of an individual token
 
 #define	MAX_QPATH			64		// max length of a quake game pathname
-#define	MAX_OSPATH			128		// max length of a filesystem pathname
+#define	MAX_OSPATH			256		// max length of a filesystem pathname
 
 //
 // per-level limits
 //
 #define	MAX_CLIENTS			256		// absolute limit
-#define	MAX_EDICTS			1024	// must change protocol to increase more
+//qb: look at CL_ParseStartSoundPacket- shaves 3 bits off short, leaving 13 bits = 8192... right?  or additional bit for flag = 4196?
+#define	MAX_EDICTS			4096	//qb: was 1024	// must change protocol to increase more
 #define	MAX_LIGHTSTYLES		256
 #define	MAX_MODELS			256		// these are sent over the net as bytes
 #define	MAX_SOUNDS			256		// so they cannot be blindly increased

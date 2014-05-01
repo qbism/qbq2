@@ -22,14 +22,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Portable C scan-level rasterization code, all pixel depths.
 
 #include "r_local.h"
+#include "r_dither.h"
 
 unsigned char	*r_turb_pbase, *r_turb_pdest;
 fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
 int				*r_turb_turb;
 int				r_turb_spancount;
 
-void D_DrawTurbulent8Span (void);
-
+void D_DrawTurbulent8Span (espan_t *pspan);
 
 /*
 =============
@@ -49,8 +49,8 @@ void D_WarpScreen (void)
 	byte	**row;
 
 	static int	cached_width, cached_height;
-	static byte	*rowptr[1200+AMP2*2];
-	static int	column[1600+AMP2*2];
+	static byte	*rowptr[4200 + AMP2 * 2]; //qb: 4K... was 1200
+	static int	column[2400 + AMP2 * 2]; //qb: 4K... was 1600
 
 	//
 	// these are constant over resolutions, and can be saved
@@ -64,7 +64,9 @@ void D_WarpScreen (void)
 		for (v=0 ; v<h+AMP2*2 ; v++)
 		{
 			v2 = (int)((float)v/(h + AMP2 * 2) * r_refdef.vrect.height);
-			rowptr[v] = r_warpbuffer + (WARP_WIDTH * v2);
+			//rowptr[v] = r_warpbuffer + (WARP_WIDTH * v2);
+			//rowptr[v] = r_warpbuffer + (w * v2);
+			rowptr[v] = r_warpbuffer + (r_warpwidth * v2);
 		}
 
 		for (u=0 ; u<w+AMP2*2 ; u++)
@@ -99,14 +101,42 @@ void D_WarpScreen (void)
 D_DrawTurbulent8Span
 =============
 */
-void D_DrawTurbulent8Span (void)
+void D_DrawTurbulent8Span (espan_t *pspan)
 {
 	int		sturb, tturb;
+	//  float ditht, diths;
 
 	do
 	{
-		sturb = ((r_turb_s + r_turb_turb[(r_turb_t>>16)&(CYCLE-1)])>>16)&63;
-		tturb = ((r_turb_t + r_turb_turb[(r_turb_s>>16)&(CYCLE-1)])>>16)&63;
+		if (sw_texturesmooth->value /*> 1*/)
+		{
+/*#if 0
+			diths = ((float)r_turb_s + (float)r_turb_turb[(r_turb_t>>16)&(CYCLE-1)]) / 65536;
+			ditht = ((float)r_turb_t + (float)r_turb_turb[(r_turb_s>>16)&(CYCLE-1)]) / 65536;
+#else
+			diths = ((float)r_turb_s + (float)r_turb_turb[(r_turb_t>>16)&(CYCLE-1)]) * .00001526;
+			ditht = ((float)r_turb_t + (float)r_turb_turb[(r_turb_s>>16)&(CYCLE-1)]) * .00001526;
+
+#endif
+			DitherKernel(&diths, &ditht, pspan->u + r_turb_spancount, pspan->v);
+
+			tturb = (int)ditht&63;
+			sturb = (int)diths&63;*/
+
+			sturb = r_turb_s + r_turb_turb[(r_turb_t>>16)&(CYCLE-1)];
+			tturb = r_turb_t + r_turb_turb[(r_turb_s>>16)&(CYCLE-1)];
+			
+			DitherKernel2(sturb, tturb, pspan->u + r_turb_spancount, pspan->v);
+		
+			tturb = (tturb>>16)&63;
+			sturb = (sturb>>16)&63;
+		}
+		else
+		{
+			sturb = ((r_turb_s + r_turb_turb[(r_turb_t>>16)&(CYCLE-1)])>>16)&63;
+			tturb = ((r_turb_t + r_turb_turb[(r_turb_s>>16)&(CYCLE-1)])>>16)&63;
+		}
+		
 		*r_turb_pdest++ = *(r_turb_pbase + (tturb<<6) + sturb);
 		r_turb_s += r_turb_sstep;
 		r_turb_t += r_turb_tstep;
@@ -238,7 +268,7 @@ void Turbulent8 (espan_t *pspan)
 			r_turb_s = r_turb_s & ((CYCLE<<16)-1);
 			r_turb_t = r_turb_t & ((CYCLE<<16)-1);
 
-			D_DrawTurbulent8Span ();
+			D_DrawTurbulent8Span (pspan);
 
 			r_turb_s = snext;
 			r_turb_t = tnext;
@@ -374,7 +404,7 @@ void NonTurbulent8 (espan_t *pspan)
 			r_turb_s = r_turb_s & ((CYCLE<<16)-1);
 			r_turb_t = r_turb_t & ((CYCLE<<16)-1);
 
-			D_DrawTurbulent8Span ();
+			D_DrawTurbulent8Span (pspan);
 
 			r_turb_s = snext;
 			r_turb_t = tnext;
@@ -403,6 +433,10 @@ void D_DrawSpans16 (espan_t *pspan)
 	fixed16_t		s, t, snext, tnext, sstep, tstep;
 	float			sdivz, tdivz, zi, z, du, dv, spancountminus1;
 	float			sdivz8stepu, tdivz8stepu, zi8stepu;
+	/*int temp1, temp2;
+	float diths, ditht;*/
+	fixed16_t idiths, iditht;
+	/*int X, Y;*/
 
 	sstep = 0;	// keep compiler happy
 	tstep = 0;	// ditto
@@ -452,6 +486,7 @@ void D_DrawSpans16 (espan_t *pspan)
 			count -= spancount;
 
 			if (count)
+			//if (1)
 			{
 			// calculate s/z, t/z, zi->fixed s and t at far end of span,
 			// calculate s and t steps across span by shifting
@@ -511,7 +546,44 @@ void D_DrawSpans16 (espan_t *pspan)
 
 			do
 			{
-				*pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth);
+				if (sw_texturesmooth->value)
+				{
+/*#if 1
+					diths = (float) s / 65536;
+					ditht = (float) t / 65536;
+#else
+					diths = (float) s * .00001526;
+					ditht = (float) t * .00001526;
+#endif
+
+					DitherKernel(&diths, &ditht, pspan->u + spancount, pspan->v);
+
+					*pdest++ = *(pbase + (int)(diths - 1) + (int)(ditht - 1) * cachewidth);*/
+
+					idiths = s;
+					iditht = t;
+
+					DitherKernel2(idiths, iditht, pspan->u + spancount, pspan->v);
+
+					/*X = (pspan->u + spancount) & 1;
+					Y = (pspan->v)&1;
+
+					idiths += kernel[X][Y][0];
+					iditht += kernel[X][Y][1];*/
+
+					idiths = idiths >> 16;
+					idiths = idiths ? idiths - 1 : idiths;
+
+					iditht = iditht >> 16;
+					iditht = iditht ? iditht - 1 : iditht;
+
+					*pdest++ = *(pbase + idiths + iditht * cachewidth);
+				}
+				else
+				{				
+					*pdest++ = *(pbase + (s >> 16) + (t >> 16) * cachewidth);
+				}
+				
 				s += sstep;
 				t += tstep;
 			} while (--spancount > 0);

@@ -25,6 +25,7 @@ viddef_t	vid;
 refimport_t	ri;
 
 unsigned	d_8to24table[256];
+unsigned	d_8to24tabble[256];
 
 entity_t	r_worldentity;
 
@@ -38,7 +39,11 @@ model_t		*currentmodel;
 
 model_t		*r_worldmodel;
 
-byte		r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+//qb:       knightmare 3.24 plus tnq2 colored light and bszili AROS q2
+//byte		r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+byte		*r_warpbuffer;
+int			r_warpwidth;
+int			r_warpheight;
 
 swstate_t sw_state;
 
@@ -110,7 +115,7 @@ void R_MarkLeaves (void);
 
 cvar_t	*r_lefthand;
 cvar_t	*sw_aliasstats;
-cvar_t	*sw_allow_modex;
+//cvar_t	*sw_allow_modex;
 cvar_t	*sw_clearcolor;
 cvar_t	*sw_drawflat;
 cvar_t	*sw_draworder;
@@ -122,6 +127,7 @@ cvar_t	*sw_reportsurfout;
 cvar_t  *sw_stipplealpha;
 cvar_t	*sw_surfcacheoverride;
 cvar_t	*sw_waterwarp;
+cvar_t  *sw_texturesmooth; // texture dither
 
 cvar_t	*r_drawworld;
 cvar_t	*r_drawentities;
@@ -139,6 +145,12 @@ cvar_t	*vid_gamma;
 //PGM
 cvar_t	*sw_lockpvs;
 //PGM
+
+cvar_t  *r_customwidth;
+cvar_t  *r_customheight;
+
+cvar_t	*r_coloredlights; // leilei
+int		coloredlights;		// leilei
 
 #define	STRINGER(x) "x"
 
@@ -232,7 +244,7 @@ void R_InitTurb (void)
 {
 	int		i;
 	
-	for (i=0 ; i<1280 ; i++)
+	for (i=0 ; i<4200 ; i++) //qb: 4k screens
 	{
 		sintable[i] = AMP + sin(i*3.14159*2/CYCLE)*AMP;
 		intsintable[i] = AMP2 + sin(i*3.14159*2/CYCLE)*AMP2;	// AMP2, not 20
@@ -245,7 +257,7 @@ void R_ImageList_f( void );
 void R_Register (void)
 {
 	sw_aliasstats = ri.Cvar_Get ("sw_polymodelstats", "0", 0);
-	sw_allow_modex = ri.Cvar_Get( "sw_allow_modex", "1", CVAR_ARCHIVE );
+	//sw_allow_modex = ri.Cvar_Get( "sw_allow_modex", "1", CVAR_ARCHIVE );
 	sw_clearcolor = ri.Cvar_Get ("sw_clearcolor", "2", 0);
 	sw_drawflat = ri.Cvar_Get ("sw_drawflat", "0", 0);
 	sw_draworder = ri.Cvar_Get ("sw_draworder", "0", 0);
@@ -258,8 +270,9 @@ void R_Register (void)
 	sw_stipplealpha = ri.Cvar_Get( "sw_stipplealpha", "0", CVAR_ARCHIVE );
 	sw_surfcacheoverride = ri.Cvar_Get ("sw_surfcacheoverride", "0", 0);
 	sw_waterwarp = ri.Cvar_Get ("sw_waterwarp", "1", 0);
-	sw_mode = ri.Cvar_Get( "sw_mode", "0", CVAR_ARCHIVE );
-
+	sw_mode = ri.Cvar_Get( "sw_mode", "4", CVAR_ARCHIVE );
+	sw_texturesmooth = ri.Cvar_Get( "sw_texturesmooth", "1", CVAR_ARCHIVE );
+	
 	r_lefthand = ri.Cvar_Get( "hand", "0", CVAR_USERINFO | CVAR_ARCHIVE );
 	r_speeds = ri.Cvar_Get ("r_speeds", "0", 0);
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", 0);
@@ -283,6 +296,14 @@ void R_Register (void)
 //PGM
 	sw_lockpvs = ri.Cvar_Get ("sw_lockpvs", "0", 0);
 //PGM
+
+	r_customwidth = ri.Cvar_Get( "r_customwidth",  "1024", CVAR_ARCHIVE );
+	r_customheight = ri.Cvar_Get( "r_customheight", "768", CVAR_ARCHIVE );
+	// leilei - colored lights
+
+	r_coloredlights = ri.Cvar_Get("r_coloredlights", "2", CVAR_ARCHIVE);
+
+	// o^_^o
 }
 
 void R_UnRegister (void)
@@ -297,7 +318,7 @@ void R_UnRegister (void)
 R_Init
 ===============
 */
-qboolean R_Init( void *hInstance, void *wndProc )
+int R_Init( void *hInstance, void *wndProc )
 {
 	R_InitImages ();
 	Mod_Init ();
@@ -327,7 +348,9 @@ qboolean R_Init( void *hInstance, void *wndProc )
 
 	R_Register ();
 	Draw_GetPalette ();
-	SWimp_Init( hInstance, wndProc );
+	Draw_InitRGBMap();		// leilei - colored lights	
+	if (SWimp_Init( hInstance, wndProc ) == false)
+		return -1;
 
 	// create the window
 	R_BeginFrame( 0 );
@@ -358,6 +381,12 @@ void R_Shutdown (void)
 		sc_base = NULL;
 	}
 
+	if ( r_warpbuffer )
+	{
+		free(r_warpbuffer);
+		r_warpbuffer = NULL;
+	}
+	
 	// free colormap
 	if (vid.colormap)
 	{
@@ -964,6 +993,13 @@ void R_CalcPalette (void)
 //	SWimp_SetPalette( palette[0] );
 }
 
+/*
+		// 3dfx gamma mock
+
+		r = pow(r, 1.0 / 1.3);
+		g = pow(g, 1.0 / 1.3);
+		b = pow(b, 1.0 / 1.3);
+		*/
 //=======================================================================
 
 void R_SetLightLevel (void)
@@ -1032,7 +1068,8 @@ void R_RenderFrame (refdef_t *fd)
 
 	R_SetLightLevel ();
 
-	if (r_dowarp)
+//	if (r_dowarp)
+	if (r_dowarp && r_warpbuffer)
 		D_WarpScreen ();
 
 	if (r_dspeeds->value)
@@ -1045,7 +1082,7 @@ void R_RenderFrame (refdef_t *fd)
 
 	if (sw_aliasstats->value)
 		R_PrintAliasStats ();
-		
+
 	if (r_speeds->value)
 		R_PrintTimes ();
 
@@ -1081,6 +1118,42 @@ void R_InitGraphics( int width, int height )
 		free( sc_base );
 		sc_base = NULL;
 	}
+	
+	r_warpwidth = vid.width;
+	r_warpheight = vid.height;
+
+	// screen warping resolutions wider than 1280 pixels cause major slowdown
+	//qb: ...OK, if not AROS/MorphOS? if ( r_warpwidth < 1440) 
+	//{
+		// speed up screen warping 1280 pixel wide resolutions 
+		if (r_warpwidth >= 1280)
+		{
+			r_warpwidth >>= 1;
+			r_warpheight >>= 1;
+		}
+		
+		//ri.Con_Printf(PRINT_ALL,"Warping resolution: %d %d\n", r_warpwidth, r_warpheight);
+		
+		if ( r_warpbuffer )
+		{
+			//ri.Con_Printf(PRINT_ALL, "***realloc\n");
+			//r_warpbuffer = realloc(r_warpbuffer, vid.width*vid.height);
+			r_warpbuffer = realloc(r_warpbuffer, r_warpwidth * r_warpheight);
+		}
+		else
+		{
+			//ri.Con_Printf(PRINT_ALL, "***malloc\n");	
+			r_warpbuffer = malloc(r_warpwidth * r_warpheight);
+		}
+	/* qb:  let it roll  }
+	else
+	{
+		if (r_warpbuffer)
+		{
+			free(r_warpbuffer);
+		}
+		r_warpbuffer = NULL;
+	}  */
 
 	d_pzbuffer = malloc(vid.width*vid.height*2);
 
@@ -1089,13 +1162,18 @@ void R_InitGraphics( int width, int height )
 	R_GammaCorrectAndSetPalette( ( const unsigned char *) d_8to24table );
 }
 
+#ifdef REDBLUE
+void SetStereoBuffer(int buf);
+#endif
 /*
 ** R_BeginFrame
 */
 void R_BeginFrame( float camera_separation )
 {
 	extern void Draw_BuildGammaTable( void );
-
+#ifdef REDBLUE
+	SetStereoBuffer((camera_separation <= 0.0) ? 0 : 1);
+#endif
 	/*
 	** rebuild the gamma correction palette if necessary
 	*/
@@ -1111,6 +1189,11 @@ void R_BeginFrame( float camera_separation )
 	{
 		rserr_t err;
 
+		/* a bit hackish approach to enable custom resolutions:
+		* SWimp_SetMode needs these values set for mode -1 */
+		vid.width = r_customwidth->value;
+		vid.height = r_customheight->value;		
+		
 		/*
 		** if this returns rserr_invalid_fullscreen then it set the mode but not as a
 		** fullscreen mode, e.g. 320x200 on a system that doesn't support that res
@@ -1119,7 +1202,15 @@ void R_BeginFrame( float camera_separation )
 		{
 			R_InitGraphics( vid.width, vid.height );
 
-			sw_state.prev_mode = sw_mode->value;
+			if ( sw_mode->value == -1 )
+			{
+				sw_state.prev_mode = 4; /* safe default for custom mode */
+			}
+			else
+			{
+				sw_state.prev_mode = sw_mode->value;
+			}			
+		
 			vid_fullscreen->modified = false;
 			sw_mode->modified = false;
 		}
@@ -1214,7 +1305,7 @@ void Draw_BuildGammaTable (void)
 	float	g;
 
 	g = vid_gamma->value;
-
+	
 	if (g == 1.0)
 	{
 		for (i=0 ; i<256 ; i++)
@@ -1346,13 +1437,14 @@ void Draw_GetPalette (void)
 
 struct image_s *R_RegisterSkin (char *name);
 
+
 /*
 @@@@@@@@@@@@@@@@@@@@@
 GetRefAPI
 
 @@@@@@@@@@@@@@@@@@@@@
 */
-refexport_t GetRefAPI (refimport_t rimp)
+refexport_t GetRefAPI(refimport_t rimp)
 {
 	refexport_t	re;
 
@@ -1361,12 +1453,11 @@ refexport_t GetRefAPI (refimport_t rimp)
 	re.api_version = API_VERSION;
 
 	re.BeginRegistration = R_BeginRegistration;
-    re.RegisterModel = R_RegisterModel;
-    re.RegisterSkin = R_RegisterSkin;
+	re.RegisterModel = R_RegisterModel;
+	re.RegisterSkin = R_RegisterSkin;
 	re.RegisterPic = Draw_FindPic;
 	re.SetSky = R_SetSky;
 	re.EndRegistration = R_EndRegistration;
-
 	re.RenderFrame = R_RenderFrame;
 
 	re.DrawGetPicSize = Draw_GetPicSize;
@@ -1375,7 +1466,7 @@ refexport_t GetRefAPI (refimport_t rimp)
 	re.DrawChar = Draw_Char;
 	re.DrawTileClear = Draw_TileClear;
 	re.DrawFill = Draw_Fill;
-	re.DrawFadeScreen= Draw_FadeScreen;
+	re.DrawFadeScreen = Draw_FadeScreen;
 
 	re.DrawStretchRaw = Draw_StretchRaw;
 
@@ -1388,35 +1479,37 @@ refexport_t GetRefAPI (refimport_t rimp)
 
 	re.AppActivate = SWimp_AppActivate;
 
-	Swap_Init ();
+	Swap_Init();
 
 	return re;
 }
 
 #ifndef REF_HARD_LINKED
 // this is only here so the functions in q_shared.c and q_shwin.c can link
-void Sys_Error (char *error, ...)
+void Sys_Error(char *error, ...)
 {
 	va_list		argptr;
 	char		text[1024];
 
-	va_start (argptr, error);
-	vsprintf (text, error, argptr);
-	va_end (argptr);
+	va_start(argptr, error);
+	//	vsprintf (text, error, argptr);
+	Q_vsnprintf(text, sizeof(text), error, argptr);
+	va_end(argptr);
 
-	ri.Sys_Error (ERR_FATAL, "%s", text);
+	ri.Sys_Error(ERR_FATAL, "%s", text);
 }
 
-void Com_Printf (char *fmt, ...)
+void Com_Printf(char *fmt, ...)
 {
 	va_list		argptr;
 	char		text[1024];
 
-	va_start (argptr, fmt);
-	vsprintf (text, fmt, argptr);
-	va_end (argptr);
+	va_start(argptr, fmt);
+	//	vsprintf (text, fmt, argptr);
+	Q_vsnprintf(text, sizeof(text), fmt, argptr);
+	va_end(argptr);
 
-	ri.Con_Printf (PRINT_ALL, "%s", text);
+	ri.Con_Printf(PRINT_ALL, "%s", text);
 }
 
 #endif

@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include <assert.h>
 #include "r_local.h"
+#include "r_dither.h"
 
 #define AFFINE_SPANLET_SIZE      16
 #define AFFINE_SPANLET_SIZE_BITS 4
@@ -51,7 +52,7 @@ vec5_t	r_clip_verts[2][MAXWORKINGVERTS+2];
 
 static int		s_minindex, s_maxindex;
 
-static void R_DrawPoly( qboolean iswater );
+static void R_DrawPoly( int iswater );
 
 /*
 ** R_DrawSpanletOpaque
@@ -64,8 +65,21 @@ void R_DrawSpanletOpaque( void )
 	{
 		unsigned ts, tt;
 
-		ts = s_spanletvars.s >> 16;
-		tt = s_spanletvars.t >> 16;
+		if (sw_texturesmooth->value)
+		{
+			ts = s_spanletvars.s;
+			tt = s_spanletvars.t;
+			
+			DitherKernel2(ts, tt, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+			ts = (ts>>16);
+			tt = (tt>>16);
+		}
+		else
+		{
+			ts = s_spanletvars.s >> 16;
+			tt = s_spanletvars.t >> 16;
+		}
 
 		btemp = *(s_spanletvars.pbase + (ts) + (tt) * cachewidth);
 		if (btemp != 255)
@@ -122,8 +136,21 @@ void R_DrawSpanletTurbulentStipple33( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			if (sw_texturesmooth->value)
+			{
+				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
+				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
+			
+				DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+				tturb = (tturb>>16)&63;
+				sturb = (sturb>>16)&63;
+			}
+			else
+			{
+				sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+				tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			}
 			
 			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 			
@@ -152,7 +179,7 @@ void R_DrawSpanletTurbulentStipple66( void )
 	byte    *pdest = s_spanletvars.pdest;
 	short   *pz    = s_spanletvars.pz;
 	int      izi   = s_spanletvars.izi;
-	
+
 	if ( !( s_spanletvars.v & 1 ) )
 	{
 		s_spanletvars.pdest += s_spanletvars.spancount;
@@ -179,8 +206,21 @@ void R_DrawSpanletTurbulentStipple66( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			if (sw_texturesmooth->value)
+			{
+				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
+				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
+			
+				DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+				tturb = (tturb>>16)&63;
+				sturb = (sturb>>16)&63;
+			}
+			else
+			{
+				sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+				tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			}
 			
 			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 			
@@ -209,8 +249,21 @@ void R_DrawSpanletTurbulentStipple66( void )
 		
 		while ( s_spanletvars.spancount > 0 )
 		{
-			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			if (sw_texturesmooth->value)
+			{
+				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
+				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
+			
+				DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+				tturb = (tturb>>16)&63;
+				sturb = (sturb>>16)&63;
+			}
+			else
+			{
+				sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+				tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+			}
 			
 			btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 			
@@ -239,8 +292,21 @@ void R_DrawSpanletTurbulentBlended66( void )
 
 	do
 	{
-		sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-		tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+		if (sw_texturesmooth->value)
+		{
+			sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
+			tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
+			
+			DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+			tturb = (tturb>>16)&63;
+			sturb = (sturb>>16)&63;
+		}
+		else
+		{
+			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+		}
 
 		btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 
@@ -263,8 +329,21 @@ void R_DrawSpanletTurbulentBlended33( void )
 
 	do
 	{
-		sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
-		tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+		if (sw_texturesmooth->value)
+		{
+			sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
+			tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
+			
+			DitherKernel2(sturb, tturb, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+			tturb = (tturb>>16)&63;
+			sturb = (sturb>>16)&63;
+		}
+		else
+		{
+			sturb = ((s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)])>>16)&63;
+			tturb = ((s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)])>>16)&63;
+		}
 
 		btemp = *( s_spanletvars.pbase + ( sturb ) + ( tturb << 6 ) );
 
@@ -287,12 +366,30 @@ void R_DrawSpanlet33( void )
 {
 	unsigned btemp;
 
+	//printf("R_DrawSpanlet33\n");
+
 	do
 	{
 		unsigned ts, tt;
 
-		ts = s_spanletvars.s >> 16;
-		tt = s_spanletvars.t >> 16;
+		if (sw_texturesmooth->value)
+		{
+			ts = s_spanletvars.s;
+			tt = s_spanletvars.t;
+			
+			DitherKernel2(ts, tt, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+			ts = (ts>>16);
+			//ts = ts ? ts - 1 : ts;
+
+			tt = (tt>>16);
+			//tt = tt ? tt - 1 : tt;
+		}
+		else
+		{
+			ts = s_spanletvars.s >> 16;
+			tt = s_spanletvars.t >> 16;
+		}
 
 		btemp = *(s_spanletvars.pbase + (ts) + (tt) * cachewidth);
 
@@ -338,8 +435,21 @@ void R_DrawSpanlet66( void )
 	{
 		unsigned ts, tt;
 
-		ts = s_spanletvars.s >> 16;
-		tt = s_spanletvars.t >> 16;
+		if (sw_texturesmooth->value)
+		{
+			ts = s_spanletvars.s;
+			tt = s_spanletvars.t;
+			
+			DitherKernel2(ts, tt, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+			ts = (ts>>16);
+			tt = (tt>>16);
+		}
+		else
+		{
+			ts = s_spanletvars.s >> 16;
+			tt = s_spanletvars.t >> 16;
+		}
 
 		btemp = *(s_spanletvars.pbase + (ts) + (tt) * cachewidth);
 
@@ -395,8 +505,25 @@ void R_DrawSpanlet33Stipple( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			unsigned s = s_spanletvars.s >> 16;
-			unsigned t = s_spanletvars.t >> 16;
+			unsigned s, t;
+			if (sw_texturesmooth->value)
+			{
+				s = s_spanletvars.s;
+				t = s_spanletvars.t;
+			
+				DitherKernel2(s, t, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+
+				s = (s>>16);
+				t = (t>>16);
+				/*s = s ? s - 1 : s;
+				t = t ? t - 1 : t;*/
+
+			}
+			else
+			{
+				s = s_spanletvars.s >> 16;
+				t = s_spanletvars.t >> 16;
+			}
 
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 			
@@ -454,8 +581,22 @@ void R_DrawSpanlet66Stipple( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			unsigned s = s_spanletvars.s >> 16;
-			unsigned t = s_spanletvars.t >> 16;
+			unsigned s, t;
+			if (sw_texturesmooth->value)
+			{
+				s = s_spanletvars.s;
+				t = s_spanletvars.t;
+			
+				DitherKernel2(s, t, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+				s = (s>>16);
+				t = (t>>16);
+			}
+			else
+			{
+				s = s_spanletvars.s >> 16;
+				t = s_spanletvars.t >> 16;
+			}
 			
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 
@@ -479,8 +620,22 @@ void R_DrawSpanlet66Stipple( void )
 	{
 		while ( s_spanletvars.spancount > 0 )
 		{
-			unsigned s = s_spanletvars.s >> 16;
-			unsigned t = s_spanletvars.t >> 16;
+			unsigned s, t;
+			if (sw_texturesmooth->value)
+			{
+				s = s_spanletvars.s;
+				t = s_spanletvars.t;
+			
+				DitherKernel2(s, t, s_spanletvars.u + s_spanletvars.spancount, s_spanletvars.v);
+		
+				s = (s>>16);
+				t = (t>>16);
+			}
+			else
+			{
+				s = s_spanletvars.s >> 16;
+				t = s_spanletvars.t >> 16;
+			}
 			
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 			
@@ -583,7 +738,8 @@ int R_ClipPolyFace (int nump, clipplane_t *pclipplane)
 /*
 ** R_PolygonDrawSpans
 */
-void R_PolygonDrawSpans(espan_t *pspan, qboolean iswater )
+// PGM - iswater was qboolean. changed to allow passing more flags
+void R_PolygonDrawSpans(espan_t *pspan, int iswater )
 {
 	int			count;
 	fixed16_t	snext, tnext;
@@ -592,8 +748,12 @@ void R_PolygonDrawSpans(espan_t *pspan, qboolean iswater )
 
 	s_spanletvars.pbase = cacheblock;
 
-	if ( iswater )
+//PGM
+	if ( iswater & SURF_WARP)
 		r_turb_turb = sintable + ((int)(r_newrefdef.time*SPEED)&(CYCLE-1));
+	else if (iswater & SURF_FLOWING)
+		r_turb_turb = blanktable;
+//PGM
 
 	sdivzspanletstepu = d_sdivzstepu * AFFINE_SPANLET_SIZE;
 	tdivzspanletstepu = d_tdivzstepu * AFFINE_SPANLET_SIZE;
@@ -889,7 +1049,8 @@ void R_PolygonScanRightEdge (void)
 /*
 ** R_ClipAndDrawPoly
 */
-void R_ClipAndDrawPoly( float alpha, qboolean isturbulent, qboolean textured )
+// PGM - isturbulent was qboolean. changed to int to allow passing more flags
+void R_ClipAndDrawPoly ( float alpha, int isturbulent, qboolean textured )
 {
 	emitpoint_t	outverts[MAXWORKINGVERTS+3], *pout;
 	float		*pv;
@@ -1047,12 +1208,14 @@ void R_BuildPolygonFromSurface(msurface_t *fa)
 		VectorSubtract( vec3_origin, r_polydesc.vpn, r_polydesc.vpn );
 	}
 
-	if ( fa->texinfo->flags & SURF_WARP )
+// PGM 09/16/98
+	if ( fa->texinfo->flags & (SURF_WARP|SURF_FLOWING) )
 	{
 		r_polydesc.pixels       = fa->texinfo->image->pixels[0];
 		r_polydesc.pixel_width  = fa->texinfo->image->width;
 		r_polydesc.pixel_height = fa->texinfo->image->height;
 	}
+// PGM 09/16/98
 	else
 	{
 		surfcache_t *scache;
@@ -1123,7 +1286,8 @@ void R_PolygonCalculateGradients (void)
 **
 ** This should NOT be called externally since it doesn't do clipping!
 */
-static void R_DrawPoly( qboolean iswater )
+// PGM - iswater was qboolean. changed to support passing more flags
+static void R_DrawPoly( int iswater )
 {
 	int			i, nump;
 	float		ymin, ymax;
@@ -1194,10 +1358,20 @@ void R_DrawAlphaSurfaces( void )
 	{
 		R_BuildPolygonFromSurface( s );
 
+//=======
+//PGM
+//		if (s->texinfo->flags & SURF_TRANS66)
+//			R_ClipAndDrawPoly( 0.60f, ( s->texinfo->flags & SURF_WARP) != 0, true );
+//		else
+//			R_ClipAndDrawPoly( 0.30f, ( s->texinfo->flags & SURF_WARP) != 0, true );
+
+		// PGM - pass down all the texinfo flags, not just SURF_WARP.
 		if (s->texinfo->flags & SURF_TRANS66)
-			R_ClipAndDrawPoly( 0.60f, ( s->texinfo->flags & SURF_WARP) != 0, true );
+			R_ClipAndDrawPoly( 0.60f, (s->texinfo->flags & (SURF_WARP|SURF_FLOWING)), true );
 		else
-			R_ClipAndDrawPoly( 0.30f, ( s->texinfo->flags & SURF_WARP) != 0, true );
+			R_ClipAndDrawPoly( 0.30f, (s->texinfo->flags & (SURF_WARP|SURF_FLOWING)), true );
+//PGM
+//=======
 
 		s = s->nextalphasurface;
 	}

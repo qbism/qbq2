@@ -1,0 +1,2728 @@
+EXPORTS
+    ACEAI_CheckShot @1
+    ACEAI_ChooseWeapon @2
+    ACEAI_FindEnemy @3
+    ACEAI_PickLongRangeGoal @4
+    ACEAI_PickShortRangeGoal @5
+    ACEAI_Think @6
+    ACECM_Commands @7
+    ACECM_Store @8
+    ACEIT_BuildItemNodeTable @9
+    ACEIT_CanUseArmor @10
+    ACEIT_ChangeWeapon @11
+    ACEIT_ClassnameToIndex @12
+    ACEIT_IsReachable @13
+    ACEIT_IsVisible @14
+    ACEIT_ItemNeed @15
+    ACEIT_PlayerAdded @16
+    ACEIT_PlayerRemoved @17
+    ACEMV_Attack @18
+    ACEMV_CanMove @19
+    ACEMV_ChangeBotAngle @20
+    ACEMV_CheckEyes @21
+    ACEMV_Move @22
+    ACEMV_MoveToGoal @23
+    ACEMV_SpecialMove @24
+    ACEMV_Wander @25
+    ACEND_AddNode @26
+    ACEND_CheckForLadder @27
+    ACEND_DrawPath @28
+    ACEND_FindCloseReachableNode @29
+    ACEND_FindClosestReachableNode @30
+    ACEND_FindCost @31
+    ACEND_FollowPath @32
+    ACEND_GrapFired @33
+    ACEND_InitNodes @34
+    ACEND_LoadNodes @35
+    ACEND_PathMap @36
+    ACEND_RemoveNodeEdge @37
+    ACEND_ResolveAllPaths @38
+    ACEND_SaveNodes @39
+    ACEND_SetGoal @40
+    ACEND_ShowNode @41
+    ACEND_ShowPath @42
+    ACEND_UpdateNodeEdge @43
+    ACESP_FindFreeClient @44
+    ACESP_HoldSpawn @45
+    ACESP_LoadBotInfo @46
+    ACESP_PutClientInServer @47
+    ACESP_RemoveBot @48
+    ACESP_Respawn @49
+    ACESP_SetName @50
+    ACESP_SpawnBot @51
+    AI_SetSightClient @52
+    ActorNames @53 DATA
+    ActorTarget @54
+    AddPointToBounds @55
+    AddReflection @56
+    Add_Ammo @57
+    AimGrenade @58
+    AngleMove_Begin @59
+    AngleMove_Calc @60
+    AngleMove_Done @61
+    AngleMove_Final @62
+    AngleVectors @63
+    AnglesNormalize @64
+    AnglesToAxis @65
+    Apply_Tech_Shell @66
+    ArmorIndex @67
+    AtLeast @68
+    AttackFinished @69
+    AxisClear @70
+    AxisCompare @71
+    AxisCopy @72
+    BecomeExplosion1 @73
+    BecomeExplosion2 @74
+    BecomeExplosion3 @75
+    BeginIntermission @76
+    BigFloat @77
+    BigLong @78
+    BigShort @79
+    Blaster_Fire @80
+    BloodType @81
+    Boss2MachineGun @82
+    Boss2Rocket @83
+    Boss2_CheckAttack @84
+    BossExplode @85
+    BoxOnPlaneSide @86
+    BoxOnPlaneSide2 @87
+    COM_DefaultExtension @88
+    COM_FileBase @89
+    COM_FileExtension @90
+    COM_FilePath @91
+    COM_Parse @92
+    COM_ParseExt @93
+    COM_SkipBracedSection @94
+    COM_SkipPath @95
+    COM_SkipRestOfLine @96
+    COM_SkipWhiteSpace @97
+    COM_StripExtension @98
+    CTFAdmin @99
+    CTFAdmin_Cancel @100
+    CTFAdmin_ChangeInstantItems @101
+    CTFAdmin_ChangeInstantWeap @102
+    CTFAdmin_ChangeMatchLen @103
+    CTFAdmin_ChangeMatchLock @104
+    CTFAdmin_ChangeMatchSetupLen @105
+    CTFAdmin_ChangeMatchStartLen @106
+    CTFAdmin_ChangeQuadDrop @107
+    CTFAdmin_ChangeWeapStay @108
+    CTFAdmin_MatchMode @109
+    CTFAdmin_MatchSet @110
+    CTFAdmin_Reset @111
+    CTFAdmin_Settings @112
+    CTFAdmin_SettingsApply @113
+    CTFAdmin_SettingsCancel @114
+    CTFAdmin_UpdateSettings @115
+    CTFApplyAmmogen @116
+    CTFApplyAmmogenSound @117
+    CTFApplyHaste @118
+    CTFApplyHasteSound @119
+    CTFApplyRegeneration @120
+    CTFApplyResistance @121
+    CTFApplyStrength @122
+    CTFApplyStrengthSound @123
+    CTFApplyVampire @124
+    CTFApplyVampireSound @125
+    CTFAssignGhost @126
+    CTFAssignSkin @127
+    CTFAssignTeam @128
+    CTFBeginElection @129
+    CTFBoot @130
+    CTFCalcScores @131
+    CTFChaseCam @132
+    CTFCheckHurtCarrier @133
+    CTFCheckRules @134
+    CTFCredits @135
+    CTFDeadDropFlag @136
+    CTFDeadDropTech @137
+    CTFDrop_Flag @138
+    CTFDrop_Tech @139
+    CTFEffects @140
+    CTFEndMatch @141
+    CTFFireGrapple @142
+    CTFFlagSetup @143
+    CTFFlagTeam @144
+    CTFFragBonuses @145
+    CTFGhost @146
+    CTFGrappleDrawCable @147
+    CTFGrappleFire @148
+    CTFGrapplePull @149
+    CTFGrappleTouch @150
+    CTFHasRegeneration @151
+    CTFHasTech @152
+    CTFID_f @153
+    CTFInMatch @154
+    CTFInit @155
+    CTFJoinTeam @156
+    CTFJoinTeam1 @157
+    CTFJoinTeam2 @158
+    CTFJoinTeam3 @159
+    CTFMatchOn @160
+    CTFMatchSetup @161
+    CTFNextMap @162
+    CTFNotReady @163
+    CTFObserver @164
+    CTFOpenAdminMenu @165
+    CTFOpenJoinMenu @166
+    CTFOtherTeam @167
+    CTFOtherTeam2 @168
+    CTFOtherTeamName @169
+    CTFOtherTeamName2 @170
+    CTFPickup_Flag @171
+    CTFPickup_Tech @172
+    CTFPlayerList @173
+    CTFPlayerResetGrapple @174
+    CTFPrecache @175
+    CTFReady @176
+    CTFRequestMatch @177
+    CTFResetAllPlayers @178
+    CTFResetFlag @179
+    CTFResetFlags @180
+    CTFResetGrapple @181
+    CTFResetTech @182
+    CTFRespawnTech @183
+    CTFReturnToMain @184
+    CTFSay_Team @185
+    CTFScoreboardMessage @186
+    CTFSetPowerUpEffect @187
+    CTFSetupTechSpawn @188
+    CTFShowScores @189
+    CTFSpawn @190
+    CTFStartClient @191
+    CTFStartMatch @192
+    CTFStats @193
+    CTFTeamName @194
+    CTFTeam_f @195
+    CTFTechTouch @196
+    CTFUpdateJoinMenu @197
+    CTFVoteNo @198
+    CTFVoteYes @199
+    CTFWarp @200
+    CTFWeapon_Grapple @201
+    CTFWeapon_Grapple_Fire @202
+    CTFWhat_Flag @203
+    CTFWhat_Tech @204
+    CTFWinElection @205
+    Cable_Think @206
+    CallMyFriends @207
+    CanDamage @208
+    Cargo_Float_Up @209
+    Cargo_Stop @210
+    Chaingun_Fire @211
+    ChangeWeapon @212
+    ChaseNext @213
+    ChasePrev @214
+    ChasecamRemove @215
+    ChasecamRestart @216
+    ChasecamStart @217
+    ChasecamTrack @218
+    CheckBlock @219
+    CheckChasecam_Viewent @220
+    CheckDMRules @221
+    CheckFlood @222
+    CheckNeedPass @223
+    CheckNumTechs @224
+    CheckTeamDamage @225
+    ChickMoan @226
+    ChickReload @227
+    ChickRocket @228
+    ChickSlash @229
+    Chick_PreAttack1 @230
+    ClearBounds @231
+    ClientBegin @232
+    ClientBeginDeathmatch @233
+    ClientBeginServerFrame @234
+    ClientCommand @235
+    ClientConnect @236
+    ClientDisconnect @237
+    ClientEndServerFrame @238
+    ClientEndServerFrames @239
+    ClientObituary @240
+    ClientPushPushable @241
+    ClientSpycam @242
+    ClientTeam @243
+    ClientThink @244
+    ClientUserinfoChanged @245
+    ClipGibVelocity @246
+    ClipVelocity @247
+    Cmd_Bbox_f @248
+    Cmd_Chasecam_Toggle @249
+    Cmd_Drop_f @250
+    Cmd_Fog_f @251
+    Cmd_Give_f @252
+    Cmd_God_f @253
+    Cmd_Help_f @254
+    Cmd_InvDrop_f @255
+    Cmd_InvUse_f @256
+    Cmd_Inven_f @257
+    Cmd_Kill_f @258
+    Cmd_Noclip_f @259
+    Cmd_Notarget_f @260
+    Cmd_PlayerList_f @261
+    Cmd_Players_f @262
+    Cmd_PutAway_f @263
+    Cmd_Say_f @264
+    Cmd_Score_f @265
+    Cmd_TechCount_f @266
+    Cmd_ToggleHud @267
+    Cmd_Use_f @268
+    Cmd_Wave_f @269
+    Cmd_WeapLast_f @270
+    Cmd_WeapNext_f @271
+    Cmd_WeapPrev_f @272
+    Com_HashFileName @273
+    Com_PageInMemory @274
+    Com_Printf @275
+    Com_sprintf @276
+    CopyToBodyQue @277
+    Crane_AdjustSpeed @278
+    Crane_Hook_Bonk @279
+    Crane_Move_Begin @280
+    Crane_Move_Done @281
+    Crane_Move_Final @282
+    Crane_Stop @283
+    Crane_blocked @284
+    CrateOnTop @285
+    CreateTargetChangeLevel @286
+    CrossProduct @287
+    DeathmatchScoreboard @288
+    DeathmatchScoreboardMessage @289
+    Debug_Modelindex @290
+    Debug_Soundindex @291
+    Decode @292
+    DefendMyFriend @293
+    DeleteBadMedic @294
+    DeleteNode @295
+    DeleteReflection @296
+    DoNotMove @297 DATA
+    DoRespawn @298
+    Do_Text_Display @299
+    DrawBBox @300
+    Drop_Ammo @301
+    Drop_General @302
+    Drop_Item @303
+    Drop_Jetpack @304
+    Drop_PowerArmor @305
+    Drop_Weapon @306
+    ED_CallSpawn @307
+    ED_NewString @308
+    ED_ParseEdict @309
+    ED_ParseEntityAlias @310
+    ED_ParseField @311
+    Encode @312
+    EndDMLevel @313
+    ExitLevel @314
+    FacingIdeal @315
+    FadeDieSink @316
+    FadeSink @317
+    FetchClientEntData @318
+    FindItem @319
+    FindItemByClassname @320
+    FindTarget @321
+    FloatNoSwap @322
+    FloatSwap @323
+    Fog @324
+    Fog_ConsoleFog @325
+    Fog_Init @326
+    Fog_Off @327
+    ForcewallOff @328
+    FoundTarget @329
+    GLFog @330
+    GLModels @331 DATA
+    GL_glClearColor @332 DATA
+    GL_glDisable @333 DATA
+    GL_glEnable @334 DATA
+    GL_glFogf @335 DATA
+    GL_glFogfv @336 DATA
+    GL_glFogi @337 DATA
+    GL_glHint @338 DATA
+    G_CheckChaseStats @339
+    G_CopyString @340
+    G_Find @341
+    G_FindCraneParts @342
+    G_FindNextCamera @343
+    G_FindPrevCamera @344
+    G_FindTeams @345
+    G_FreeEdict @346
+    G_InitEdict @347
+    G_PickTarget @348
+    G_ProjectSource @349
+    G_ProjectSource2 @350
+    G_RunEntity @351
+    G_RunFrame @352
+    G_SetClientEffects @353
+    G_SetClientEvent @354
+    G_SetClientFrame @355
+    G_SetClientSound @356
+    G_SetMovedir @357
+    G_SetSpectatorStats @358
+    G_SetStats @359
+    G_Spawn @360
+    G_TouchSolids @361
+    G_TouchTriggers @362
+    G_UseTarget @363
+    G_UseTargets @364
+    GaldiatorMelee @365
+    GameDirRelativePath @366
+    GetChaseTarget @367
+    GetGameAPI @368
+    GetItemByIndex @369
+    GladiatorGun @370
+    Grenade_Evade @371
+    GunnerFire @372
+    GunnerGrenade @373
+    HasSpawnFunction @374
+    HelpComputer @375
+    HintTestNext @376
+    HintTestStart @377
+    Hud_Off @378
+    Hud_On @379
+    HuntTarget @380
+    InPak @381
+    InTriggerFog @382 DATA
+    InfantryMachineGun @383
+    Info_RemoveKey @384
+    Info_SetValueForKey @385
+    Info_Validate @386
+    Info_ValueForKey @387
+    InitBodyQue @388
+    InitClientPersistant @389
+    InitClientResp @390
+    InitGame @391
+    InitItems @392
+    InitTree @393
+    InitTrigger @394
+    InitiallyDead @395
+    InsertNode @396
+    InterlockedCompareExchange@12 @397
+    IsFemale @398
+    IsIdMap @399
+    IsNeutral @400
+    Jet_ApplyJet @401
+    Jet_ApplyLifting @402
+    Jet_ApplySparks @403
+    Jet_AvoidGround @404
+    Jet_BecomeExplosion @405
+    Jorg_CheckAttack @406
+    KillBox @407
+    Killed @408
+    LerpAngle @409
+    Lights @410
+    LittleFloat @411
+    LittleLong @412
+    LittleShort @413
+    LoadAliasData @414
+    LoadTransitionEnts @415
+    LongNoSwap @416
+    LongSwap @417
+    LookAhead @418
+    LookAtKiller @419
+    LookingAt @420
+    MOVEDIR_DOWN @421 DATA
+    MOVEDIR_UP @422 DATA
+    M_CatagorizePosition @423
+    M_ChangeYaw @424
+    M_CheckAttack @425
+    M_CheckBottom @426
+    M_CheckGround @427
+    M_FliesOff @428
+    M_FliesOn @429
+    M_FlyCheck @430
+    M_MoveFrame @431
+    M_MoveToGoal @432
+    M_ReactToDamage @433
+    M_SetDeath @434
+    M_SetEffects @435
+    M_WorldEffects @436
+    M_droptofloor @437
+    M_walkmove @438
+    Machinegun_Fire @439
+    MakeNormalVectors @440
+    MakronHyperblaster @441
+    MakronPrecache @442
+    MakronRailgun @443
+    MakronSaveloc @444
+    MakronSpawn @445
+    MakronToss @446
+    Makron_CheckAttack @447
+    MegaHealth_think @448
+    MoveClientToIntermission @449
+    MoveRiders @450
+    Move_Begin @451
+    Move_Calc @452
+    Move_Done @453
+    Move_Final @454
+    Moving_Speaker_Think @455
+    NextPathTrack @456
+    NoAmmoWeaponChange @457
+    NumOfTech @458
+    OnSameTeam @459
+    PM_CmdScale @460
+    PM_trace @461
+    PMenu_Close @462
+    PMenu_Do_Update @463
+    PMenu_Next @464
+    PMenu_Open @465
+    PMenu_Prev @466
+    PMenu_Select @467
+    PMenu_Update @468
+    PMenu_UpdateEntry @469
+    P_DamageFeedback @470
+    P_FallingDamage @471
+    P_ProjectSource @472
+    P_SlamDamage @473
+    P_WorldEffects @474
+    PatchDeadSoldier @475
+    PatchMonsterModel @476
+    PatchPlayerModels @477
+    PerpendicularVector @478
+    Pickup_Adrenaline @479
+    Pickup_Ammo @480
+    Pickup_AmmogenPack @481
+    Pickup_AncientHead @482
+    Pickup_Armor @483
+    Pickup_Bandolier @484
+    Pickup_Health @485
+    Pickup_Key @486
+    Pickup_Pack @487
+    Pickup_PowerArmor @488
+    Pickup_Powerup @489
+    Pickup_Weapon @490
+    PlayerNoise @491
+    PlayerOnFloor @492
+    PlayerSort @493
+    PlayerTrail_Add @494
+    PlayerTrail_Init @495
+    PlayerTrail_LastSpot @496
+    PlayerTrail_New @497
+    PlayerTrail_PickFirst @498
+    PlayerTrail_PickNext @499
+    PlayersOnCTFTeam @500
+    PlayersRangeFromSpot @501
+    PowerArmorType @502
+    PrecacheDebris @503
+    PrecacheItem @504
+    PrintPmove @505
+    ProjectPointOnPlane @506
+    PutClientInServer @507
+    Q_fabs @508
+    Q_log2 @509
+    Q_strcasecmp @510
+    Q_stricmp @511
+    Q_strncasecmp @512
+    R_ConcatRotations @513
+    R_ConcatTransforms @514
+    ReadClient @515
+    ReadEdict @516
+    ReadField @517
+    ReadGame @518
+    ReadLevel @519
+    ReadLevelLocals @520
+    RealBoundingBox @521
+    RealFunc @522 DATA
+    ReflectExplosion @523
+    ReflectSparks @524
+    ReflectSteam @525
+    ReflectTrail @526
+    RemovePush @527
+    RemoveTechs @528
+    RiderMass @529
+    Rocket_Evade @530
+    RotateAngles @531
+    RotatePointAroundVector @532
+    SP_bolt @533
+    SP_crane_beam @534
+    SP_crane_control @535
+    SP_crane_hoist @536
+    SP_crane_hook @537
+    SP_crane_reset @538
+    SP_debris @539
+    SP_func_areaportal @540
+    SP_func_bobbingwater @541
+    SP_func_breakaway @542
+    SP_func_button @543
+    SP_func_clock @544
+    SP_func_conveyor @545
+    SP_func_door @546
+    SP_func_door_rot_dh @547
+    SP_func_door_rotating @548
+    SP_func_door_secret @549
+    SP_func_door_swinging @550
+    SP_func_explosive @551
+    SP_func_force_wall @552
+    SP_func_killbox @553
+    SP_func_monitor @554
+    SP_func_object @555
+    SP_func_pendulum @556
+    SP_func_pivot @557
+    SP_func_plat @558
+    SP_func_pushable @559
+    SP_func_reflect @560
+    SP_func_rotating @561
+    SP_func_rotating_dh @562
+    SP_func_timer @563
+    SP_func_trackchange @564
+    SP_func_tracktrain @565
+    SP_func_train @566
+    SP_func_trainbutton @567
+    SP_func_vehicle @568
+    SP_func_wall @569
+    SP_func_water @570
+    SP_gib @571
+    SP_gibhead @572
+    SP_grenade @573
+    SP_handgrenade @574
+    SP_hint_path @575
+    SP_info_notnull @576
+    SP_info_null @577
+    SP_info_player_coop @578
+    SP_info_player_deathmatch @579
+    SP_info_player_intermission @580
+    SP_info_player_start @581
+    SP_info_player_team1 @582
+    SP_info_player_team2 @583
+    SP_info_player_team3 @584
+    SP_info_teleport_destination @585
+    SP_info_train_start @586
+    SP_item_health @587
+    SP_item_health_large @588
+    SP_item_health_mega @589
+    SP_item_health_small @590
+    SP_light @591
+    SP_light_mine1 @592
+    SP_light_mine2 @593
+    SP_misc_actor @594
+    SP_misc_banner @595
+    SP_misc_bigviper @596
+    SP_misc_blackhole @597
+    SP_misc_ctf_banner @598
+    SP_misc_ctf_small_banner @599
+    SP_misc_deadsoldier @600
+    SP_misc_easterchick @601
+    SP_misc_easterchick2 @602
+    SP_misc_eastertank @603
+    SP_misc_explobox @604
+    SP_misc_gib_arm @605
+    SP_misc_gib_head @606
+    SP_misc_gib_leg @607
+    SP_misc_insane @608
+    SP_misc_light @609
+    SP_misc_satellite_dish @610
+    SP_misc_strogg_ship @611
+    SP_misc_teleporter @612
+    SP_misc_teleporter_dest @613
+    SP_misc_viper @614
+    SP_misc_viper_bomb @615
+    SP_model_spawn @616
+    SP_model_train @617
+    SP_model_turret @618
+    SP_monster_berserk @619
+    SP_monster_boss2 @620
+    SP_monster_boss3_stand @621
+    SP_monster_brain @622
+    SP_monster_chick @623
+    SP_monster_commander_body @624
+    SP_monster_flipper @625
+    SP_monster_floater @626
+    SP_monster_flyer @627
+    SP_monster_gladiator @628
+    SP_monster_gunner @629
+    SP_monster_hover @630
+    SP_monster_infantry @631
+    SP_monster_jorg @632
+    SP_monster_makron @633
+    SP_monster_medic @634
+    SP_monster_mutant @635
+    SP_monster_parasite @636
+    SP_monster_soldier @637
+    SP_monster_soldier_light @638
+    SP_monster_soldier_ss @639
+    SP_monster_soldier_x @640
+    SP_monster_supertank @641
+    SP_monster_tank @642
+    SP_path_corner @643
+    SP_path_track @644
+    SP_point_combat @645
+    SP_rocket @646
+    SP_target_CD @647
+    SP_target_actor @648
+    SP_target_anger @649
+    SP_target_animation @650
+    SP_target_attractor @651
+    SP_target_blaster @652
+    SP_target_change @653
+    SP_target_changelevel @654
+    SP_target_character @655
+    SP_target_clone @656
+    SP_target_command @657
+    SP_target_crosslevel_target @658
+    SP_target_crosslevel_trigger @659
+    SP_target_earthquake @660
+    SP_target_effect @661
+    SP_target_explosion @662
+    SP_target_fade @663
+    SP_target_failure @664
+    SP_target_fog @665
+    SP_target_fountain @666
+    SP_target_goal @667
+    SP_target_help @668
+    SP_target_laser @669
+    SP_target_lightramp @670
+    SP_target_lightswitch @671
+    SP_target_locator @672
+    SP_target_lock @673
+    SP_target_lock_clue @674
+    SP_target_lock_code @675
+    SP_target_lock_digit @676
+    SP_target_monitor @677
+    SP_target_monsterbattle @678
+    SP_target_movewith @679
+    SP_target_precipitation @680
+    SP_target_rocks @681
+    SP_target_rotation @682
+    SP_target_secret @683
+    SP_target_set_effect @684
+    SP_target_skill @685
+    SP_target_sky @686
+    SP_target_spawner @687
+    SP_target_speaker @688
+    SP_target_splash @689
+    SP_target_string @690
+    SP_target_temp_entity @691
+    SP_target_text @692
+    SP_thing @693
+    SP_tremor_trigger_multiple @694
+    SP_trigger_always @695
+    SP_trigger_bbox @696
+    SP_trigger_counter @697
+    SP_trigger_disguise @698
+    SP_trigger_elevator @699
+    SP_trigger_fog @700
+    SP_trigger_fog_bbox @701
+    SP_trigger_gravity @702
+    SP_trigger_hurt @703
+    SP_trigger_inside @704
+    SP_trigger_key @705
+    SP_trigger_look @706
+    SP_trigger_mass @707
+    SP_trigger_monsterjump @708
+    SP_trigger_multiple @709
+    SP_trigger_once @710
+    SP_trigger_push @711
+    SP_trigger_relay @712
+    SP_trigger_scales @713
+    SP_trigger_speaker @714
+    SP_trigger_switch @715
+    SP_trigger_teleport @716
+    SP_trigger_teleporter @717
+    SP_trigger_transition @718
+    SP_turret_base @719
+    SP_turret_breach @720
+    SP_turret_driver @721
+    SP_viewthing @722
+    SP_worldspawn @723
+    SVCmd_AddIP_f @724
+    SVCmd_ListIP_f @725
+    SVCmd_RemoveIP_f @726
+    SVCmd_WriteIP_f @727
+    SV_AddBlend @728
+    SV_AddGravity @729
+    SV_AddRotationalFriction @730
+    SV_CalcBlend @731
+    SV_CalcGunOffset @732
+    SV_CalcRoll @733
+    SV_CalcViewOffset @734
+    SV_CheckVelocity @735
+    SV_CloseEnough @736
+    SV_DebrisEntity @737
+    SV_FilterPacket @738
+    SV_FixCheckBottom @739
+    SV_FlyMove @740
+    SV_Impact @741
+    SV_NewChaseDir @742
+    SV_Physics_Conveyor @743
+    SV_Physics_Debris @744
+    SV_Physics_Noclip @745
+    SV_Physics_None @746
+    SV_Physics_Pusher @747
+    SV_Physics_Step @748
+    SV_Physics_Toss @749
+    SV_Physics_Vehicle @750
+    SV_Push @751
+    SV_PushEntity @752
+    SV_PushableMove @753
+    SV_RunThink @754
+    SV_StepDirection @755
+    SV_TestEntityPosition @756
+    SV_VehicleMove @757
+    SV_movestep @758
+    SaveClientData @759
+    SaveEntProps @760
+    SelectCTFSpawnPoint @761
+    SelectCoopSpawnPoint @762
+    SelectDeathmatchSpawnPoint @763
+    SelectFarthestDeathmatchSpawnPoint @764
+    SelectNextItem @765
+    SelectPrevItem @766
+    SelectRandomDeathmatchSpawnPoint @767
+    SelectSpawnPoint @768
+    SelectStartWeapon @769
+    ServerCommand @770
+    SetAmmoPickupValues @771
+    SetCTFStats @772
+    SetCableLength @773
+    SetItemNames @774
+    SetLazarusCrosshair @775
+    SetRespawn @776
+    SetSensitivities @777
+    SetSpotlightLength @778
+    SetupHintPaths @779
+    ShiftItem @780
+    ShortNoSwap @781
+    ShortSwap @782
+    ShutdownGame @783
+    SnapToEights @784
+    SpawnDamage @785
+    SpawnEntities @786
+    SpawnForcewall @787
+    SpawnItem @788
+    SpawnMoreTechs @789
+    SpawnThing @790
+    Svcmd_Test_f @791
+    Swap_Init @792
+    SwitchToBestStartWeapon @793
+    Sys_Error @794
+    TH_viewthing @795
+    TTCTFOpenJoinMenu @796
+    TTCTFUpdateJoinMenu @797
+    T_Damage @798
+    T_RadiusDamage @799
+    TankBlaster @800
+    TankMachineGun @801
+    TankRocket @802
+    TankStrike @803
+    TechCount @804
+    Text_BuildDisplay @805
+    Text_Close @806
+    Text_Next @807
+    Text_Open @808
+    Text_Prev @809
+    Text_Update @810
+    Think_AccelMove @811
+    Think_Boss3Stand @812
+    Think_CalcMoveSpeed @813
+    Think_Delay @814
+    Think_Delay_Single @815
+    Think_SpawnDoorTrigger @816
+    Think_Weapon @817
+    ThrowClientHead @818
+    ThrowDebris @819
+    ThrowGib @820
+    ThrowHead @821
+    ThrowRock @822
+    ToggleLights @823
+    TossClientWeapon @824
+    Touch_DoorTrigger @825
+    Touch_Item @826
+    Touch_Multi @827
+    Touch_Plat_Center @828
+    TraceAimPoint @829
+    TreadSound @830
+    TurretTarget @831
+    UTIL_AngleDistance @832
+    UTIL_AngleMod @833
+    UTIL_ApproachAngle @834
+    UpdateChaseCam @835
+    Use_Areaportal @836
+    Use_Boss3 @837
+    Use_Breather @838
+    Use_Crane_Control @839
+    Use_Envirosuit @840
+    Use_Flashlight @841
+    Use_Invulnerability @842
+    Use_Item @843
+    Use_Jet @844
+    Use_Multi @845
+    Use_Plat @846
+    Use_PowerArmor @847
+    Use_Quad @848
+    Use_Silencer @849
+    Use_Stasis @850
+    Use_Target_Help @851
+    Use_Target_Speaker @852
+    Use_Target_Tent @853
+    Use_Target_Text @854
+    Use_Weapon @855
+    Use_tremor_Multi @856
+    VEC_DOWN @857 DATA
+    VEC_UP @858 DATA
+    ValidateSelectedItem @859
+    VecToAngleRolled @860
+    VectorCompare @861
+    VectorInverse @862
+    VectorLength @863
+    VectorMA @864
+    VectorNormalize @865
+    VectorNormalize2 @866
+    VectorRotate @867
+    VectorScale @868
+    VelocityForDamage @869
+    Weapon_BFG @870
+    Weapon_Blaster @871
+    Weapon_Blaster_Fire @872
+    Weapon_Chaingun @873
+    Weapon_Generic @874
+    Weapon_Generic2 @875
+    Weapon_Grenade @876
+    Weapon_GrenadeLauncher @877
+    Weapon_HomingMissileLauncher @878
+    Weapon_HomingMissileLauncher_Fire @879
+    Weapon_HyperBlaster @880
+    Weapon_HyperBlaster_Fire @881
+    Weapon_Machinegun @882
+    Weapon_Null @883
+    Weapon_Railgun @884
+    Weapon_RocketLauncher @885
+    Weapon_RocketLauncher_Fire @886
+    Weapon_Shotgun @887
+    Weapon_SuperShotgun @888
+    WhatIsIt @889
+    WhatsIt @890
+    WriteClient @891
+    WriteEdict @892
+    WriteField1 @893
+    WriteField2 @894
+    WriteGame @895
+    WriteLevel @896
+    WriteLevelLocals @897
+    WriteTransitionEdict @898
+    _DotProduct @899
+    _InterlockedCompareExchange @900
+    _VectorAdd @901
+    _VectorCopy @902
+    _VectorSubtract @903
+    abortHeal @904
+    actorBFG @905
+    actorBlaster @906
+    actorChaingun @907
+    actorGrenadeLauncher @908
+    actorHyperblaster @909
+    actorMachineGun @910
+    actorRailGun @911
+    actorRocket @912
+    actorShotgun @913
+    actorSuperShotgun @914
+    actor_attack @915
+    actor_blocked @916
+    actor_checkattack @917
+    actor_dead @918
+    actor_die @919
+    actor_end_jump @920
+    actor_files @921
+    actor_fire @922
+    actor_frames_attack @923 DATA
+    actor_frames_crattack @924 DATA
+    actor_frames_crouch @925 DATA
+    actor_frames_crouchwalk @926 DATA
+    actor_frames_crouchwalk_back @927 DATA
+    actor_frames_death1 @928 DATA
+    actor_frames_death2 @929 DATA
+    actor_frames_flipoff @930 DATA
+    actor_frames_jump @931 DATA
+    actor_frames_pain1 @932 DATA
+    actor_frames_pain2 @933 DATA
+    actor_frames_pain3 @934 DATA
+    actor_frames_run @935 DATA
+    actor_frames_run_back @936 DATA
+    actor_frames_run_bad @937 DATA
+    actor_frames_salute @938 DATA
+    actor_frames_stand @939 DATA
+    actor_frames_switch @940 DATA
+    actor_frames_taunt @941 DATA
+    actor_frames_walk @942 DATA
+    actor_frames_walk_back @943 DATA
+    actor_ideal_range @944
+    actor_jump @945
+    actor_move_attack @946 DATA
+    actor_move_crattack @947 DATA
+    actor_move_crouch @948 DATA
+    actor_move_crouchwalk @949 DATA
+    actor_move_crouchwalk_back @950 DATA
+    actor_move_death1 @951 DATA
+    actor_move_death2 @952 DATA
+    actor_move_flipoff @953 DATA
+    actor_move_jump @954 DATA
+    actor_move_pain1 @955 DATA
+    actor_move_pain2 @956 DATA
+    actor_move_pain3 @957 DATA
+    actor_move_run @958 DATA
+    actor_move_run_back @959 DATA
+    actor_move_run_bad @960 DATA
+    actor_move_salute @961 DATA
+    actor_move_stand @962 DATA
+    actor_move_switch @963 DATA
+    actor_move_taunt @964 DATA
+    actor_move_walk @965 DATA
+    actor_move_walk_back @966 DATA
+    actor_moveit @967
+    actor_no_weapon_sound @968
+    actor_pain @969
+    actor_run @970
+    actor_run_back @971
+    actor_salute @972
+    actor_seekcover @973
+    actor_stand @974
+    actor_switch @975
+    actor_use @976
+    actor_walk @977
+    actor_walk_back @978
+    actorchicken @979 DATA
+    actorjump @980 DATA
+    actorscram @981 DATA
+    add_velocity_throw @982 DATA
+    adjust_train_corners @983 DATA
+    admin_password @984 DATA
+    adminmenu @985 DATA
+    ai_charge @986
+    ai_checkattack @987
+    ai_chicken @988
+    ai_move @989
+    ai_run @990
+    ai_run_melee @991
+    ai_run_missile @992
+    ai_run_slide @993
+    ai_stand @994
+    ai_turn @995
+    ai_walk @996
+    aimangles @997 DATA
+    alert_sounds @998 DATA
+    alias_data @999 DATA
+    alias_data_size @1000 DATA
+    allow_admin @1001 DATA
+    allow_clear_inventory @1002 DATA
+    allow_download @1003 DATA
+    allow_flagdrop @1004 DATA
+    allow_flagpickup @1005 DATA
+    allow_fog @1006 DATA
+    allow_player_use_abandoned_turret @1007 DATA
+    allow_techdrop @1008 DATA
+    allow_techpickup @1009 DATA
+    anglemod @1010
+    armor_bonus_value @1011 DATA
+    bando_bullets @1012 DATA
+    bando_cells @1013 DATA
+    bando_fuel @1014 DATA
+    bando_shells @1015 DATA
+    bando_slugs @1016 DATA
+    barrel_delay @1017
+    barrel_explode @1018
+    barrel_touch @1019
+    berserk_attack_club @1020
+    berserk_attack_spike @1021
+    berserk_dead @1022
+    berserk_die @1023
+    berserk_fidget @1024
+    berserk_frames_attack_club @1025 DATA
+    berserk_frames_attack_spike @1026 DATA
+    berserk_frames_attack_strike @1027 DATA
+    berserk_frames_death1 @1028 DATA
+    berserk_frames_death2 @1029 DATA
+    berserk_frames_jump @1030 DATA
+    berserk_frames_pain1 @1031 DATA
+    berserk_frames_pain2 @1032 DATA
+    berserk_frames_run1 @1033 DATA
+    berserk_frames_stand @1034 DATA
+    berserk_frames_stand_fidget @1035 DATA
+    berserk_frames_walk @1036 DATA
+    berserk_jump @1037
+    berserk_melee @1038
+    berserk_move_attack_club @1039 DATA
+    berserk_move_attack_spike @1040 DATA
+    berserk_move_attack_strike @1041 DATA
+    berserk_move_death1 @1042 DATA
+    berserk_move_death2 @1043 DATA
+    berserk_move_jump @1044 DATA
+    berserk_move_pain1 @1045 DATA
+    berserk_move_pain2 @1046 DATA
+    berserk_move_run1 @1047 DATA
+    berserk_move_stand @1048 DATA
+    berserk_move_stand_fidget @1049 DATA
+    berserk_move_walk @1050 DATA
+    berserk_pain @1051
+    berserk_run @1052
+    berserk_search @1053
+    berserk_sight @1054
+    berserk_stand @1055
+    berserk_strike @1056
+    berserk_swing @1057
+    berserk_walk @1058
+    bfg_damage @1059 DATA
+    bfg_damage2 @1060 DATA
+    bfg_damage_dm @1061 DATA
+    bfg_explode @1062
+    bfg_radius @1063 DATA
+    bfg_rdamage @1064 DATA
+    bfg_speed @1065 DATA
+    bfg_think @1066
+    bfg_touch @1067
+    bigendien @1068 DATA
+    blaster_color @1069 DATA
+    blaster_damage @1070 DATA
+    blaster_damage_dm @1071 DATA
+    blaster_speed @1072 DATA
+    blaster_touch @1073
+    blocker @1074 DATA
+    bob_init @1075
+    bob_pitch @1076 DATA
+    bob_roll @1077 DATA
+    bob_think @1078
+    bob_up @1079 DATA
+    bobcycle @1080 DATA
+    bobfracsin @1081 DATA
+    bobmove @1082 DATA
+    body_armor_index @1083 DATA
+    body_die @1084
+    bodyarmor_info @1085 DATA
+    bolt_delayed_start @1086
+    boss2_attack @1087
+    boss2_attack_mg @1088
+    boss2_dead @1089
+    boss2_die @1090
+    boss2_firebullet_left @1091
+    boss2_firebullet_right @1092
+    boss2_frames_attack_mg @1093 DATA
+    boss2_frames_attack_post_mg @1094 DATA
+    boss2_frames_attack_pre_mg @1095 DATA
+    boss2_frames_attack_rocket @1096 DATA
+    boss2_frames_death @1097 DATA
+    boss2_frames_fidget @1098 DATA
+    boss2_frames_pain_heavy @1099 DATA
+    boss2_frames_pain_light @1100 DATA
+    boss2_frames_run @1101 DATA
+    boss2_frames_stand @1102 DATA
+    boss2_frames_walk @1103 DATA
+    boss2_move_attack_mg @1104 DATA
+    boss2_move_attack_post_mg @1105 DATA
+    boss2_move_attack_pre_mg @1106 DATA
+    boss2_move_attack_rocket @1107 DATA
+    boss2_move_death @1108 DATA
+    boss2_move_fidget @1109 DATA
+    boss2_move_pain_heavy @1110 DATA
+    boss2_move_pain_light @1111 DATA
+    boss2_move_run @1112 DATA
+    boss2_move_stand @1113 DATA
+    boss2_move_walk @1114 DATA
+    boss2_pain @1115
+    boss2_reattack_mg @1116
+    boss2_run @1117
+    boss2_search @1118
+    boss2_stand @1119
+    boss2_walk @1120
+    bot_info @1121 DATA
+    bounce_bounce @1122 DATA
+    bounce_minv @1123 DATA
+    box_bullets @1124 DATA
+    box_cells @1125 DATA
+    box_die @1126
+    box_fuel @1127 DATA
+    box_grenades @1128 DATA
+    box_movestep @1129
+    box_rockets @1130 DATA
+    box_shells @1131 DATA
+    box_slugs @1132 DATA
+    box_touch @1133
+    box_use @1134
+    box_walkmove @1135
+    box_water_friction @1136
+    brain_chest_closed @1137
+    brain_chest_open @1138
+    brain_dead @1139
+    brain_die @1140
+    brain_dodge @1141
+    brain_duck_down @1142
+    brain_duck_hold @1143
+    brain_duck_up @1144
+    brain_frames_attack1 @1145 DATA
+    brain_frames_attack2 @1146 DATA
+    brain_frames_death1 @1147 DATA
+    brain_frames_death2 @1148 DATA
+    brain_frames_defense @1149 DATA
+    brain_frames_duck @1150 DATA
+    brain_frames_idle @1151 DATA
+    brain_frames_pain1 @1152 DATA
+    brain_frames_pain2 @1153 DATA
+    brain_frames_pain3 @1154 DATA
+    brain_frames_run @1155 DATA
+    brain_frames_stand @1156 DATA
+    brain_frames_walk1 @1157 DATA
+    brain_hit_left @1158
+    brain_hit_right @1159
+    brain_idle @1160
+    brain_melee @1161
+    brain_move_attack1 @1162 DATA
+    brain_move_attack2 @1163 DATA
+    brain_move_death1 @1164 DATA
+    brain_move_death2 @1165 DATA
+    brain_move_defense @1166 DATA
+    brain_move_duck @1167 DATA
+    brain_move_idle @1168 DATA
+    brain_move_pain1 @1169 DATA
+    brain_move_pain2 @1170 DATA
+    brain_move_pain3 @1171 DATA
+    brain_move_run @1172 DATA
+    brain_move_stand @1173 DATA
+    brain_move_walk1 @1174 DATA
+    brain_pain @1175
+    brain_run @1176
+    brain_search @1177
+    brain_sight @1178
+    brain_stand @1179
+    brain_swing_left @1180
+    brain_swing_right @1181
+    brain_tentacle_attack @1182
+    brain_walk @1183
+    breather_time @1184 DATA
+    bullets_index @1185 DATA
+    button_done @1186
+    button_fire @1187
+    button_killed @1188
+    button_return @1189
+    button_touch @1190
+    button_use @1191
+    button_wait @1192
+    c_no @1193 DATA
+    c_yes @1194 DATA
+    camera_off @1195
+    camera_on @1196
+    canReach @1197
+    capturelimit @1198 DATA
+    cargo_blocked @1199
+    cd_loopcount @1200 DATA
+    cells_index @1201 DATA
+    chaingun_damage @1202 DATA
+    chaingun_damage_dm @1203 DATA
+    chaingun_hspread @1204 DATA
+    chaingun_vspread @1205 DATA
+    check_jump_blocked @1206
+    check_plat_blocked @1207
+    check_reverse_rotation @1208
+    check_shot_blocked @1209
+    chick_attack @1210
+    chick_attack1 @1211
+    chick_dead @1212
+    chick_die @1213
+    chick_dodge @1214
+    chick_duck_down @1215
+    chick_duck_hold @1216
+    chick_duck_up @1217
+    chick_fidget @1218
+    chick_frames_attack1 @1219 DATA
+    chick_frames_death1 @1220 DATA
+    chick_frames_death2 @1221 DATA
+    chick_frames_duck @1222 DATA
+    chick_frames_end_attack1 @1223 DATA
+    chick_frames_end_slash @1224 DATA
+    chick_frames_fidget @1225 DATA
+    chick_frames_pain1 @1226 DATA
+    chick_frames_pain2 @1227 DATA
+    chick_frames_pain3 @1228 DATA
+    chick_frames_run @1229 DATA
+    chick_frames_slash @1230 DATA
+    chick_frames_stand @1231 DATA
+    chick_frames_start_attack1 @1232 DATA
+    chick_frames_start_run @1233 DATA
+    chick_frames_start_slash @1234 DATA
+    chick_frames_walk @1235 DATA
+    chick_melee @1236
+    chick_move_attack1 @1237 DATA
+    chick_move_death1 @1238 DATA
+    chick_move_death2 @1239 DATA
+    chick_move_duck @1240 DATA
+    chick_move_end_attack1 @1241 DATA
+    chick_move_end_slash @1242 DATA
+    chick_move_fidget @1243 DATA
+    chick_move_pain1 @1244 DATA
+    chick_move_pain2 @1245 DATA
+    chick_move_pain3 @1246 DATA
+    chick_move_run @1247 DATA
+    chick_move_slash @1248 DATA
+    chick_move_stand @1249 DATA
+    chick_move_start_attack1 @1250 DATA
+    chick_move_start_run @1251 DATA
+    chick_move_start_slash @1252 DATA
+    chick_move_walk @1253 DATA
+    chick_pain @1254
+    chick_rerocket @1255
+    chick_reslash @1256
+    chick_run @1257
+    chick_sight @1258
+    chick_skip_frames @1259
+    chick_slash @1260
+    chick_stand @1261
+    chick_walk @1262
+    cl_gun @1263 DATA
+    cl_thirdperson @1264 DATA
+    cleanupHeal @1265
+    cleanupHealTarget @1266
+    clientfields @1267 DATA
+    clone @1268
+    codesize @1269 DATA
+    com_token @1270 DATA
+    combat_armor_index @1271 DATA
+    combatarmor_info @1272 DATA
+    commander_body_drop @1273
+    commander_body_think @1274
+    commander_body_use @1275
+    competition @1276 DATA
+    coop @1277 DATA
+    corners @1278 DATA
+    corpse_fade @1279 DATA
+    corpse_fadetime @1280 DATA
+    crane_control_action @1281
+    crane_light_off @1282
+    crane_reset_go @1283
+    crane_reset_use @1284
+    creditsmenu @1285 DATA
+    crossh @1286 DATA
+    crosshair @1287 DATA
+    ctf @1288 DATA
+    ctf_blastercolors @1289 DATA
+    ctf_forcejoin @1290 DATA
+    ctf_statusbar @1291 DATA
+    ctfgame @1292 DATA
+    dad @1293 DATA
+    deadmonster_think @1294
+    deathmatch @1295 DATA
+    debris_delayed_start @1296
+    debris_die @1297
+    debug_mode @1298 DATA
+    debug_printf @1299
+    decoy_die @1300
+    decoy_think @1301
+    dedicated @1302 DATA
+    def_setmenu @1303 DATA
+    developer @1304 DATA
+    directed_debris_die @1305
+    dm_start_bfg @1306 DATA
+    dm_start_bullets @1307 DATA
+    dm_start_cells @1308 DATA
+    dm_start_chaingun @1309 DATA
+    dm_start_grenadelauncher @1310 DATA
+    dm_start_grenades @1311 DATA
+    dm_start_homing @1312 DATA
+    dm_start_hyperblaster @1313 DATA
+    dm_start_machinegun @1314 DATA
+    dm_start_railgun @1315 DATA
+    dm_start_rocketlauncher @1316 DATA
+    dm_start_rockets @1317 DATA
+    dm_start_shells @1318 DATA
+    dm_start_shotgun @1319 DATA
+    dm_start_slugs @1320 DATA
+    dm_start_sshotgun @1321 DATA
+    dm_statusbar @1322 DATA
+    dmflags @1323 DATA
+    door_blocked @1324
+    door_destroyed @1325
+    door_go_down @1326
+    door_go_up @1327
+    door_hit_bottom @1328
+    door_hit_top @1329
+    door_killed @1330
+    door_secret_blocked @1331
+    door_secret_die @1332
+    door_secret_done @1333
+    door_secret_move1 @1334
+    door_secret_move2 @1335
+    door_secret_move3 @1336
+    door_secret_move4 @1337
+    door_secret_move5 @1338
+    door_secret_move6 @1339
+    door_secret_use @1340
+    door_touch @1341
+    door_use @1342
+    door_use_areaportals @1343
+    drop_add_to_chain @1344
+    drop_splash @1345
+    drop_touch @1346
+    droptofloor @1347
+    electpercentage @1348 DATA
+    embedded @1349
+    enemy_infront @1350 DATA
+    enemy_range @1351 DATA
+    enemy_vis @1352 DATA
+    enemy_yaw @1353 DATA
+    enviro_time @1354 DATA
+    face_wall @1355
+    fade_fog @1356 DATA
+    faker_animate @1357
+    falling_armor_damage @1358 DATA
+    fields @1359 DATA
+    filterban @1360 DATA
+    find_target_blaster_target @1361
+    find_tracktrain @1362
+    findradius @1363
+    fire_bfg @1364
+    fire_blaster @1365
+    fire_bullet @1366
+    fire_grenade @1367
+    fire_grenade2 @1368
+    fire_hit @1369
+    fire_rail @1370
+    fire_rocket @1371
+    fire_shotgun @1372
+    flipper_bite @1373
+    flipper_breathe @1374
+    flipper_dead @1375
+    flipper_die @1376
+    flipper_frames_attack @1377 DATA
+    flipper_frames_death @1378 DATA
+    flipper_frames_pain1 @1379 DATA
+    flipper_frames_pain2 @1380 DATA
+    flipper_frames_run @1381 DATA
+    flipper_frames_run_start @1382 DATA
+    flipper_frames_stand @1383 DATA
+    flipper_frames_start_run @1384 DATA
+    flipper_frames_walk @1385 DATA
+    flipper_melee @1386
+    flipper_move_attack @1387 DATA
+    flipper_move_death @1388 DATA
+    flipper_move_pain1 @1389 DATA
+    flipper_move_pain2 @1390 DATA
+    flipper_move_run_loop @1391 DATA
+    flipper_move_run_start @1392 DATA
+    flipper_move_stand @1393 DATA
+    flipper_move_start_run @1394 DATA
+    flipper_move_walk @1395 DATA
+    flipper_pain @1396
+    flipper_preattack @1397
+    flipper_run @1398
+    flipper_run_loop @1399
+    flipper_search @1400
+    flipper_sight @1401
+    flipper_stand @1402
+    flipper_start_run @1403
+    flipper_walk @1404
+    floater_attack @1405
+    floater_dead @1406
+    floater_die @1407
+    floater_fire_blaster @1408
+    floater_frames_activate @1409 DATA
+    floater_frames_attack1 @1410 DATA
+    floater_frames_attack2 @1411 DATA
+    floater_frames_attack3 @1412 DATA
+    floater_frames_death @1413 DATA
+    floater_frames_pain1 @1414 DATA
+    floater_frames_pain2 @1415 DATA
+    floater_frames_pain3 @1416 DATA
+    floater_frames_run @1417 DATA
+    floater_frames_stand1 @1418 DATA
+    floater_frames_stand2 @1419 DATA
+    floater_frames_walk @1420 DATA
+    floater_idle @1421
+    floater_melee @1422
+    floater_move_activate @1423 DATA
+    floater_move_attack1 @1424 DATA
+    floater_move_attack2 @1425 DATA
+    floater_move_attack3 @1426 DATA
+    floater_move_death @1427 DATA
+    floater_move_pain1 @1428 DATA
+    floater_move_pain2 @1429 DATA
+    floater_move_pain3 @1430 DATA
+    floater_move_run @1431 DATA
+    floater_move_stand1 @1432 DATA
+    floater_move_stand2 @1433 DATA
+    floater_move_walk @1434 DATA
+    floater_pain @1435
+    floater_run @1436
+    floater_sight @1437
+    floater_stand @1438
+    floater_walk @1439
+    floater_wham @1440
+    floater_zap @1441
+    flood_msgs @1442 DATA
+    flood_persecond @1443 DATA
+    flood_waitdelay @1444 DATA
+    flyer_attack @1445
+    flyer_check_melee @1446
+    flyer_die @1447
+    flyer_fire @1448
+    flyer_fireleft @1449
+    flyer_fireright @1450
+    flyer_frames_attack2 @1451 DATA
+    flyer_frames_bankleft @1452 DATA
+    flyer_frames_bankright @1453 DATA
+    flyer_frames_defense @1454 DATA
+    flyer_frames_end_melee @1455 DATA
+    flyer_frames_loop_melee @1456 DATA
+    flyer_frames_pain1 @1457 DATA
+    flyer_frames_pain2 @1458 DATA
+    flyer_frames_pain3 @1459 DATA
+    flyer_frames_rollleft @1460 DATA
+    flyer_frames_rollright @1461 DATA
+    flyer_frames_run @1462 DATA
+    flyer_frames_stand @1463 DATA
+    flyer_frames_start @1464 DATA
+    flyer_frames_start_melee @1465 DATA
+    flyer_frames_stop @1466 DATA
+    flyer_frames_walk @1467 DATA
+    flyer_idle @1468
+    flyer_loop_melee @1469
+    flyer_melee @1470
+    flyer_move_attack2 @1471 DATA
+    flyer_move_bankleft @1472 DATA
+    flyer_move_bankright @1473 DATA
+    flyer_move_defense @1474 DATA
+    flyer_move_end_melee @1475 DATA
+    flyer_move_loop_melee @1476 DATA
+    flyer_move_pain1 @1477 DATA
+    flyer_move_pain2 @1478 DATA
+    flyer_move_pain3 @1479 DATA
+    flyer_move_rollleft @1480 DATA
+    flyer_move_rollright @1481 DATA
+    flyer_move_run @1482 DATA
+    flyer_move_stand @1483 DATA
+    flyer_move_start @1484 DATA
+    flyer_move_start_melee @1485 DATA
+    flyer_move_stop @1486 DATA
+    flyer_move_walk @1487 DATA
+    flyer_nextmove @1488
+    flyer_pain @1489
+    flyer_pop_blades @1490
+    flyer_run @1491
+    flyer_setstart @1492
+    flyer_sight @1493
+    flyer_slash_left @1494
+    flyer_slash_right @1495
+    flyer_stand @1496
+    flyer_start @1497
+    flyer_stop @1498
+    flyer_walk @1499
+    flymonster_start @1500
+    flymonster_start_go @1501
+    fog_fade @1502
+    footstep_sounds @1503 DATA
+    force_wall_think @1504
+    force_wall_use @1505
+    forcewall_think @1506
+    fov @1507 DATA
+    fraglimit @1508 DATA
+    fuel_index @1509 DATA
+    func_breakaway_activate @1510
+    func_breakaway_die @1511
+    func_breakaway_fall @1512
+    func_breakaway_hit @1513
+    func_breakaway_makesolid @1514
+    func_breakaway_spawn @1515
+    func_breakaway_think @1516
+    func_breakaway_touch @1517
+    func_breakaway_use @1518
+    func_clock_think @1519
+    func_clock_use @1520
+    func_conveyor_use @1521
+    func_door_rot_dh_init @1522
+    func_door_swinging_init @1523
+    func_explosive_die @1524
+    func_explosive_explode @1525
+    func_explosive_makeshootable @1526
+    func_explosive_respawn @1527
+    func_explosive_spawn @1528
+    func_explosive_touch @1529
+    func_explosive_use @1530
+    func_force_wall_touch @1531
+    func_monitor_init @1532
+    func_object_release @1533
+    func_object_touch @1534
+    func_object_use @1535
+    func_pushable_spawn @1536
+    func_rotating_dh_init @1537
+    func_timer_think @1538
+    func_timer_use @1539
+    func_tracktrain_find @1540
+    func_train_find @1541
+    func_vehicle_explode @1542
+    func_wall_use @1543
+    g_edicts @1544 DATA
+    g_mirror @1545 DATA
+    g_select_empty @1546 DATA
+    game @1547 DATA
+    gfogs @1548 DATA
+    gi @1549 DATA
+    gib_delayed_start @1550
+    gib_die @1551
+    gib_fade @1552
+    gib_fade2 @1553
+    gib_think @1554
+    gib_touch @1555
+    gibsthisframe @1556 DATA
+    gl_clear @1557 DATA
+    gl_driver @1558 DATA
+    gl_driver_fog @1559 DATA
+    gladiator_attack @1560
+    gladiator_blocked @1561
+    gladiator_cleaver_swing @1562
+    gladiator_dead @1563
+    gladiator_die @1564
+    gladiator_frames_attack_gun @1565 DATA
+    gladiator_frames_attack_melee @1566 DATA
+    gladiator_frames_death @1567 DATA
+    gladiator_frames_pain @1568 DATA
+    gladiator_frames_pain_air @1569 DATA
+    gladiator_frames_run @1570 DATA
+    gladiator_frames_stand @1571 DATA
+    gladiator_frames_walk @1572 DATA
+    gladiator_idle @1573
+    gladiator_melee @1574
+    gladiator_move_attack_gun @1575 DATA
+    gladiator_move_attack_melee @1576 DATA
+    gladiator_move_death @1577 DATA
+    gladiator_move_pain @1578 DATA
+    gladiator_move_pain_air @1579 DATA
+    gladiator_move_run @1580 DATA
+    gladiator_move_stand @1581 DATA
+    gladiator_move_walk @1582 DATA
+    gladiator_pain @1583
+    gladiator_run @1584
+    gladiator_search @1585
+    gladiator_sight @1586
+    gladiator_stand @1587
+    gladiator_walk @1588
+    globals @1589 DATA
+    grenade_damage @1590 DATA
+    grenade_delayed_start @1591
+    grenade_radius @1592 DATA
+    grenade_speed @1593 DATA
+    grenades_index @1594 DATA
+    gun_x @1595 DATA
+    gun_y @1596 DATA
+    gun_z @1597 DATA
+    gunner_attack @1598
+    gunner_dead @1599
+    gunner_die @1600
+    gunner_dodge @1601
+    gunner_duck_down @1602
+    gunner_duck_hold @1603
+    gunner_duck_up @1604
+    gunner_fidget @1605
+    gunner_fire_chain @1606
+    gunner_frames_attack_chain @1607 DATA
+    gunner_frames_attack_grenade @1608 DATA
+    gunner_frames_death @1609 DATA
+    gunner_frames_duck @1610 DATA
+    gunner_frames_endfire_chain @1611 DATA
+    gunner_frames_fidget @1612 DATA
+    gunner_frames_fire_chain @1613 DATA
+    gunner_frames_jump @1614 DATA
+    gunner_frames_pain1 @1615 DATA
+    gunner_frames_pain2 @1616 DATA
+    gunner_frames_pain3 @1617 DATA
+    gunner_frames_run @1618 DATA
+    gunner_frames_runandshoot @1619 DATA
+    gunner_frames_stand @1620 DATA
+    gunner_frames_walk @1621 DATA
+    gunner_grenade_check @1622
+    gunner_idlesound @1623
+    gunner_jump @1624
+    gunner_move_attack_chain @1625 DATA
+    gunner_move_attack_grenade @1626 DATA
+    gunner_move_death @1627 DATA
+    gunner_move_duck @1628 DATA
+    gunner_move_endfire_chain @1629 DATA
+    gunner_move_fidget @1630 DATA
+    gunner_move_fire_chain @1631 DATA
+    gunner_move_jump @1632 DATA
+    gunner_move_pain1 @1633 DATA
+    gunner_move_pain2 @1634 DATA
+    gunner_move_pain3 @1635 DATA
+    gunner_move_run @1636 DATA
+    gunner_move_runandshoot @1637 DATA
+    gunner_move_stand @1638 DATA
+    gunner_move_walk @1639 DATA
+    gunner_opengun @1640
+    gunner_pain @1641
+    gunner_refire_chain @1642
+    gunner_run @1643
+    gunner_runandshoot @1644
+    gunner_search @1645
+    gunner_sight @1646
+    gunner_stand @1647
+    gunner_walk @1648
+    hOpenGL @1649 DATA
+    hand @1650 DATA
+    hand_grenade_damage @1651 DATA
+    hand_grenade_radius @1652 DATA
+    handgrenade_delayed_start @1653
+    has_valid_enemy @1654
+    health_bonus_value @1655 DATA
+    hint_chain_count @1656 DATA
+    hint_chain_starts @1657 DATA
+    hint_chains_exist @1658 DATA
+    hintcheck_monsterlost @1659
+    hintpath_start @1660
+    hintpath_stop @1661
+    hml_index @1662 DATA
+    homing_index @1663 DATA
+    homing_think @1664
+    hover_attack @1665
+    hover_dead @1666
+    hover_deadthink @1667
+    hover_die @1668
+    hover_fire_blaster @1669
+    hover_frames_attack1 @1670 DATA
+    hover_frames_backward @1671 DATA
+    hover_frames_death1 @1672 DATA
+    hover_frames_end_attack @1673 DATA
+    hover_frames_forward @1674 DATA
+    hover_frames_land @1675 DATA
+    hover_frames_pain1 @1676 DATA
+    hover_frames_pain2 @1677 DATA
+    hover_frames_pain3 @1678 DATA
+    hover_frames_run @1679 DATA
+    hover_frames_stand @1680 DATA
+    hover_frames_start_attack @1681 DATA
+    hover_frames_stop1 @1682 DATA
+    hover_frames_stop2 @1683 DATA
+    hover_frames_takeoff @1684 DATA
+    hover_frames_walk @1685 DATA
+    hover_move_attack1 @1686 DATA
+    hover_move_backward @1687 DATA
+    hover_move_death1 @1688 DATA
+    hover_move_end_attack @1689 DATA
+    hover_move_forward @1690 DATA
+    hover_move_land @1691 DATA
+    hover_move_pain1 @1692 DATA
+    hover_move_pain2 @1693 DATA
+    hover_move_pain3 @1694 DATA
+    hover_move_run @1695 DATA
+    hover_move_stand @1696 DATA
+    hover_move_start_attack @1697 DATA
+    hover_move_stop1 @1698 DATA
+    hover_move_stop2 @1699 DATA
+    hover_move_takeoff @1700 DATA
+    hover_move_walk @1701 DATA
+    hover_pain @1702
+    hover_reattack @1703
+    hover_run @1704
+    hover_search @1705
+    hover_sight @1706
+    hover_stand @1707
+    hover_start_attack @1708
+    hover_walk @1709
+    hrocket_turret_fire @1710
+    hurt_touch @1711
+    hurt_use @1712
+    hyperblaster_color @1713 DATA
+    hyperblaster_damage @1714 DATA
+    hyperblaster_damage_dm @1715 DATA
+    hyperblaster_speed @1716 DATA
+    i @1717 DATA
+    imageindex_ctfsb1 @1718 DATA
+    imageindex_ctfsb2 @1719 DATA
+    imageindex_ctfsb3 @1720 DATA
+    imageindex_i_ctf1 @1721 DATA
+    imageindex_i_ctf1d @1722 DATA
+    imageindex_i_ctf1t @1723 DATA
+    imageindex_i_ctf2 @1724 DATA
+    imageindex_i_ctf2d @1725 DATA
+    imageindex_i_ctf2t @1726 DATA
+    imageindex_i_ctf3 @1727 DATA
+    imageindex_i_ctf3d @1728 DATA
+    imageindex_i_ctf3t @1729 DATA
+    imageindex_i_ctfj @1730 DATA
+    imageindex_sbfctf1 @1731 DATA
+    imageindex_sbfctf2 @1732 DATA
+    imageindex_sbfctf3 @1733 DATA
+    infantry_attack @1734
+    infantry_cock_gun @1735
+    infantry_dead @1736
+    infantry_die @1737
+    infantry_dodge @1738
+    infantry_duck_down @1739
+    infantry_duck_hold @1740
+    infantry_duck_up @1741
+    infantry_fidget @1742
+    infantry_fire @1743
+    infantry_frames_attack1 @1744 DATA
+    infantry_frames_attack2 @1745 DATA
+    infantry_frames_death1 @1746 DATA
+    infantry_frames_death2 @1747 DATA
+    infantry_frames_death3 @1748 DATA
+    infantry_frames_duck @1749 DATA
+    infantry_frames_fidget @1750 DATA
+    infantry_frames_jump @1751 DATA
+    infantry_frames_pain1 @1752 DATA
+    infantry_frames_pain2 @1753 DATA
+    infantry_frames_run @1754 DATA
+    infantry_frames_stand @1755 DATA
+    infantry_frames_walk @1756 DATA
+    infantry_jump @1757
+    infantry_move_attack1 @1758 DATA
+    infantry_move_attack2 @1759 DATA
+    infantry_move_death1 @1760 DATA
+    infantry_move_death2 @1761 DATA
+    infantry_move_death3 @1762 DATA
+    infantry_move_duck @1763 DATA
+    infantry_move_fidget @1764 DATA
+    infantry_move_jump @1765 DATA
+    infantry_move_pain1 @1766 DATA
+    infantry_move_pain2 @1767 DATA
+    infantry_move_run @1768 DATA
+    infantry_move_stand @1769 DATA
+    infantry_move_walk @1770 DATA
+    infantry_pain @1771
+    infantry_run @1772
+    infantry_sight @1773
+    infantry_smack @1774
+    infantry_stand @1775
+    infantry_swing @1776
+    infantry_walk @1777
+    infront @1778
+    init_trigger_fog_delay @1779
+    insane_checkdown @1780
+    insane_checkup @1781
+    insane_cross @1782
+    insane_dead @1783
+    insane_die @1784
+    insane_fist @1785
+    insane_frames_crawl @1786 DATA
+    insane_frames_crawl_death @1787 DATA
+    insane_frames_crawl_pain @1788 DATA
+    insane_frames_cross @1789 DATA
+    insane_frames_down @1790 DATA
+    insane_frames_downtoup @1791 DATA
+    insane_frames_jumpdown @1792 DATA
+    insane_frames_stand_death @1793 DATA
+    insane_frames_stand_insane @1794 DATA
+    insane_frames_stand_normal @1795 DATA
+    insane_frames_stand_pain @1796 DATA
+    insane_frames_struggle_cross @1797 DATA
+    insane_frames_uptodown @1798 DATA
+    insane_frames_walk_insane @1799 DATA
+    insane_frames_walk_normal @1800 DATA
+    insane_moan @1801
+    insane_move_crawl @1802 DATA
+    insane_move_crawl_death @1803 DATA
+    insane_move_crawl_pain @1804 DATA
+    insane_move_cross @1805 DATA
+    insane_move_down @1806 DATA
+    insane_move_downtoup @1807 DATA
+    insane_move_jumpdown @1808 DATA
+    insane_move_run_insane @1809 DATA
+    insane_move_run_normal @1810 DATA
+    insane_move_runcrawl @1811 DATA
+    insane_move_stand_death @1812 DATA
+    insane_move_stand_insane @1813 DATA
+    insane_move_stand_normal @1814 DATA
+    insane_move_stand_pain @1815 DATA
+    insane_move_struggle_cross @1816 DATA
+    insane_move_uptodown @1817 DATA
+    insane_move_walk_insane @1818 DATA
+    insane_move_walk_normal @1819 DATA
+    insane_onground @1820
+    insane_pain @1821
+    insane_run @1822
+    insane_scream @1823
+    insane_shake @1824
+    insane_stand @1825
+    insane_walk @1826
+    instantweap @1827 DATA
+    inv_time @1828 DATA
+    ipfilters @1829 DATA
+    is_backing_up @1830
+    item_die @1831
+    item_table @1832 DATA
+    itemlist @1833 DATA
+    jacket_armor_index @1834 DATA
+    jacketarmor_info @1835 DATA
+    jetpack_weenie @1836 DATA
+    joinmenu @1837 DATA
+    jorgBFG @1838
+    jorg_attack @1839
+    jorg_attack1 @1840
+    jorg_dead @1841
+    jorg_death_hit @1842
+    jorg_die @1843
+    jorg_firebullet @1844
+    jorg_firebullet_left @1845
+    jorg_firebullet_right @1846
+    jorg_frames_attack1 @1847 DATA
+    jorg_frames_attack2 @1848 DATA
+    jorg_frames_death1 @1849 DATA
+    jorg_frames_end_attack1 @1850 DATA
+    jorg_frames_end_walk @1851 DATA
+    jorg_frames_pain1 @1852 DATA
+    jorg_frames_pain2 @1853 DATA
+    jorg_frames_pain3 @1854 DATA
+    jorg_frames_run @1855 DATA
+    jorg_frames_stand @1856 DATA
+    jorg_frames_start_attack1 @1857 DATA
+    jorg_frames_start_walk @1858 DATA
+    jorg_frames_walk @1859 DATA
+    jorg_idle @1860
+    jorg_move_attack1 @1861 DATA
+    jorg_move_attack2 @1862 DATA
+    jorg_move_death @1863 DATA
+    jorg_move_end_attack1 @1864 DATA
+    jorg_move_end_walk @1865 DATA
+    jorg_move_pain1 @1866 DATA
+    jorg_move_pain2 @1867 DATA
+    jorg_move_pain3 @1868 DATA
+    jorg_move_run @1869 DATA
+    jorg_move_stand @1870 DATA
+    jorg_move_start_attack1 @1871 DATA
+    jorg_move_start_walk @1872 DATA
+    jorg_move_walk @1873 DATA
+    jorg_pain @1874
+    jorg_reattack1 @1875
+    jorg_run @1876
+    jorg_search @1877
+    jorg_stand @1878
+    jorg_step_left @1879
+    jorg_step_right @1880
+    jorg_walk @1881
+    joy_pitchsensitivity @1882 DATA
+    joy_yawsensitivity @1883 DATA
+    jump_kick @1884 DATA
+    jump_kick_damage @1885 DATA
+    kick_attack @1886
+    laser_sight_think @1887
+    last_opengl_frame @1888 DATA
+    last_software_frame @1889 DATA
+    lastgibframe @1890 DATA
+    lazarus_cd_loop @1891 DATA
+    lazarus_cl_gun @1892 DATA
+    lazarus_crosshair @1893 DATA
+    lazarus_gl_clear @1894 DATA
+    lazarus_joyp @1895 DATA
+    lazarus_joyy @1896 DATA
+    lazarus_pitch @1897 DATA
+    lazarus_yaw @1898 DATA
+    leaf_fade @1899
+    leaf_fade2 @1900
+    level @1901 DATA
+    levelfields @1902 DATA
+    lights @1903 DATA
+    lightsmin @1904 DATA
+    listSize @1905
+    lithium_defaults @1906
+    loc_names @1907 DATA
+    lock_clue_initialize @1908
+    lock_clue_think @1909
+    lock_clue_use @1910
+    lock_code_use @1911
+    lock_digit_increment @1912
+    lock_initialize @1913
+    lson @1914 DATA
+    m_pitch @1915 DATA
+    m_yaw @1916 DATA
+    machinegun_damage @1917 DATA
+    machinegun_hspread @1918 DATA
+    machinegun_vspread @1919 DATA
+    makronBFG @1920
+    makron_attack @1921
+    makron_brainsplorch @1922
+    makron_dead @1923
+    makron_die @1924
+    makron_frames_attack3 @1925 DATA
+    makron_frames_attack4 @1926 DATA
+    makron_frames_attack5 @1927 DATA
+    makron_frames_death2 @1928 DATA
+    makron_frames_death3 @1929 DATA
+    makron_frames_pain4 @1930 DATA
+    makron_frames_pain5 @1931 DATA
+    makron_frames_pain6 @1932 DATA
+    makron_frames_run @1933 DATA
+    makron_frames_sight @1934 DATA
+    makron_frames_stand @1935 DATA
+    makron_frames_walk @1936 DATA
+    makron_hit @1937
+    makron_move_attack3 @1938 DATA
+    makron_move_attack4 @1939 DATA
+    makron_move_attack5 @1940 DATA
+    makron_move_death2 @1941 DATA
+    makron_move_death3 @1942 DATA
+    makron_move_pain4 @1943 DATA
+    makron_move_pain5 @1944 DATA
+    makron_move_pain6 @1945 DATA
+    makron_move_run @1946 DATA
+    makron_move_sight @1947 DATA
+    makron_move_stand @1948 DATA
+    makron_move_walk @1949 DATA
+    makron_pain @1950
+    makron_popup @1951
+    makron_prerailgun @1952
+    makron_run @1953
+    makron_sight @1954
+    makron_stand @1955
+    makron_step_left @1956
+    makron_step_right @1957
+    makron_taunt @1958
+    makron_torso @1959
+    makron_torso_die @1960
+    makron_torso_think @1961
+    makron_walk @1962
+    match_length @1963 DATA
+    match_position @1964 DATA
+    matchlock @1965 DATA
+    matchsetuptime @1966 DATA
+    matchstarttime @1967 DATA
+    matchtime @1968 DATA
+    max_armor @1969 DATA
+    max_bullets @1970 DATA
+    max_cells @1971 DATA
+    max_fuel @1972 DATA
+    max_grenades @1973 DATA
+    max_health @1974 DATA
+    max_health_dm @1975 DATA
+    max_modelindex @1976 DATA
+    max_rockets @1977 DATA
+    max_shells @1978 DATA
+    max_slugs @1979 DATA
+    max_soundindex @1980 DATA
+    maxclients @1981 DATA
+    maxentities @1982 DATA
+    maxspectators @1983 DATA
+    meansOfDeath @1984 DATA
+    medic_FindDeadMonster @1985
+    medic_NextPatrolPoint @1986
+    medic_StopPatrolling @1987
+    medic_attack @1988
+    medic_cable_attack @1989
+    medic_checkattack @1990
+    medic_continue @1991
+    medic_dead @1992
+    medic_deadmonster_think @1993
+    medic_die @1994
+    medic_dodge @1995
+    medic_duck_down @1996
+    medic_duck_hold @1997
+    medic_duck_up @1998
+    medic_fire_blaster @1999
+    medic_frames_attackBlaster @2000 DATA
+    medic_frames_attackCable @2001 DATA
+    medic_frames_attackHyperBlaster @2002 DATA
+    medic_frames_death @2003 DATA
+    medic_frames_duck @2004 DATA
+    medic_frames_pain1 @2005 DATA
+    medic_frames_pain2 @2006 DATA
+    medic_frames_run @2007 DATA
+    medic_frames_stand @2008 DATA
+    medic_frames_walk @2009 DATA
+    medic_hook_launch @2010
+    medic_hook_retract @2011
+    medic_idle @2012
+    medic_move_attackBlaster @2013 DATA
+    medic_move_attackCable @2014 DATA
+    medic_move_attackHyperBlaster @2015 DATA
+    medic_move_death @2016 DATA
+    medic_move_duck @2017 DATA
+    medic_move_pain1 @2018 DATA
+    medic_move_pain2 @2019 DATA
+    medic_move_run @2020 DATA
+    medic_move_stand @2021 DATA
+    medic_move_walk @2022 DATA
+    medic_pain @2023
+    medic_run @2024
+    medic_search @2025
+    medic_sight @2026
+    medic_stand @2027
+    medic_test @2028 DATA
+    medic_walk @2029
+    mega_gibs @2030 DATA
+    misc_banner_think @2031
+    misc_blackhole_think @2032
+    misc_blackhole_transparent @2033
+    misc_blackhole_use @2034
+    misc_deadsoldier_die @2035
+    misc_deadsoldier_flieson @2036
+    misc_easterchick2_think @2037
+    misc_easterchick_think @2038
+    misc_eastertank_think @2039
+    misc_light_think @2040
+    misc_light_use @2041
+    misc_satellite_dish_think @2042
+    misc_satellite_dish_use @2043
+    misc_strogg_ship_use @2044
+    misc_viper_bomb_prethink @2045
+    misc_viper_bomb_touch @2046
+    misc_viper_bomb_use @2047
+    misc_viper_use @2048
+    mmove_reloc @2049 DATA
+    model_die @2050
+    model_spawn_use @2051
+    model_train_animator @2052
+    modelspawn_think @2053
+    monster_death_use @2054
+    monster_fire_bfg @2055
+    monster_fire_blaster @2056
+    monster_fire_bullet @2057
+    monster_fire_grenade @2058
+    monster_fire_railgun @2059
+    monster_fire_rocket @2060
+    monster_fire_shotgun @2061
+    monster_flash_offset @2062 DATA
+    monster_start @2063
+    monster_start_go @2064
+    monster_think @2065
+    monster_triggered_spawn @2066
+    monster_triggered_spawn_use @2067
+    monster_triggered_start @2068
+    monster_use @2069
+    monsterjump @2070 DATA
+    movewith_detach @2071
+    movewith_init @2072
+    movewith_update @2073
+    multi_trigger @2074
+    multi_wait @2075
+    mutant_check_jump @2076
+    mutant_check_landing @2077
+    mutant_check_melee @2078
+    mutant_check_refire @2079
+    mutant_checkattack @2080
+    mutant_dead @2081
+    mutant_die @2082
+    mutant_fake_jump @2083
+    mutant_frames_attack @2084 DATA
+    mutant_frames_death1 @2085 DATA
+    mutant_frames_death2 @2086 DATA
+    mutant_frames_fake_jump @2087 DATA
+    mutant_frames_idle @2088 DATA
+    mutant_frames_jump @2089 DATA
+    mutant_frames_pain1 @2090 DATA
+    mutant_frames_pain2 @2091 DATA
+    mutant_frames_pain3 @2092 DATA
+    mutant_frames_run @2093 DATA
+    mutant_frames_stand @2094 DATA
+    mutant_frames_start_walk @2095 DATA
+    mutant_frames_walk @2096 DATA
+    mutant_hit_left @2097
+    mutant_hit_right @2098
+    mutant_idle @2099
+    mutant_idle_loop @2100
+    mutant_jump @2101
+    mutant_jump_takeoff @2102
+    mutant_jump_touch @2103
+    mutant_melee @2104
+    mutant_move_attack @2105 DATA
+    mutant_move_death1 @2106 DATA
+    mutant_move_death2 @2107 DATA
+    mutant_move_fake_jump @2108 DATA
+    mutant_move_idle @2109 DATA
+    mutant_move_jump @2110 DATA
+    mutant_move_pain1 @2111 DATA
+    mutant_move_pain2 @2112 DATA
+    mutant_move_pain3 @2113 DATA
+    mutant_move_run @2114 DATA
+    mutant_move_stand @2115 DATA
+    mutant_move_start_walk @2116 DATA
+    mutant_move_walk @2117 DATA
+    mutant_pain @2118
+    mutant_run @2119
+    mutant_search @2120
+    mutant_sight @2121
+    mutant_stand @2122
+    mutant_step @2123
+    mutant_swing @2124
+    mutant_walk @2125
+    mutant_walk_loop @2126
+    muzzleflash_think @2127
+    my_bprintf @2128
+    nbomb_max @2129 DATA
+    needpass @2130 DATA
+    newmap @2131 DATA
+    nochasemenu @2132 DATA
+    nodes @2133 DATA
+    nohud @2134 DATA
+    nostatus @2135 DATA
+    noweapon_index @2136 DATA
+    nuke_max @2137 DATA
+    num_botinfo @2138 DATA
+    num_items @2139 DATA
+    num_players @2140 DATA
+    numipfilters @2141 DATA
+    numitemnodes @2142 DATA
+    numnodes @2143 DATA
+    obstacle @2144 DATA
+    onconveyor @2145 DATA
+    other_FallingDamage @2146
+    pack_armor @2147 DATA
+    pack_bullets @2148 DATA
+    pack_cells @2149 DATA
+    pack_fuel @2150 DATA
+    pack_grenades @2151 DATA
+    pack_health @2152 DATA
+    pack_rockets @2153 DATA
+    pack_shells @2154 DATA
+    pack_slugs @2155 DATA
+    paged_total @2156 DATA
+    parasite_attack @2157
+    parasite_blocked @2158
+    parasite_dead @2159
+    parasite_die @2160
+    parasite_do_fidget @2161
+    parasite_drain_attack @2162
+    parasite_drain_attack_ok @2163
+    parasite_end_fidget @2164
+    parasite_frames_break @2165 DATA
+    parasite_frames_death @2166 DATA
+    parasite_frames_drain @2167 DATA
+    parasite_frames_end_fidget @2168 DATA
+    parasite_frames_fidget @2169 DATA
+    parasite_frames_jump @2170 DATA
+    parasite_frames_pain1 @2171 DATA
+    parasite_frames_run @2172 DATA
+    parasite_frames_stand @2173 DATA
+    parasite_frames_start_fidget @2174 DATA
+    parasite_frames_start_run @2175 DATA
+    parasite_frames_start_walk @2176 DATA
+    parasite_frames_stop_run @2177 DATA
+    parasite_frames_stop_walk @2178 DATA
+    parasite_frames_walk @2179 DATA
+    parasite_idle @2180
+    parasite_jump @2181
+    parasite_launch @2182
+    parasite_move_break @2183 DATA
+    parasite_move_death @2184 DATA
+    parasite_move_drain @2185 DATA
+    parasite_move_end_fidget @2186 DATA
+    parasite_move_fidget @2187 DATA
+    parasite_move_jump @2188 DATA
+    parasite_move_pain1 @2189 DATA
+    parasite_move_run @2190 DATA
+    parasite_move_stand @2191 DATA
+    parasite_move_start_fidget @2192 DATA
+    parasite_move_start_run @2193 DATA
+    parasite_move_start_walk @2194 DATA
+    parasite_move_stop_run @2195 DATA
+    parasite_move_stop_walk @2196 DATA
+    parasite_move_walk @2197 DATA
+    parasite_pain @2198
+    parasite_reel_in @2199
+    parasite_refidget @2200
+    parasite_run @2201
+    parasite_scratch @2202
+    parasite_search @2203
+    parasite_sight @2204
+    parasite_stand @2205
+    parasite_start_run @2206
+    parasite_start_walk @2207
+    parasite_tap @2208
+    parasite_walk @2209
+    password @2210 DATA
+    path_corner_touch @2211
+    path_table @2212 DATA
+    path_track_use @2213
+    paused @2214 DATA
+    pendulum_blocked @2215
+    pendulum_die @2216
+    pendulum_rotate @2217
+    pendulum_use @2218
+    pfog @2219 DATA
+    pivot_blocked @2220
+    pivot_init @2221
+    pivot_stop @2222
+    pivot_touch @2223
+    plat_Accelerate @2224
+    plat_CalcAcceleratedMove @2225
+    plat_blocked @2226
+    plat_go_down @2227
+    plat_go_up @2228
+    plat_hit_bottom @2229
+    plat_hit_top @2230
+    plat_spawn_inside_trigger @2231
+    player_accel @2232 DATA
+    player_crouch_speed @2233 DATA
+    player_die @2234
+    player_gib_health @2235 DATA
+    player_jump_sounds @2236 DATA
+    player_max_speed @2237 DATA
+    player_pain @2238
+    player_stopspeed @2239 DATA
+    players @2240 DATA
+    pm_passent @2241 DATA
+    point_combat_touch @2242
+    point_infront @2243
+    power_screen_index @2244 DATA
+    power_shield_index @2245 DATA
+    powerup_max @2246 DATA
+    printcount @2247 DATA
+    pushed @2248 DATA
+    pushed_p @2249 DATA
+    quad_time @2250 DATA
+    rail_color @2251 DATA
+    railgun_damage @2252 DATA
+    railgun_damage_dm @2253 DATA
+    range @2254
+    readout @2255 DATA
+    realrange @2256
+    respawn @2257
+    rl_index @2258 DATA
+    rocket_damage @2259 DATA
+    rocket_damage2 @2260 DATA
+    rocket_delayed_start @2261
+    rocket_radius @2262 DATA
+    rocket_rdamage @2263 DATA
+    rocket_speed @2264 DATA
+    rocket_strafe @2265 DATA
+    rocket_target @2266
+    rocket_touch @2267
+    rockets_index @2268 DATA
+    rotate_distance @2269 DATA
+    rotating_accel @2270
+    rotating_blocked @2271
+    rotating_decel @2272
+    rotating_touch @2273
+    rotating_use @2274
+    rson @2275 DATA
+    run_pitch @2276 DATA
+    run_roll @2277 DATA
+    s_primary @2278 DATA
+    safe_bprintf @2279
+    safe_centerprintf @2280
+    safe_cprintf @2281
+    set_child_movement @2282
+    shells_index @2283 DATA
+    shift_distance @2284 DATA
+    shotgun_count @2285 DATA
+    shotgun_damage @2286 DATA
+    shotgun_hspread @2287 DATA
+    shotgun_vspread @2288 DATA
+    show_path_from @2289 DATA
+    show_path_to @2290 DATA
+    silencer_shots @2291 DATA
+    single_statusbar @2292 DATA
+    skill @2293 DATA
+    skinnames @2294 DATA
+    slugs_index @2295 DATA
+    sm_meat_index @2296 DATA
+    snd_fry @2297 DATA
+    soldier_attack @2298
+    soldier_attack1_refire1 @2299
+    soldier_attack1_refire2 @2300
+    soldier_attack2_refire1 @2301
+    soldier_attack2_refire2 @2302
+    soldier_attack3_refire @2303
+    soldier_attack6_refire @2304
+    soldier_cock @2305
+    soldier_dead @2306
+    soldier_die @2307
+    soldier_dodge @2308
+    soldier_duck_down @2309
+    soldier_duck_hold @2310
+    soldier_duck_up @2311
+    soldier_fire @2312
+    soldier_fire1 @2313
+    soldier_fire2 @2314
+    soldier_fire3 @2315
+    soldier_fire4 @2316
+    soldier_fire6 @2317
+    soldier_fire7 @2318
+    soldier_fire8 @2319
+    soldier_frames_attack1 @2320 DATA
+    soldier_frames_attack2 @2321 DATA
+    soldier_frames_attack3 @2322 DATA
+    soldier_frames_attack4 @2323 DATA
+    soldier_frames_attack6 @2324 DATA
+    soldier_frames_death1 @2325 DATA
+    soldier_frames_death2 @2326 DATA
+    soldier_frames_death3 @2327 DATA
+    soldier_frames_death4 @2328 DATA
+    soldier_frames_death5 @2329 DATA
+    soldier_frames_death6 @2330 DATA
+    soldier_frames_duck @2331 DATA
+    soldier_frames_jump @2332 DATA
+    soldier_frames_pain1 @2333 DATA
+    soldier_frames_pain2 @2334 DATA
+    soldier_frames_pain3 @2335 DATA
+    soldier_frames_pain4 @2336 DATA
+    soldier_frames_run @2337 DATA
+    soldier_frames_stand1 @2338 DATA
+    soldier_frames_stand3 @2339 DATA
+    soldier_frames_start_run @2340 DATA
+    soldier_frames_walk1 @2341 DATA
+    soldier_frames_walk2 @2342 DATA
+    soldier_idle @2343
+    soldier_jump @2344
+    soldier_move_attack1 @2345 DATA
+    soldier_move_attack2 @2346 DATA
+    soldier_move_attack3 @2347 DATA
+    soldier_move_attack4 @2348 DATA
+    soldier_move_attack6 @2349 DATA
+    soldier_move_death1 @2350 DATA
+    soldier_move_death2 @2351 DATA
+    soldier_move_death3 @2352 DATA
+    soldier_move_death4 @2353 DATA
+    soldier_move_death5 @2354 DATA
+    soldier_move_death6 @2355 DATA
+    soldier_move_duck @2356 DATA
+    soldier_move_jump @2357 DATA
+    soldier_move_pain1 @2358 DATA
+    soldier_move_pain2 @2359 DATA
+    soldier_move_pain3 @2360 DATA
+    soldier_move_pain4 @2361 DATA
+    soldier_move_run @2362 DATA
+    soldier_move_stand1 @2363 DATA
+    soldier_move_stand3 @2364 DATA
+    soldier_move_start_run @2365 DATA
+    soldier_move_walk1 @2366 DATA
+    soldier_move_walk2 @2367 DATA
+    soldier_pain @2368
+    soldier_run @2369
+    soldier_sight @2370
+    soldier_stand @2371
+    soldier_walk @2372
+    soldier_walk1_random @2373
+    spawn_precipitation @2374
+    spawns @2375 DATA
+    spectator_password @2376 DATA
+    spectator_respawn @2377
+    spline_calc @2378
+    sshotgun_count @2379 DATA
+    sshotgun_damage @2380 DATA
+    sshotgun_hspread @2381 DATA
+    sshotgun_vspread @2382 DATA
+    st @2383 DATA
+    stasis_time @2384 DATA
+    stuffcmd @2385
+    supertankMachineGun @2386
+    supertankRocket @2387
+    supertank_attack @2388
+    supertank_dead @2389
+    supertank_die @2390
+    supertank_forward @2391
+    supertank_frames_attack1 @2392 DATA
+    supertank_frames_attack2 @2393 DATA
+    supertank_frames_attack3 @2394 DATA
+    supertank_frames_attack4 @2395 DATA
+    supertank_frames_backward @2396 DATA
+    supertank_frames_death1 @2397 DATA
+    supertank_frames_end_attack1 @2398 DATA
+    supertank_frames_forward @2399 DATA
+    supertank_frames_pain1 @2400 DATA
+    supertank_frames_pain2 @2401 DATA
+    supertank_frames_pain3 @2402 DATA
+    supertank_frames_run @2403 DATA
+    supertank_frames_stand @2404 DATA
+    supertank_frames_turn_left @2405 DATA
+    supertank_frames_turn_right @2406 DATA
+    supertank_move_attack1 @2407 DATA
+    supertank_move_attack2 @2408 DATA
+    supertank_move_attack3 @2409 DATA
+    supertank_move_attack4 @2410 DATA
+    supertank_move_backward @2411 DATA
+    supertank_move_death @2412 DATA
+    supertank_move_end_attack1 @2413 DATA
+    supertank_move_forward @2414 DATA
+    supertank_move_pain1 @2415 DATA
+    supertank_move_pain2 @2416 DATA
+    supertank_move_pain3 @2417 DATA
+    supertank_move_run @2418 DATA
+    supertank_move_stand @2419 DATA
+    supertank_move_turn_left @2420 DATA
+    supertank_move_turn_right @2421 DATA
+    supertank_pain @2422
+    supertank_reattack1 @2423
+    supertank_run @2424
+    supertank_search @2425
+    supertank_stand @2426
+    supertank_walk @2427
+    sv_cheats @2428 DATA
+    sv_gravity @2429 DATA
+    sv_maplist @2430 DATA
+    sv_maxgibs @2431 DATA
+    sv_maxvelocity @2432 DATA
+    sv_rollangle @2433 DATA
+    sv_rollspeed @2434 DATA
+    swimmonster_start @2435
+    swimmonster_start_go @2436
+    swinging_door_killed @2437
+    swinging_door_reset @2438
+    tank_attack @2439
+    tank_dead @2440
+    tank_die @2441
+    tank_doattack_rocket @2442
+    tank_footstep @2443
+    tank_frames_attack_blast @2444 DATA
+    tank_frames_attack_chain @2445 DATA
+    tank_frames_attack_fire_rocket @2446 DATA
+    tank_frames_attack_post_blast @2447 DATA
+    tank_frames_attack_post_rocket @2448 DATA
+    tank_frames_attack_pre_rocket @2449 DATA
+    tank_frames_attack_strike @2450 DATA
+    tank_frames_death1 @2451 DATA
+    tank_frames_pain1 @2452 DATA
+    tank_frames_pain2 @2453 DATA
+    tank_frames_pain3 @2454 DATA
+    tank_frames_reattack_blast @2455 DATA
+    tank_frames_run @2456 DATA
+    tank_frames_stand @2457 DATA
+    tank_frames_start_run @2458 DATA
+    tank_frames_start_walk @2459 DATA
+    tank_frames_stop_run @2460 DATA
+    tank_frames_stop_walk @2461 DATA
+    tank_frames_walk @2462 DATA
+    tank_idle @2463
+    tank_move_attack_blast @2464 DATA
+    tank_move_attack_chain @2465 DATA
+    tank_move_attack_fire_rocket @2466 DATA
+    tank_move_attack_post_blast @2467 DATA
+    tank_move_attack_post_rocket @2468 DATA
+    tank_move_attack_pre_rocket @2469 DATA
+    tank_move_attack_strike @2470 DATA
+    tank_move_death @2471 DATA
+    tank_move_pain1 @2472 DATA
+    tank_move_pain2 @2473 DATA
+    tank_move_pain3 @2474 DATA
+    tank_move_reattack_blast @2475 DATA
+    tank_move_run @2476 DATA
+    tank_move_stand @2477 DATA
+    tank_move_start_run @2478 DATA
+    tank_move_start_walk @2479 DATA
+    tank_move_stop_run @2480 DATA
+    tank_move_stop_walk @2481 DATA
+    tank_move_walk @2482 DATA
+    tank_pain @2483
+    tank_poststrike @2484
+    tank_reattack_blaster @2485
+    tank_refire_rocket @2486
+    tank_run @2487
+    tank_sight @2488
+    tank_stand @2489
+    tank_thud @2490
+    tank_walk @2491
+    tank_windup @2492
+    target_actor_touch @2493
+    target_animate @2494
+    target_animation_use @2495
+    target_attractor_think @2496
+    target_attractor_think_single @2497
+    target_blaster_init @2498
+    target_blaster_think @2499
+    target_clone_starton @2500
+    target_command_use @2501
+    target_crosslevel_target_think @2502
+    target_earthquake_think @2503
+    target_earthquake_use @2504
+    target_effect_at @2505
+    target_effect_explosion @2506
+    target_effect_lightning @2507
+    target_effect_sparks @2508
+    target_effect_splash @2509
+    target_effect_steam @2510
+    target_effect_think @2511
+    target_effect_trail @2512
+    target_effect_tunnel_sparks @2513
+    target_effect_use @2514
+    target_effect_widowbeam @2515
+    target_explosion_explode @2516
+    target_failure_fade_lights @2517
+    target_failure_player_die @2518
+    target_failure_think @2519
+    target_failure_wipe @2520
+    target_fog_use @2521
+    target_fountain_delayed_use @2522
+    target_fountain_think @2523
+    target_fountain_use @2524
+    target_laser_off @2525
+    target_laser_on @2526
+    target_laser_ps_off @2527
+    target_laser_ps_on @2528
+    target_laser_ps_think @2529
+    target_laser_ps_use @2530
+    target_laser_start @2531
+    target_laser_think @2532
+    target_laser_use @2533
+    target_lightramp_think @2534
+    target_lightramp_use @2535
+    target_lightswitch_toggle @2536
+    target_locator_init @2537
+    target_lock_use @2538
+    target_monitor_move @2539
+    target_monitor_off @2540
+    target_precipitation_delayed_use @2541
+    target_precipitation_think @2542
+    target_precipitation_use @2543
+    target_string_use @2544
+    tech_flags @2545 DATA
+    tech_haste @2546 DATA
+    tech_life @2547 DATA
+    tech_max @2548 DATA
+    tech_min @2549 DATA
+    tech_perplayer @2550 DATA
+    tech_regen @2551 DATA
+    tech_regen_armor @2552 DATA
+    tech_regen_armor_always @2553 DATA
+    tech_regen_armor_max @2554 DATA
+    tech_regen_health_max @2555 DATA
+    tech_resist @2556 DATA
+    tech_spawn @2557 DATA
+    tech_strength @2558 DATA
+    tech_vampire @2559 DATA
+    tech_vampiremax @2560 DATA
+    teleport_transition_ents @2561
+    teleporter_touch @2562
+    text @2563 DATA
+    text_buf @2564 DATA
+    textsize @2565 DATA
+    thing_grenade_boom @2566
+    thing_restore_leader @2567
+    thing_think @2568
+    thing_think_pause @2569
+    thing_touch @2570
+    timelimit @2571 DATA
+    toggle_target_blaster @2572
+    toggle_turret_breach @2573
+    touch_hint_path @2574
+    touch_trigger_disguise @2575
+    touch_trigger_switch @2576
+    tpp @2577 DATA
+    tpp_auto @2578 DATA
+    trackchange_done @2579
+    trackchange_use @2580
+    tracktrain_blocked @2581
+    tracktrain_die @2582
+    tracktrain_disengage @2583
+    tracktrain_drive @2584
+    tracktrain_hide @2585
+    tracktrain_next @2586
+    tracktrain_reach_dest @2587
+    tracktrain_think @2588
+    tracktrain_turn @2589
+    tracktrain_use @2590
+    trail @2591 DATA
+    trail_active @2592 DATA
+    trail_head @2593 DATA
+    train_angles @2594
+    train_blocked @2595
+    train_children_think @2596
+    train_die @2597
+    train_next @2598
+    train_resume @2599
+    train_spline @2600
+    train_use @2601
+    train_wait @2602
+    train_yaw @2603
+    trainbutton_done @2604
+    trainbutton_fire @2605
+    trainbutton_killed @2606
+    trainbutton_return @2607
+    trainbutton_touch @2608
+    trainbutton_use @2609
+    trainbutton_wait @2610
+    trans_ent_filename @2611
+    tremor_trigger_enable @2612
+    trig_fade_fog @2613 DATA
+    trig_fog_fade @2614
+    trigger_bbox_die @2615
+    trigger_bbox_reset @2616
+    trigger_bbox_touch @2617
+    trigger_bbox_use @2618
+    trigger_counter_use @2619
+    trigger_crosslevel_trigger_use @2620
+    trigger_elevator_init @2621
+    trigger_elevator_use @2622
+    trigger_enable @2623
+    trigger_fog_use @2624
+    trigger_gravity_touch @2625
+    trigger_inside_think @2626
+    trigger_key_use @2627
+    trigger_look_disable @2628
+    trigger_look_enable @2629
+    trigger_look_touch @2630
+    trigger_mass_touch @2631
+    trigger_monsterjump_touch @2632
+    trigger_push_touch @2633
+    trigger_relay_use @2634
+    trigger_scales_think @2635
+    trigger_speaker_disable @2636
+    trigger_speaker_enable @2637
+    trigger_speaker_think @2638
+    trigger_switch @2639
+    trigger_switch_delay @2640
+    trigger_switch_usetargets @2641
+    trigger_teleporter_use @2642
+    trigger_transition_ents @2643
+    ttctf @2644 DATA
+    ttctf_joinmenu @2645 DATA
+    ttctf_nochasemenu @2646 DATA
+    ttctf_statusbar @2647 DATA
+    turn_rider @2648 DATA
+    turn_vehicle @2649
+    turret_base_finish @2650
+    turret_blocked @2651
+    turret_breach_finish_init @2652
+    turret_breach_fire @2653
+    turret_breach_think @2654
+    turret_breach_touch @2655
+    turret_die @2656
+    turret_die_temp_think @2657
+    turret_disengage @2658
+    turret_driver_die @2659
+    turret_driver_link @2660
+    turret_driver_think @2661
+    turret_turn @2662
+    tv @2663
+    use_camera @2664
+    use_coloredtechs @2665 DATA
+    use_func_reflect @2666
+    use_killbox @2667
+    use_lithiumtechs @2668 DATA
+    use_target_CD @2669
+    use_target_anger @2670
+    use_target_attractor @2671
+    use_target_blaster @2672
+    use_target_change @2673
+    use_target_changelevel @2674
+    use_target_explosion @2675
+    use_target_fade @2676
+    use_target_failure @2677
+    use_target_goal @2678
+    use_target_lightswitch @2679
+    use_target_monitor @2680
+    use_target_monsterbattle @2681
+    use_target_movewith @2682
+    use_target_rocks @2683
+    use_target_rotation @2684
+    use_target_secret @2685
+    use_target_set_effect @2686
+    use_target_skill @2687
+    use_target_sky @2688
+    use_target_spawner @2689
+    use_target_splash @2690
+    use_techs @2691 DATA
+    use_teleporter @2692
+    use_trigger_disguise @2693
+    use_trigger_switch @2694
+    use_turret_base @2695
+    use_turret_breach @2696
+    use_vwep @2697 DATA
+    va @2698
+    vec3_origin @2699 DATA
+    vectoangles @2700
+    vectoangles2 @2701
+    vectoyaw @2702
+    vectoyaw2 @2703
+    vehicle_blocked @2704
+    vehicle_disengage @2705
+    vehicle_think @2706
+    vehicle_touch @2707
+    vid_ref @2708 DATA
+    viper_bomb_think @2709
+    viper_die @2710
+    visible @2711
+    vtos @2712
+    walkmonster_start @2713
+    walkmonster_start_go @2714
+    warn_unbalanced @2715 DATA
+    warp_list @2716 DATA
+    wasonground @2717 DATA
+    weapon_bfg_fire @2718
+    weapon_grenade_fire @2719
+    weapon_grenadelauncher_fire @2720
+    weapon_railgun_fire @2721
+    weapon_shotgun_fire @2722
+    weapon_supershotgun_fire @2723
+    weight_on_top @2724
+    xyspeed @2725 DATA
+    zoomrate @2726 DATA
+    zoomsnap @2727 DATA

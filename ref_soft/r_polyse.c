@@ -42,6 +42,9 @@ typedef struct {
 	int				count;
 	byte			*ptex;
 	int				sfrac, tfrac, light, zi;
+#ifdef COLMODEL
+	int				lightr, lightg, lightb; // leilei - colored lighting
+#endif
 } spanpackage_t;
 
 typedef struct {
@@ -100,6 +103,12 @@ int						d_lightbasestep, d_pdestbasestep, d_ptexbasestep;
 int						d_sfracbasestep, d_tfracbasestep;
 int						d_ziextrastep, d_zibasestep;
 int						d_pzextrastep, d_pzbasestep;
+
+// leilei - colored lighting
+
+int						d_lightrbasestep, d_lightgbasestep, d_lightbbasestep;
+int						d_lightrextrastep, d_lightgextrastep, d_lightbextrastep;
+int						d_lightr, d_lightg, d_lightb;
 
 typedef struct {
 	int		quotient;
@@ -251,6 +260,20 @@ void R_DrawTriangle( void )
 		r_p2[3] = aliastriangleparms.c->t;
 		r_p2[4] = aliastriangleparms.c->l;
 		r_p2[5] = aliastriangleparms.c->zi;
+/* // i crash fixme
+	//	if (coloredlights){
+		r_p0[6] = aliastriangleparms.a->l;		// lightr
+		r_p0[7] = aliastriangleparms.a->l;		// lightg
+		r_p0[8] = aliastriangleparms.a->l;		// lightb
+		r_p1[6] = aliastriangleparms.b->l;		// lightr
+		r_p1[7] = aliastriangleparms.b->l;		// lightg
+		r_p1[8] = aliastriangleparms.b->l;		// lightb
+		r_p2[6] = aliastriangleparms.c->l;		// lightr
+		r_p2[7] = aliastriangleparms.c->l;		// lightg
+		r_p2[8] = aliastriangleparms.c->l;		// lightb
+//		}
+
+		*/
 
 		R_PolysetSetEdgeTable ();
 		R_RasterizeAliasPolySmooth ();
@@ -277,6 +300,11 @@ void R_PolysetScanLeftEdge_C(int height)
 
 	// FIXME: need to clamp l, s, t, at both ends?
 		d_pedgespanpackage->light = d_light;
+#ifdef COLMODEL
+		d_pedgespanpackage->lightr = d_lightr;
+		d_pedgespanpackage->lightg = d_lightg;
+		d_pedgespanpackage->lightb = d_lightb;
+#endif
 		d_pedgespanpackage->zi = d_zi;
 
 		d_pedgespanpackage++;
@@ -301,6 +329,11 @@ void R_PolysetScanLeftEdge_C(int height)
 			d_light += d_lightextrastep;
 			d_zi += d_ziextrastep;
 			errorterm -= erroradjustdown;
+#ifdef COLMODEL
+			d_lightr += d_lightextrastep;
+			d_lightg += d_lightextrastep;
+			d_lightb += d_lightextrastep;
+#endif
 		}
 		else
 		{
@@ -318,6 +351,11 @@ void R_PolysetScanLeftEdge_C(int height)
 				d_tfrac &= 0xFFFF;
 			}
 			d_light += d_lightbasestep;
+#ifdef COLMODEL
+			d_lightr += d_lightrbasestep;
+			d_lightg += d_lightgbasestep;
+			d_lightb += d_lightbbasestep;
+#endif
 			d_zi += d_zibasestep;
 		}
 	} while (--height);
@@ -411,7 +449,7 @@ void R_PolysetSetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 R_PolysetCalcGradients
 ================
 */
-#if id386 && !defined __linux__
+#if id386 && !defined __linux__ && !defined __FreeBSD__
 void R_PolysetCalcGradients( int skinwidth )
 {
 	static float xstepdenominv, ystepdenominv, t0, t1;
@@ -1035,10 +1073,22 @@ void R_PolysetDrawSpansConstant8_66( spanpackage_t *pspanpackage)
 }
 
 #if !id386
+// leilei - colored lighting
+
+extern byte	palmap2[64][64][64];		//  Colored Lighting Lookup Table
 void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 {
 	int		lcount;
 
+	unsigned char *pix24;	// leilei - colored lighting
+	int trans [3];			// leilei - colored lighting
+	int		llightrgb[3];	// leilei - colored lighting
+	vec3_t	lpcolor;
+
+		//R_LightPointColor(currententity->origin, lpcolor);
+		lpcolor[0] = lightin[0];
+		lpcolor[1] = lightin[1];
+		lpcolor[2] = lightin[2];
 	do
 	{
 		lcount = d_aspancount - pspanpackage->count;
@@ -1070,7 +1120,15 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 			ltfrac = pspanpackage->tfrac;
 			llight = pspanpackage->light;
 			lzi = pspanpackage->zi;
-
+			if(coloredlights){
+			llightrgb[0] = pspanpackage->lightr;
+			llightrgb[1] = pspanpackage->lightg;
+			llightrgb[2] = pspanpackage->lightb;
+		//	llightrgb[0] = 84;
+		//	llightrgb[1] = 54;
+		//	llightrgb[2] = 122;
+	//			llight = 16384;
+			}
 			do
 			{
 				if ((lzi >> 16) >= *lpz)
@@ -1078,7 +1136,24 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 //PGM
 					if(r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
 						*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
+					// leilei - colored lights begin
+					else if (coloredlights){
+						pix24 = (unsigned char *)&d_8to24table[*lptex];	
+				//		trans[0] = (pix24[0] * (16384 - llightrgb[0])) >> 15;
+				//		trans[1] = (pix24[1] * (16384 - llightrgb[1])) >> 15;
+				//		trans[2] = (pix24[2] * (16384 - llightrgb[2])) >> 15;
+				//		trans[0] = (int)(pix24[0] * 16384 * lpcolor[0]) >> 15;
+				//		trans[1] = (int)(pix24[1] * 16384 * lpcolor[1]) >> 15;
+				//		trans[2] = (int)(pix24[2] * 16384 * lpcolor[2]) >> 15;	// leilei - temporarily use lightpoint... until we properly have model lights
+						trans[0] = (int)(pix24[0] * (llight * lpcolor[0])) >> 15;
+						trans[1] = (int)(pix24[1] * (llight * lpcolor[1])) >> 15;
+						trans[2] = (int)(pix24[2] * (llight * lpcolor[2])) >> 15;	// leilei - temporarily use lightpoint... until we properly have model lights
+						if (trans[0] < 0) trans[0] = 0;	if (trans[1] < 0) trans[1] = 0;	if (trans[2] < 0) trans[2] = 0;
+						if (trans[0] > 63) trans[0] = 63; if (trans[1] > 63) trans[1] = 63;	if (trans[2] > 63) trans[2] = 63;	
+						*lpdest = palmap2[trans[0]][trans[1]][trans[2]];
+					}
 					else
+					// leilei - colored lights end
 					*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)];
 //PGM
 					*lpz = lzi >> 16;
@@ -1199,7 +1274,11 @@ void R_RasterizeAliasPolySmooth (void)
 //#endif
 	d_light = plefttop[4];
 	d_zi = plefttop[5];
-
+#ifdef COLMODEL
+	d_lightr = plefttop[6];
+	d_lightg = plefttop[7];
+	d_lightb = plefttop[8];
+#endif
 	d_pdest = (byte *)d_viewbuffer +
 			ystart * r_screenwidth + plefttop[0];
 	d_pz = d_pzbuffer + ystart * d_zwidth + plefttop[0];
@@ -1216,6 +1295,11 @@ void R_RasterizeAliasPolySmooth (void)
 
 	// FIXME: need to clamp l, s, t, at both ends?
 		d_pedgespanpackage->light = d_light;
+#ifdef COLMODEL
+		d_pedgespanpackage->lightr = d_lightr;
+		d_pedgespanpackage->lightg = d_lightg;
+		d_pedgespanpackage->lightb = d_lightb;
+#endif
 		d_pedgespanpackage->zi = d_zi;
 
 		d_pedgespanpackage++;
@@ -1276,6 +1360,10 @@ void R_RasterizeAliasPolySmooth (void)
 		d_lightbasestep = r_lstepy + working_lstepx * ubasestep;
 		d_zibasestep = r_zistepy + r_zistepx * ubasestep;
 
+		d_lightrbasestep = r_lstepy + working_lstepx * ubasestep;
+		d_lightgbasestep = r_lstepy + working_lstepx * ubasestep;
+		d_lightbbasestep = r_lstepy + working_lstepx * ubasestep;
+
 		d_ptexextrastep = ((r_sstepy + r_sstepx * d_countextrastep) >> 16) +
 				((r_tstepy + r_tstepx * d_countextrastep) >> 16) *
 				r_affinetridesc.skinwidth;
@@ -1296,6 +1384,10 @@ void R_RasterizeAliasPolySmooth (void)
 //#endif
 		d_lightextrastep = d_lightbasestep + working_lstepx;
 		d_ziextrastep = d_zibasestep + r_zistepx;
+
+		d_lightrextrastep = d_lightrbasestep + working_lstepx;
+		d_lightgextrastep = d_lightgbasestep + working_lstepx;
+		d_lightbextrastep = d_lightbbasestep + working_lstepx;
 
 #if id386
 		if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )
@@ -1331,7 +1423,11 @@ void R_RasterizeAliasPolySmooth (void)
 		d_tfrac = 0;
 		d_light = plefttop[4];
 		d_zi = plefttop[5];
-
+#ifdef COLMODEL
+		d_lightr = plefttop[6];
+		d_lightg = plefttop[7];
+		d_lightb = plefttop[8];
+#endif
 		d_pdest = (byte *)d_viewbuffer + ystart * r_screenwidth + plefttop[0];
 		d_pz = d_pzbuffer + ystart * d_zwidth + plefttop[0];
 
@@ -1347,6 +1443,11 @@ void R_RasterizeAliasPolySmooth (void)
 
 		// FIXME: need to clamp l, s, t, at both ends?
 			d_pedgespanpackage->light = d_light;
+#ifdef COLMODEL
+			d_pedgespanpackage->lightr = d_lightr;
+			d_pedgespanpackage->lightg = d_lightg;
+			d_pedgespanpackage->lightb = d_lightb;
+#endif
 			d_pedgespanpackage->zi = d_zi;
 
 			d_pedgespanpackage++;
@@ -1402,6 +1503,10 @@ void R_RasterizeAliasPolySmooth (void)
 			d_lightbasestep = r_lstepy + working_lstepx * ubasestep;
 			d_zibasestep = r_zistepy + r_zistepx * ubasestep;
 
+			d_lightrbasestep = r_lstepy + working_lstepx * ubasestep;
+			d_lightgbasestep = r_lstepy + working_lstepx * ubasestep;
+			d_lightbbasestep = r_lstepy + working_lstepx * ubasestep;
+
 			d_ptexextrastep = ((r_sstepy + r_sstepx * d_countextrastep) >> 16) +
 					((r_tstepy + r_tstepx * d_countextrastep) >> 16) *
 					r_affinetridesc.skinwidth;
@@ -1422,6 +1527,10 @@ void R_RasterizeAliasPolySmooth (void)
 //#endif
 			d_lightextrastep = d_lightbasestep + working_lstepx;
 			d_ziextrastep = d_zibasestep + r_zistepx;
+
+			d_lightrextrastep = d_lightrbasestep + working_lstepx;
+			d_lightgextrastep = d_lightgbasestep + working_lstepx;
+			d_lightbextrastep = d_lightbbasestep + working_lstepx;
 
 #if id386
 			if ( d_pdrawspans == R_PolysetDrawSpans8_Opaque )

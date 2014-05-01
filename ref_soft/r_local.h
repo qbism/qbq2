@@ -26,7 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../client/ref.h"
 
-#define REF_VERSION     "SOFT 0.01"
+
+#define REF_VERSION     "KolorSoft"  //qb: LOL
 
 // up / down
 #define PITCH   0
@@ -37,6 +38,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // fall over
 #define ROLL    2
 
+
+// leilei - colored lighting
+
+#define	COLMODEL
 
 /*
 
@@ -172,6 +177,7 @@ extern oldrefdef_t      r_refdef;
 #define WARP_WIDTH              320
 #define WARP_HEIGHT             240
 
+
 #define MAX_LBM_HEIGHT  480
 
 
@@ -191,11 +197,12 @@ extern oldrefdef_t      r_refdef;
 
 #define DS_SPAN_LIST_END        -128
 
-#define NUMSTACKEDGES           2000
+//qb: increased to solve dropped faces in maps with large open spaces like SMD
+#define NUMSTACKEDGES           8192	//qb: 8192 per qsb - was 2400	
 #define MINEDGES                        NUMSTACKEDGES
-#define NUMSTACKSURFACES        1000
+#define NUMSTACKSURFACES        8192  //qb: 8192 per qsb - was 1000
 #define MINSURFACES                     NUMSTACKSURFACES
-#define MAXSPANS                        3000
+#define MAXSPANS                8192 //qb: was 3000.
 
 // flags in finalvert_t.flags
 #define ALIAS_LEFT_CLIP                         0x0001
@@ -282,6 +289,10 @@ typedef struct finalvert_s {
 	int             zi;
 	int             flags;
 	float   xyz[3];         // eye space
+#ifdef COLMODEL
+	// leilei - colored light
+	int             lr, lg, lb;
+#endif
 } finalvert_t;
 
 #define FINALVERT_V0     0
@@ -294,7 +305,15 @@ typedef struct finalvert_s {
 #define FINALVERT_X     28
 #define FINALVERT_Y     32
 #define FINALVERT_Z     36
+
+#ifdef COLMODEL
+#define FINALVERT_LR    40
+#define FINALVERT_LG    44
+#define FINALVERT_LB    48
+#define FINALVERT_SIZE  52
+#else
 #define FINALVERT_SIZE  40
+#endif
 
 #endif
 
@@ -332,6 +351,12 @@ typedef struct {
 	int                     ambientlight;
 	int                     shadelight;
 	float           *plightvec;
+
+	// leilei - colored lighting
+
+	float           *prlightvec;
+	float           *pglightvec;
+	float           *pblightvec;
 } alight_t;
 
 // clipped bmodel edges
@@ -465,9 +490,10 @@ void R_DrawSurface (void);
 
 extern int              c_surf;
 
-extern byte             r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
-
-
+//extern byte             r_warpbuffer[WARP_WIDTH * WARP_HEIGHT];
+extern byte		*r_warpbuffer;
+extern int		r_warpwidth;
+extern int		r_warpheight;
 
 
 extern float    scale_for_mip;
@@ -512,9 +538,9 @@ extern int              r_screenwidth;
 
 extern int              r_drawnpolycount;
 
-extern int      sintable[1280];
-extern int      intsintable[1280];
-extern int		blanktable[1280];		// PGM
+extern int      sintable[4200];
+extern int      intsintable[4200];
+extern int		blanktable[4200];		// PGM
 
 extern  vec3_t  vup, base_vup;
 extern  vec3_t  vpn, base_vpn;
@@ -560,6 +586,7 @@ extern cvar_t   *sw_reportedgeout;
 extern cvar_t   *sw_stipplealpha;
 extern cvar_t   *sw_surfcacheoverride;
 extern cvar_t   *sw_waterwarp;
+extern cvar_t   *sw_texturesmooth; // texture dither
 
 extern cvar_t   *r_fullbright;
 extern cvar_t	*r_lefthand;
@@ -575,6 +602,10 @@ extern cvar_t   *r_lightlevel;  //FIXME HACK
 extern cvar_t	*vid_fullscreen;
 extern	cvar_t	*vid_gamma;
 
+extern cvar_t  *r_customwidth;
+extern cvar_t  *r_customheight;
+extern cvar_t   *r_coloredlights; // leilei
+extern int		coloredlights;	// leilei
 
 extern  clipplane_t     view_clipplanes[4];
 extern int              *pfrustum_indexes[4];
@@ -595,6 +626,9 @@ extern  model_t         *currentmodel;
 extern  entity_t                *currententity;
 extern  vec3_t  modelorg;
 extern  vec3_t  r_entorigin;
+
+
+vec3_t			lightin;	// leilei - model lighting
 
 extern  float   verticalFieldOfView;
 extern  float   xOrigin, yOrigin;
@@ -633,6 +667,14 @@ void R_DrawSurfaceBlock8_mip2 (void);
 void R_DrawSurfaceBlock8_mip3 (void);
 
 #endif
+
+//	leilei  - colored lighting
+void R_DrawSurfaceBlock8RGB_mip0 (void);
+void R_DrawSurfaceBlock8RGB_mip1 (void);
+void R_DrawSurfaceBlock8RGB_mip2 (void);
+void R_DrawSurfaceBlock8RGB_mip3 (void);
+//  o^_^o
+
 
 void R_GenSkyTile (void *pdest);
 void R_GenSkyTile16 (void *pdest);
@@ -790,6 +832,7 @@ void	 R_BeginFrame( float camera_separation );
 void	R_CinematicSetPalette( const unsigned char *palette );
 
 extern unsigned d_8to24table[256]; // base
+extern unsigned d_8to24tabble[256]; // base
 
 void    Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length);
 void    Sys_SetFPCW (void);
@@ -802,6 +845,11 @@ image_t *R_FindImage (char *name, imagetype_t type);
 void    R_FreeUnusedImages (void);
 
 void	R_GammaCorrectAndSetPalette( const unsigned char *pal );
+
+#ifdef QMAX
+void	R_AddStain (vec3_t org, float intensity, float r, float g, float b);
+void	Draw_ScaledPic (int x, int y, float scale, float alpha, char *pic);
+#endif
 
 extern mtexinfo_t  *sky_texinfo[6];
 

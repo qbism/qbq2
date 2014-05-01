@@ -36,6 +36,12 @@ int				r_amodels_drawn;
 affinetridesc_t	r_affinetridesc;
 
 vec3_t			r_plightvec;
+
+//qb: colored lighting from leilei
+vec3_t			r_prlightvec;
+vec3_t			r_pglightvec;
+vec3_t			r_pblightvec;
+
 vec3_t          r_lerped[1024];
 vec3_t          r_lerp_frontv, r_lerp_backv, r_lerp_move;
 
@@ -105,7 +111,6 @@ unsigned long R_AliasCheckFrameBBox( daliasframe_t *frame, float worldxf[3][4] )
 	vec3_t        mins, maxs;
 	vec3_t        transformed_min, transformed_max;
 	qboolean      zclipped = false, zfullyclipped = true;
-	float         minz = 9999.0F;
 
 	/*
 	** get the exact frame bounding box
@@ -313,6 +318,9 @@ void R_AliasPreparePoints (void)
 			}
 			else
 			{
+				if(coloredlights)
+				R_AliasClipTriangleRGB (pfv[2], pfv[1], pfv[0]);
+				else
 				R_AliasClipTriangle (pfv[2], pfv[1], pfv[0]);
 			}
 		}
@@ -348,6 +356,9 @@ void R_AliasPreparePoints (void)
 			}
 			else		
 			{	// partially clipped
+				if(coloredlights)
+				R_AliasClipTriangleRGB (pfv[0], pfv[1], pfv[2]);
+				else
 				R_AliasClipTriangle (pfv[0], pfv[1], pfv[2]);
 			}
 		}
@@ -429,7 +440,7 @@ void R_AliasSetUpTransform (void)
 R_AliasTransformFinalVerts
 ================
 */
-#if id386 && !defined __linux__
+#if id386 && !defined __linux__ && !defined __FreeBSD__
 void R_AliasTransformFinalVerts( int numpoints, finalvert_t *fv, dtrivertx_t *oldv, dtrivertx_t *newv )
 {
 	float  lightcos;
@@ -885,7 +896,17 @@ R_AliasSetupLighting
 void R_AliasSetupLighting (void)
 {
 	alight_t		lighting;
+	
+	/*
 	float			lightvec[3] = {-1, 0, 0};
+	float			rlightvec[3] = {-1, 0, 0};
+	float			glightvec[3] = {-1, 0, 0};
+	float			blightvec[3] = {-1, 0, 0};
+	*/
+	float			lightvec[3] = {0.2, -0.8, 0.6};
+	float			rlightvec[3] = {-1, 0, 0};
+	float			glightvec[3] = {0, -1, 0};
+	float			blightvec[3] = {0, 0, -1};
 	vec3_t			light;
 	int				i, j;
 
@@ -897,6 +918,11 @@ void R_AliasSetupLighting (void)
 	}
 	else
 	{
+		if (coloredlights){
+		//R_LightPointColor (currententity->origin, shadelight);
+		R_LightPointColor (currententity->origin, lightin);
+		}
+		else
 		R_LightPoint (currententity->origin, light);
 	}
 
@@ -932,7 +958,12 @@ void R_AliasSetupLighting (void)
 	lighting.ambientlight = j;
 	lighting.shadelight = j;
 
+	
 	lighting.plightvec = lightvec;
+
+	lighting.prlightvec = rlightvec;
+	lighting.pglightvec = glightvec;
+	lighting.pblightvec = blightvec;
 
 // clamp lighting so it doesn't overbright as much
 	if (lighting.ambientlight > 128)
@@ -947,6 +978,13 @@ void R_AliasSetupLighting (void)
 	if (r_ambientlight < LIGHT_MIN)
 		r_ambientlight = LIGHT_MIN;
 
+	if (r_coloredlights->value){
+	
+		r_ambientlight = 416; //qb: was 276;	// leilei - for lightpoint interrim hack
+	r_ambientlight *= VID_GRADES;
+	}
+	else
+
 	r_ambientlight = (255 - r_ambientlight) << VID_CBITS;
 
 	if (r_ambientlight < LIGHT_MIN)
@@ -957,12 +995,22 @@ void R_AliasSetupLighting (void)
 	if (r_shadelight < 0)
 		r_shadelight = 0;
 
+	if (r_coloredlights->value){
+	r_shadelight = 256;	// leilei - for lightpoint interrim hack
+	
+
+	}
+
 	r_shadelight *= VID_GRADES;
 
 // rotate the lighting vector into the model's frame of reference
 	r_plightvec[0] =  DotProduct( lighting.plightvec, s_alias_forward );
 	r_plightvec[1] = -DotProduct( lighting.plightvec, s_alias_right );
 	r_plightvec[2] =  DotProduct( lighting.plightvec, s_alias_up );
+
+	r_prlightvec[0] =  DotProduct( lighting.prlightvec, s_alias_forward );
+	r_pglightvec[1] = -DotProduct( lighting.pglightvec, s_alias_right );
+	r_pblightvec[2] =  DotProduct( lighting.pblightvec, s_alias_up );
 }
 
 
@@ -1108,8 +1156,8 @@ void R_AliasDrawModel (void)
 
 		// PMM - added double
 		color = currententity->flags & ( RF_SHELL_RED | RF_SHELL_GREEN | RF_SHELL_BLUE | RF_SHELL_DOUBLE | RF_SHELL_HALF_DAM);
-		// PMM - reordered, old code first
-/*
+		// PMM - reordered, new shells after old shells (so they get overriden)
+
 		if ( color == RF_SHELL_RED )
 			r_aliasblendcolor = SHELL_RED_COLOR;
 		else if ( color == RF_SHELL_GREEN )
@@ -1130,8 +1178,7 @@ void R_AliasDrawModel (void)
 		// pmm
 		else
 			r_aliasblendcolor = SHELL_WHITE_COLOR;
-*/
-		if ( color & RF_SHELL_RED )
+/*		if ( color & RF_SHELL_RED )
 		{
 			if ( ( color & RF_SHELL_BLUE) && ( color & RF_SHELL_GREEN) )
 				r_aliasblendcolor = SHELL_WHITE_COLOR;
@@ -1155,7 +1202,7 @@ void R_AliasDrawModel (void)
 			r_aliasblendcolor = SHELL_GREEN_COLOR;
 		else
 			r_aliasblendcolor = SHELL_WHITE_COLOR;
-
+*/
 
 		if ( currententity->alpha > 0.33 )
 			d_pdrawspans = R_PolysetDrawSpansConstant8_66;

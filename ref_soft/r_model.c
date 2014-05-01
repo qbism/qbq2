@@ -316,6 +316,27 @@ void Mod_LoadLighting (lump_t *l)
 	}
 }
 
+/*
+=================
+Mod_LoadRighting
+
+Loads the lighting directly like the GL renderer does
+since we can support the RGB data now
+=================
+*/
+
+void Mod_LoadRighting (lump_t *l)
+{
+	if (!l->filelen)
+	{
+		loadmodel->lightdata = NULL;
+		return;
+	}
+	loadmodel->lightdata = Hunk_Alloc ( l->filelen);	
+	memcpy (loadmodel->lightdata, mod_base + l->fileofs, l->filelen);
+
+}
+
 
 int		r_leaftovis[MAX_MAP_LEAFS];
 int		r_vistoleaf[MAX_MAP_LEAFS];
@@ -385,6 +406,14 @@ void Mod_LoadVertexes (lump_t *l)
 		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
 	out = Hunk_Alloc ( (count+8)*sizeof(*out));		// extra for skybox
+        /*
+         * PATCH: eliasm
+         *
+         * This patch fixes the problem where the games dumped core
+         * when changing levels.
+         */
+        memset( out, 0, (count + 6) * sizeof( *out ) );
+        /* END OF PATCH */
 
 	loadmodel->vertexes = out;
 	loadmodel->numvertexes = count;
@@ -407,6 +436,7 @@ void Mod_LoadSubmodels (lump_t *l)
 	dmodel_t	*in;
 	dmodel_t	*out;
 	int			i, j, count;
+	int			lastface;	// Knightmare added
 
 	in = (void *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -428,6 +458,11 @@ void Mod_LoadSubmodels (lump_t *l)
 		out->headnode = LittleLong (in->headnode);
 		out->firstface = LittleLong (in->firstface);
 		out->numfaces = LittleLong (in->numfaces);
+		// Knightmare added
+		lastface = out->firstface + out->numfaces;
+		if (lastface < out->firstface) // || lastface > loadmodel->nummodelsurfaces)
+			ri.Sys_Error (ERR_DROP, "Mod_LoadSubmodels: bad facenum");
+		// end Knightmare
 	}
 }
 
@@ -455,6 +490,9 @@ void Mod_LoadEdges (lump_t *l)
 	{
 		out->v[0] = (unsigned short)LittleShort(in->v[0]);
 		out->v[1] = (unsigned short)LittleShort(in->v[1]);
+		// Knightmare added
+		if ( out->v[0] >= loadmodel->numvertexes || out->v[1] >= loadmodel->numvertexes )
+			ri.Sys_Error (ERR_DROP, "Mod_LoadEdges: bad vertexnum");
 	}
 }
 
@@ -506,8 +544,22 @@ void Mod_LoadTexinfo (lump_t *l)
 		out->flags = LittleLong (in->flags);
 
 		next = LittleLong (in->nexttexinfo);
-		if (next > 0)
+		if (next > 0) {
+			if (next >= count)	// Knightmare added
+				ri.Sys_Error(ERR_DROP, "Mod_LoadTexinfo: bad anim chain");
 			out->next = loadmodel->texinfo + next;
+		}
+                /*
+                 * PATCH: eliasm
+                 *
+                 * This patch fixes the problem where the game
+                 * domed core when loading a new level.
+                 */
+
+                else {
+                  out->next = NULL;
+                }
+                /* END OF PATCH */
 
 		Com_sprintf (name, sizeof(name), "textures/%s.wal", in->texture);
 		out->image = R_FindImage (name, it_wall);
@@ -595,6 +647,7 @@ void Mod_LoadFaces (lump_t *l)
 	msurface_t 	*out;
 	int			i, count, surfnum;
 	int			planenum, side;
+	int			ti, lastedge;	// Knightmare added
 
 	in = (void *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -612,16 +665,30 @@ void Mod_LoadFaces (lump_t *l)
 		if (out->numedges < 3)
 			ri.Sys_Error (ERR_DROP,"Surface with %s edges", out->numedges);
 		out->flags = 0;
+		// Knightmare added
+		lastedge = out->firstedge + out->numedges;
+		if (out->numedges < 3 || lastedge < out->firstedge)	// || lastedge > loadmodel->numedges)
+			ri.Sys_Error (ERR_DROP, "Mod_LoadFaces: bad surfedges");
+		// end Knightmare
 
 		planenum = LittleShort(in->planenum);
+		if (planenum > loadmodel->numplanes)	// Knightmare added
+			ri.Sys_Error (ERR_DROP, "Mod_LoadFaces: bad planenum");
 		side = LittleShort(in->side);
 		if (side)
 			out->flags |= SURF_PLANEBACK;			
 
 		out->plane = loadmodel->planes + planenum;
 
-		out->texinfo = loadmodel->texinfo + LittleShort (in->texinfo);
+	//	out->texinfo = loadmodel->texinfo + LittleShort (in->texinfo);
+		// Knightmare added
+		ti = LittleShort (in->texinfo);
+		if (ti < 0 || ti >= loadmodel->numtexinfo)
+			ri.Sys_Error (ERR_DROP, "Mod_LoadFaces: bad texinfo number");
+		out->texinfo = loadmodel->texinfo + ti;
+		// end Knightmare
 
+		// Knightmare- TODO: chop surface up if extents > 256
 		CalcSurfaceExtents (out);
 				
 	// lighting info is converted from 24 bit on disk to 8 bit
@@ -632,6 +699,9 @@ void Mod_LoadFaces (lump_t *l)
 		if (i == -1)
 			out->samples = NULL;
 		else
+			if (coloredlights)
+			out->samples = loadmodel->lightdata + i;
+			else
 			out->samples = loadmodel->lightdata + i/3;
 		
 	// set the drawing flags flag
@@ -722,6 +792,8 @@ void Mod_LoadNodes (lump_t *l)
 		out->firstsurface = LittleShort (in->firstface);
 		out->numsurfaces = LittleShort (in->numfaces);
 		out->contents = CONTENTS_NODE;	// differentiate from leafs
+		if (out->firstsurface + out->numsurfaces > loadmodel->numsurfaces)	// Knightmare added
+			ri.Sys_Error (ERR_DROP, "Mod_LoadNodes: bad faces in node");
 		
 		for (j=0 ; j<2 ; j++)
 		{
@@ -746,6 +818,7 @@ void Mod_LoadLeafs (lump_t *l)
 	dleaf_t 	*in;
 	mleaf_t 	*out;
 	int			i, j, count;
+	int			lastmarksurface;	// Knightmare added
 
 	in = (void *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
@@ -767,10 +840,21 @@ void Mod_LoadLeafs (lump_t *l)
 		out->contents = LittleLong(in->contents);
 		out->cluster = LittleShort(in->cluster);
 		out->area = LittleShort(in->area);
+		// Knightmare added
+		if (loadmodel->vis != NULL) {
+			if (out->cluster < -1 || out->cluster >= loadmodel->vis->numclusters)
+				ri.Sys_Error (ERR_DROP, "Mod_LoadLeafs: bad cluster");
+		}
+		// end Knightmare
 
 		out->firstmarksurface = loadmodel->marksurfaces +
 			LittleShort(in->firstleafface);
 		out->nummarksurfaces = LittleShort(in->numleaffaces);
+		// Knightmare added
+		lastmarksurface = LittleShort(in->firstleafface) + out->nummarksurfaces;
+		if (lastmarksurface > loadmodel->nummarksurfaces)
+			ri.Sys_Error (ERR_DROP, "Mod_LoadLeafs: bad leaf face index");
+		// end Knightmare
 	}	
 }
 
@@ -823,8 +907,11 @@ void Mod_LoadSurfedges (lump_t *l)
 	loadmodel->surfedges = out;
 	loadmodel->numsurfedges = count;
 
-	for ( i=0 ; i<count ; i++)
+	for ( i=0 ; i<count ; i++) {
 		out[i] = LittleLong (in[i]);
+		if (out[i] >= loadmodel->numedges)	// Knightmare added
+			ri.Sys_Error (ERR_DROP, "Mod_LoadSurfedges: bad edge index");
+	}
 }
 
 /*
@@ -865,7 +952,7 @@ void Mod_LoadPlanes (lump_t *l)
 	}
 }
 
-
+extern int coloredlights;
 /*
 =================
 Mod_LoadBrushModel
@@ -876,6 +963,7 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 	int			i;
 	dheader_t	*header;
 	dmodel_t 	*bm;
+	coloredlights = r_coloredlights->value; // leilei - colored lights - sanity check
 	
 	loadmodel->type = mod_brush;
 	if (loadmodel != mod_known)
@@ -898,6 +986,9 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 	Mod_LoadVertexes (&header->lumps[LUMP_VERTEXES]);
 	Mod_LoadEdges (&header->lumps[LUMP_EDGES]);
 	Mod_LoadSurfedges (&header->lumps[LUMP_SURFEDGES]);
+	if (coloredlights)
+	Mod_LoadRighting (&header->lumps[LUMP_LIGHTING]);
+		else
 	Mod_LoadLighting (&header->lumps[LUMP_LIGHTING]);
 	Mod_LoadPlanes (&header->lumps[LUMP_PLANES]);
 	Mod_LoadTexinfo (&header->lumps[LUMP_TEXINFO]);
