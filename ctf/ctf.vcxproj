@@ -119,7 +119,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <LinkDLL>true</LinkDLL>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>..\q2release\ctf\gamex86.dll</OutputFile>
+      <OutputFile>..\..\q2release\ctf\gamex86.dll</OutputFile>
       <ImportLibrary>.\release\gamex86.lib</ImportLibrary>
       <AdditionalLibraryDirectories>win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>

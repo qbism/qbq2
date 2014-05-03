@@ -267,7 +267,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>..\q2release\ref_soft.dll</OutputFile>
+      <OutputFile>..\..\q2release\ref_soft.dll</OutputFile>
       <ImportLibrary>.\..\release\ref_soft.lib</ImportLibrary>
       <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\ref_soft.def</ModuleDefinitionFile>
@@ -355,10 +355,6 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release Alpha|Win32'"> /QA21164 /QAieee1   /QA21164 /QAieee1 </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="r_surf.c">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Alpha|Win32'"> /QA21164 /MTd /QAieee1   /QA21164 /MTd /QAieee1 </AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release Alpha|Win32'"> /QA21164 /QAieee1   /QA21164 /QAieee1 </AdditionalOptions>
-    </ClCompile>
-    <ClCompile Include="..\win32\rw_ddraw.c">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Alpha|Win32'"> /QA21164 /MTd /QAieee1   /QA21164 /MTd /QAieee1 </AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release Alpha|Win32'"> /QA21164 /QAieee1   /QA21164 /QAieee1 </AdditionalOptions>
     </ClCompile>

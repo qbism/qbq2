@@ -214,9 +214,9 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <OutputFile>.\q2release\qbq2.exe</OutputFile>
+      <OutputFile>..\q2release\qbq2.exe</OutputFile>
       <AdditionalLibraryDirectories>lpng154;win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>winmm.lib;wsock32.lib;vorbis_static.lib;vorbisfile_static.lib;ogg_static.lib;zlibstat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;wsock32.lib;vorbis_static.lib;vorbisfile_static.lib;ogg_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>

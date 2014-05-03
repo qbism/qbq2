@@ -34,10 +34,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "winquake.h"
 
 // Console variables that we need to access from this module
-
 swwstate_t sww_state;
 
-cvar_t	*vid_ddraw; //qb: all by it's lonesome...
 
 /*
 ** VID_CreateWindow
@@ -52,7 +50,6 @@ void VID_CreateWindow(int width, int height, int stylebits)
 	int				x, y, w, h;
 	int				exstyle;
 
-	vid_ddraw = ri.Cvar_Get("vid_ddraw", "0", CVAR_ARCHIVE); //qb: added
 	vid_xpos = ri.Cvar_Get("vid_xpos", "0", 0);
 	vid_ypos = ri.Cvar_Get("vid_ypos", "0", 0);
 	vid_fullscreen = ri.Cvar_Get("vid_fullscreen", "0", CVAR_ARCHIVE);
@@ -130,41 +127,27 @@ int SWimp_Init(void *hInstance, void *wndProc)
 ** SWimp_InitGraphics
 **
 ** This initializes the software refresh's implementation specific
-** graphics subsystem.  In the case of Windows it creates DIB or
-** DDRAW surfaces.
+** graphics subsystem.  In the case of Windows it creates DIB surfaces.
 **
 ** The necessary width and height parameters are grabbed from
 ** vid.width and vid.height.
 */
-static qboolean SWimp_InitGraphics(qboolean fullscreen)
+static qboolean SWimp_InitGraphics(void)
 {
 	// free resources in use
 	SWimp_Shutdown();
 
 	// create a new window
 	VID_CreateWindow(vid.width, vid.height, WINDOW_STYLE);
-		// initialize the appropriate subsystem
-	if (/*vid_ddraw->value == 0 */ 1 || !fullscreen)//qb: ddraw toggle
-	{
-		//if (vid.rowbytes > vid.width) //qb: added
-		//	vid.rowbytes = vid.width;
-		if (!DIB_Init(&vid.buffer, &vid.rowbytes))
-		{
-			vid.buffer = 0;
-			vid.rowbytes = 0;
+	// initialize the appropriate subsystem
+	//qb: nuke ddraw
 
-			return false;
-		}
-	}
-	else
+	if (!DIB_Init(&vid.buffer, &vid.rowbytes))
 	{
-		if (!DDRAW_Init(&vid.buffer, &vid.rowbytes))
-		{
-			vid.buffer = 0;
-			vid.rowbytes = 0;
+		vid.buffer = 0;
+		vid.rowbytes = 0;
 
-			return false;
-		}
+		return false;
 	}
 
 	return true;
@@ -174,100 +157,35 @@ static qboolean SWimp_InitGraphics(qboolean fullscreen)
 ** SWimp_EndFrame
 **
 ** This does an implementation specific copy from the backbuffer to the
-** front buffer.  In the Win32 case it uses BitBlt or BltFast depending
-** on whether we're using DIB sections/GDI or DDRAW.
+** front buffer.  In the Win32 case it uses BitBlt 
 */
 void SWimp_EndFrame(void)
 {
-	if (/*vid_ddraw->value == 0 */ 1 || !sw_state.fullscreen) //qb: ddraw toggle
+
+	if (sww_state.palettized)
 	{
-		if (sww_state.palettized)
-		{
-			//			holdpal = SelectPalette(hdcScreen, hpalDIB, FALSE);
-			//			RealizePalette(hdcScreen);
-		}
-
-
-		BitBlt(sww_state.hDC,
-			0, 0,
-			vid.width,
-			vid.height,
-			sww_state.hdcDIBSection,
-			0, 0,
-			SRCCOPY);
-
-		if (sww_state.palettized)
-		{
-			//			SelectPalette(hdcScreen, holdpal, FALSE);
-		}
+		//			holdpal = SelectPalette(hdcScreen, hpalDIB, FALSE);
+		//			RealizePalette(hdcScreen);
 	}
-	else
+
+	BitBlt(sww_state.hDC,
+		0, 0,
+		vid.width,
+		vid.height,
+		sww_state.hdcDIBSection,
+		0, 0,
+		SRCCOPY);
+
+	if (sww_state.palettized)
 	{
-		RECT r;
-		HRESULT rval;
-		DDSURFACEDESC ddsd;
-
-		r.left = 0;
-		r.top = 0;
-		r.right = vid.width;
-		r.bottom = vid.height;
-
-		sww_state.lpddsOffScreenBuffer->lpVtbl->Unlock(sww_state.lpddsOffScreenBuffer, vid.buffer);
-
-		if (sww_state.modex)
-		{
-			if ((rval = sww_state.lpddsBackBuffer->lpVtbl->BltFast(sww_state.lpddsBackBuffer,
-				0, 0,
-				sww_state.lpddsOffScreenBuffer,
-				&r,
-				DDBLTFAST_WAIT)) == DDERR_SURFACELOST)
-			{
-				sww_state.lpddsBackBuffer->lpVtbl->Restore(sww_state.lpddsBackBuffer);
-				sww_state.lpddsBackBuffer->lpVtbl->BltFast(sww_state.lpddsBackBuffer,
-					0, 0,
-					sww_state.lpddsOffScreenBuffer,
-					&r,
-					DDBLTFAST_WAIT);
-			}
-
-			if ((rval = sww_state.lpddsFrontBuffer->lpVtbl->Flip(sww_state.lpddsFrontBuffer,
-				NULL, DDFLIP_WAIT)) == DDERR_SURFACELOST)
-			{
-				sww_state.lpddsFrontBuffer->lpVtbl->Restore(sww_state.lpddsFrontBuffer);
-				sww_state.lpddsFrontBuffer->lpVtbl->Flip(sww_state.lpddsFrontBuffer, NULL, DDFLIP_WAIT);
-			}
-		}
-		else
-		{
-			if ((rval = sww_state.lpddsBackBuffer->lpVtbl->BltFast(sww_state.lpddsFrontBuffer,
-				0, 0,
-				sww_state.lpddsOffScreenBuffer,
-				&r,
-				DDBLTFAST_WAIT)) == DDERR_SURFACELOST)
-			{
-				sww_state.lpddsBackBuffer->lpVtbl->Restore(sww_state.lpddsFrontBuffer);
-				sww_state.lpddsBackBuffer->lpVtbl->BltFast(sww_state.lpddsFrontBuffer,
-					0, 0,
-					sww_state.lpddsOffScreenBuffer,
-					&r,
-					DDBLTFAST_WAIT);
-			}
-		}
-
-		memset(&ddsd, 0, sizeof(ddsd));
-		ddsd.dwSize = sizeof(ddsd);
-
-		sww_state.lpddsOffScreenBuffer->lpVtbl->Lock(sww_state.lpddsOffScreenBuffer, NULL, &ddsd, DDLOCK_WAIT, NULL);
-
-		vid.buffer = ddsd.lpSurface;
-		vid.rowbytes = ddsd.lPitch;
+		//			SelectPalette(hdcScreen, holdpal, FALSE);
 	}
 }
 
 /*
 ** SWimp_SetMode
 */
-rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode, qboolean fullscreen)
+rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode)
 {
 	const char *win_fs[] = { "W", "FS" };
 	rserr_t retval = rserr_ok;
@@ -280,17 +198,17 @@ rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode, qboolean fullscreen)
 		return rserr_invalid_mode;
 	}
 
-	ri.Con_Printf(PRINT_ALL, " %d %d %s\n", *pwidth, *pheight, win_fs[fullscreen]);
+	ri.Con_Printf(PRINT_ALL, " %d %d %s\n", *pwidth, *pheight, win_fs[(vid_fullscreen->value > 0)]);
 
 	sww_state.initializing = true;
-	if (fullscreen)
+	if (vid_fullscreen->value) //qb: get rid of 'fullscreen'.
 	{
 		if (!SWimp_InitGraphics(1))
 		{
 			if (SWimp_InitGraphics(0))
 			{
 				// mode is legal but not as fullscreen
-				fullscreen = 0;
+				ri.Cvar_SetValue("vid_fullscreen", 0); //qb: so it flips to 'no' on the menu... fixme: except it doesn't
 				retval = rserr_invalid_fullscreen;
 			}
 			else
@@ -303,14 +221,14 @@ rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode, qboolean fullscreen)
 	else
 	{
 		// failure to set a valid mode in windowed mode
-		if (!SWimp_InitGraphics(fullscreen))
+		if (!SWimp_InitGraphics())
 		{
 			sww_state.initializing = true;
 			return rserr_unknown;
 		}
 	}
 
-	sw_state.fullscreen = fullscreen;
+	sw_state.fullscreen = vid_fullscreen->value;
 #if 0
 	if ( retval != rserr_unknown )
 	{
@@ -343,28 +261,18 @@ void SWimp_SetPalette(const unsigned char *palette)
 
 	if (!palette)
 		palette = (const unsigned char *)sw_state.currentpalette;
-
-	if ( /*vid_ddraw->value > 0*/ 0 || !sw_state.fullscreen)
-	{
-		DDRAW_SetPalette((const unsigned char *)palette);
-	}
-	else
-	{
-		DIB_SetPalette((const unsigned char *)palette);
-	}
+	DIB_SetPalette((const unsigned char *)palette);
 }
 
 /*
 ** SWimp_Shutdown
 **
-** System specific graphics subsystem shutdown routine.  Destroys
-** DIBs or                                      surfaces as appropriate.
+** System specific graphics subsystem shutdown routine.  Destroys DIBs
 */
 void SWimp_Shutdown(void)
 {
 	ri.Con_Printf(PRINT_ALL, "Shutting down SW imp\n");
 	DIB_Shutdown();
-	DDRAW_Shutdown();
 
 	if (sww_state.hWnd)
 	{

@@ -261,7 +261,7 @@
       <LinkDLL>true</LinkDLL>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <OutputFile>..\q2release\ref_gl.dll</OutputFile>
+      <OutputFile>..\..\q2release\ref_gl.dll</OutputFile>
       <ImportLibrary>.\..\release\ref_gl.lib</ImportLibrary>
       <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\ref_gl.def</ModuleDefinitionFile>

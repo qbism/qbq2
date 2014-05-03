@@ -892,6 +892,6 @@ void		SWimp_EndFrame (void);
 int			SWimp_Init( void *hInstance, void *wndProc );
 void		SWimp_SetPalette( const unsigned char *palette);
 void		SWimp_Shutdown( void );
-rserr_t		SWimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen );
+rserr_t		SWimp_SetMode(unsigned int *pwidth, unsigned int *pheight, int mode);
 void		SWimp_AppActivate( qboolean active );
 

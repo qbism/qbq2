@@ -908,6 +908,13 @@ void FS_AddGameDirectory(char *dir)
 	searchpath_t	*search;
 	pack_t			*pak;
 	char			pakfile[MAX_OSPATH];
+	//VoiD -S- *.pak support  
+	//char *path = NULL; 
+	char findname[1024];
+	char **dirnames;
+	int ndirs;
+	char *tmp;
+	//VoiD -E- *.pack support 
 
 	strcpy(fs_gamedir, dir);
 
@@ -935,6 +942,40 @@ void FS_AddGameDirectory(char *dir)
 	}
 
 
+	//VoiD -S- *.pack support //qb: from BES 3.22
+
+			// Standard Quake II pack file '.pak' 
+			Com_sprintf(findname, sizeof(findname), "%s/%s", dir, "*.pak");  //qb: was a typo in BES, ".pak" (no asterisk)
+
+		tmp = findname;
+		while (*tmp != 0)
+		{
+			if (*tmp == '\\')
+				*tmp = '/';
+			tmp++;
+		}
+		if ((dirnames = FS_ListFiles(findname, &ndirs, 0, 0)) != 0)
+		{
+			int i;
+
+			for (i = 0; i < ndirs - 1; i++)
+			{
+				if (strrchr(dirnames[i], '/'))
+				{
+					pak = FS_LoadPackFile(dirnames[i]);
+					if (!pak)
+						continue;
+					search = Z_Malloc(sizeof(searchpath_t));
+					search->pack = pak;
+					search->next = fs_searchpaths;
+					fs_searchpaths = search;
+				}
+				free(dirnames[i]);
+			}
+			free(dirnames);
+
+		}
+		//VoiD -E- *.pack support 
 }
 
 /*

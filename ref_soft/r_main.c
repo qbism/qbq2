@@ -1198,7 +1198,7 @@ void R_BeginFrame( float camera_separation )
 		** if this returns rserr_invalid_fullscreen then it set the mode but not as a
 		** fullscreen mode, e.g. 320x200 on a system that doesn't support that res
 		*/
-		if ( ( err = SWimp_SetMode( &vid.width, &vid.height, sw_mode->value, vid_fullscreen->value ) ) == rserr_ok )
+		if ( ( err = SWimp_SetMode( &vid.width, &vid.height, sw_mode->value) ) == rserr_ok )
 		{
 			R_InitGraphics( vid.width, vid.height );
 
