@@ -203,12 +203,13 @@ rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode)
 	sww_state.initializing = true;
 	if (vid_fullscreen->value) //qb: get rid of 'fullscreen'.
 	{
-		if (!SWimp_InitGraphics(1))
+		if (!SWimp_InitGraphics())
 		{
-			if (SWimp_InitGraphics(0))
+			ri.Cvar_SetValue("vid_fullscreen", !vid_fullscreen->value);  //qb: added
+			vid_fullscreen->modified = true;
+			if (SWimp_InitGraphics())
 			{
 				// mode is legal but not as fullscreen
-				ri.Cvar_SetValue("vid_fullscreen", 0); //qb: so it flips to 'no' on the menu... fixme: except it doesn't
 				retval = rserr_invalid_fullscreen;
 			}
 			else

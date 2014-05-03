@@ -124,7 +124,7 @@ qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 		sww_state.palettized = false;
 	}
 
-	vid.width = (int)(vid.width / 4) * 4; //qb: multiple of 4 still required for DIB after all these years...
+	vid.width = (int)(vid.width / 4) * 4; //qb: multiple of 4 required for DIB
 
 	/*
 	** fill in the BITMAPINFO struct
@@ -181,78 +181,6 @@ qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 	}
 
 
-
-
-
-
-	/*  qb: temporarily here for reference from super8...
-
-	qboolean VID_SetFullDIBMode(int modenum)
-	{
-	HDC				hdc;
-	VID_DestroyWindow();
-
-	gdevmode.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
-	gdevmode.dmPelsWidth = modelist[modenum].width;
-	gdevmode.dmPelsHeight = modelist[modenum].height;
-	gdevmode.dmSize = sizeof (gdevmode);
-
-	if (ChangeDisplaySettings(&gdevmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-	Sys_Error("Couldn't set fullscreen DIB mode");
-
-	modestate = MS_FULLDIB;
-	vid_fulldib_on_focus_mode = modenum;
-	WindowRect.top = WindowRect.left = 0;
-
-	WindowRect.right = modelist[modenum].width;
-	WindowRect.bottom = modelist[modenum].height;
-
-	DIBWidth = ((int)modelist[modenum].width / 4) * 4; //qb: multiple of 4
-	DIBHeight = modelist[modenum].height;
-
-	WindowStyle = WS_POPUP | WS_SYSMENU | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-	ExWindowStyle = 0;
-
-	AdjustWindowRectEx(&WindowRect, WindowStyle, FALSE, 0);
-
-	SetWindowLong(hWndWinQuake, GWL_STYLE, WindowStyle | WS_VISIBLE);
-	SetWindowLong(hWndWinQuake, GWL_EXSTYLE, ExWindowStyle);
-
-	if (!SetWindowPos(hWnd,
-	NULL,
-	0, 0,
-	WindowRect.right - WindowRect.left,
-	WindowRect.bottom - WindowRect.top,
-	SWP_NOCOPYBITS | SWP_NOZORDER))
-	{
-	Sys_Error("Couldn't resize DIB window");
-	}
-
-	// position and show the DIB window
-	//VID_CheckWindowXY();
-	CenterWindow(hWndWinQuake); //qb:
-	UpdateWindow(hWndWinQuake);
-
-	vid.numpages = 1;
-	//	vid.maxwarpwidth = WARP_WIDTH; //qb: from Manoel Kasimier - hi-res waterwarp - removed
-	//	vid.maxwarpheight = WARP_HEIGHT; //qb: from Manoel Kasimier - hi-res waterwarp - removed
-
-	vid.height = vid.conheight = DIBHeight;
-	vid.width = vid.conwidth = DIBWidth;
-
-	vid.maxwarpwidth = vid.width; //qb: from  Manoel Kasimier - hi-res waterwarp
-	vid.maxwarpheight = vid.height; //qb: from  Manoel Kasimier - hi-res waterwarp
-	Sbar_SizeScreen(); //qb: calc sbar scale from MQ 1.6
-
-	// needed because we're not getting WM_MOVE messages fullscreen on NT
-	window_x = 0;
-	window_y = 0;
-
-	return true;
-	}
-
-	*/
-
 	ChangeDisplaySettings(NULL, 0);
 
 	if (vid_fullscreen->value) //qb: fullscreen dib
@@ -277,9 +205,7 @@ qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 		if (ChangeDisplaySettings(&gdevmode, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 		{
 			//ri.Sys_Error(ERR_FATAL, "Couldn't set fullscreen DIB mode");
-			vid_fullscreen->value = 0;
-			vid_fullscreen->modified = true;
-			goto windowmode;  //qb:  goto a windowed mode rather than error.
+			goto fail; //qb: don't panic
 		}
 
 		if (!SetWindowPos(sww_state.hWnd,
@@ -290,9 +216,7 @@ qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 			SWP_NOCOPYBITS | SWP_NOZORDER))
 		{
 			//ri.Sys_Error(ERR_FATAL, "Couldn't resize DIB window");
-			vid_fullscreen->value = 0;
-			vid_fullscreen->modified = true;
-			goto windowmode; //qb:  goto a windowed mode rather than error.
+			goto fail; //qb: don't panic
 		}
 
 		WindowStyle = WS_POPUP | WS_SYSMENU | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;

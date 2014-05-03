@@ -111,7 +111,7 @@ static qboolean VerifyDriver( void )
 */
 #define	WINDOW_CLASS_NAME	"Quake 2"
 
-qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
+qboolean VID_CreateWindow( int width, int height) //qb: nuke passing of 'fullscreen', we have a cvar.
 {
 	WNDCLASS		wc;
 	RECT			r;
@@ -135,7 +135,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
     if (!RegisterClass (&wc) )
 		ri.Sys_Error (ERR_FATAL, "Couldn't register window class");
 
-	if (fullscreen)
+	if (vid_fullscreen->value)
 	{
 		exstyle = WS_EX_TOPMOST;
 		stylebits = WS_POPUP|WS_VISIBLE;
@@ -156,7 +156,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 	w = r.right - r.left;
 	h = r.bottom - r.top;
 
-	if (fullscreen)
+	if (vid_fullscreen->value)
 	{
 		x = 0;
 		y = 0;
@@ -206,7 +206,7 @@ qboolean VID_CreateWindow( int width, int height, qboolean fullscreen )
 /*
 ** GLimp_SetMode
 */
-rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen )
+rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode)
 {
 	int width, height;
 	const char *win_fs[] = { "W", "FS" };
@@ -221,7 +221,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 		return rserr_invalid_mode;
 	}
 
-	ri.Con_Printf( PRINT_ALL, " %d %d %s\n", width, height, win_fs[fullscreen] );
+	ri.Con_Printf(PRINT_ALL, " %d %d %s\n", width, height, win_fs[(vid_fullscreen->value > 0)]); //qb: this was dangerous, anyway, 'fullscreen' was not guaranteed to be 0 or 1.
 
 	// destroy the existing window
 	if (glw_state.hWnd)
@@ -230,7 +230,7 @@ rserr_t GLimp_SetMode( int *pwidth, int *pheight, int mode, qboolean fullscreen 
 	}
 
 	// do a CDS if needed
-	if ( fullscreen )
+	if (vid_fullscreen->value)
 	{
 		DEVMODE dm;
 
