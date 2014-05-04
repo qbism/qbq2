@@ -65,7 +65,7 @@ void R_DrawSpanletOpaque( void )
 	{
 		unsigned ts, tt;
 
-		if (sw_texturesmooth->value)
+		if (sw_transmooth->value)
 		{
 			ts = s_spanletvars.s;
 			tt = s_spanletvars.t;
@@ -136,7 +136,7 @@ void R_DrawSpanletTurbulentStipple33( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			if (sw_texturesmooth->value)
+			if (sw_transmooth->value)
 			{
 				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
 				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
@@ -206,7 +206,7 @@ void R_DrawSpanletTurbulentStipple66( void )
 
 		while ( s_spanletvars.spancount > 0 )
 		{
-			if (sw_texturesmooth->value)
+			if (sw_transmooth->value)
 			{
 				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
 				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
@@ -249,7 +249,7 @@ void R_DrawSpanletTurbulentStipple66( void )
 		
 		while ( s_spanletvars.spancount > 0 )
 		{
-			if (sw_texturesmooth->value)
+			if (sw_transmooth->value)
 			{
 				sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
 				tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
@@ -292,7 +292,7 @@ void R_DrawSpanletTurbulentBlended66( void )
 
 	do
 	{
-		if (sw_texturesmooth->value)
+		if (sw_transmooth->value)
 		{
 			sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
 			tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
@@ -329,7 +329,7 @@ void R_DrawSpanletTurbulentBlended33( void )
 
 	do
 	{
-		if (sw_texturesmooth->value)
+		if (sw_transmooth->value)
 		{
 			sturb = s_spanletvars.s + r_turb_turb[(s_spanletvars.t>>16)&(CYCLE-1)];
 			tturb = s_spanletvars.t + r_turb_turb[(s_spanletvars.s>>16)&(CYCLE-1)];
@@ -372,7 +372,7 @@ void R_DrawSpanlet33( void )
 	{
 		unsigned ts, tt;
 
-		if (sw_texturesmooth->value)
+		if (sw_transmooth->value)
 		{
 			ts = s_spanletvars.s;
 			tt = s_spanletvars.t;
@@ -435,7 +435,7 @@ void R_DrawSpanlet66( void )
 	{
 		unsigned ts, tt;
 
-		if (sw_texturesmooth->value)
+		if (sw_transmooth->value)
 		{
 			ts = s_spanletvars.s;
 			tt = s_spanletvars.t;
@@ -506,7 +506,7 @@ void R_DrawSpanlet33Stipple( void )
 		while ( s_spanletvars.spancount > 0 )
 		{
 			unsigned s, t;
-			if (sw_texturesmooth->value)
+			if (sw_transmooth->value)
 			{
 				s = s_spanletvars.s;
 				t = s_spanletvars.t;
@@ -582,7 +582,7 @@ void R_DrawSpanlet66Stipple( void )
 		while ( s_spanletvars.spancount > 0 )
 		{
 			unsigned s, t;
-			if (sw_texturesmooth->value)
+			if (sw_transmooth->value)
 			{
 				s = s_spanletvars.s;
 				t = s_spanletvars.t;
@@ -621,7 +621,7 @@ void R_DrawSpanlet66Stipple( void )
 		while ( s_spanletvars.spancount > 0 )
 		{
 			unsigned s, t;
-			if (sw_texturesmooth->value)
+			if (sw_transmooth->value)
 			{
 				s = s_spanletvars.s;
 				t = s_spanletvars.t;

@@ -980,7 +980,7 @@ void R_AliasSetupLighting (void)
 
 	if (r_coloredlights->value){
 	
-		r_ambientlight = 416; //qb: was 276;	// leilei - for lightpoint interrim hack
+		r_ambientlight = 276; //qb: tried 416, originally 276;	// leilei - for lightpoint interrim hack
 	r_ambientlight *= VID_GRADES;
 	}
 	else

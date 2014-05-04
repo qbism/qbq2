@@ -789,6 +789,7 @@ void R_PolysetDrawThreshSpans8 (spanpackage_t *pspanpackage)
 	int		llight;
 	int		lzi;
 	short	*lpz;
+	int forg; //fog
 
 	do
 	{
@@ -817,6 +818,13 @@ void R_PolysetDrawThreshSpans8 (spanpackage_t *pspanpackage)
 
 			do
 			{
+				if (r_fogenable)
+				{
+					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
+					*lptex = host_fogmap[*lptex + (forg >> 2 & 0xFF00)];
+
+				} // leilei - fog FIXME- dumb math
 				if ((lzi >> 16) >= *lpz)
 				{
 					rand1k_index = (rand1k_index + 1) & MASK_1K;
@@ -864,6 +872,7 @@ void R_PolysetDrawSpans8_33( spanpackage_t *pspanpackage)
 	int		llight;
 	int		lzi;
 	short	*lpz;
+	int forg; //fog
 
 	do
 	{
@@ -892,6 +901,13 @@ void R_PolysetDrawSpans8_33( spanpackage_t *pspanpackage)
 
 			do
 			{
+				if (r_fogenable)
+				{
+					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
+					*lptex = host_fogmap[*lptex + (forg >> 2 & 0xFF00)];
+
+				} // leilei - fog FIXME- dumb math
 				if ((lzi >> 16) >= *lpz)
 				{
 					int temp = vid.colormap[*lptex + ( llight & 0xFF00 )];
@@ -972,6 +988,7 @@ void R_PolysetDrawSpans8_66(spanpackage_t *pspanpackage)
 	int		llight;
 	int		lzi;
 	short	*lpz;
+	int forg; //fog
 
 	do
 	{
@@ -1000,6 +1017,13 @@ void R_PolysetDrawSpans8_66(spanpackage_t *pspanpackage)
 
 			do
 			{
+				if (r_fogenable)
+				{
+					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
+					*lptex = host_fogmap[*lptex + (forg >> 2 & 0xFF00)];
+
+				} // leilei - fog FIXME- dumb math
 				if ((lzi >> 16) >= *lpz)
 				{
 					int temp = vid.colormap[*lptex + ( llight & 0xFF00 )];
@@ -1076,19 +1100,25 @@ void R_PolysetDrawSpansConstant8_66( spanpackage_t *pspanpackage)
 // leilei - colored lighting
 
 extern byte	palmap2[64][64][64];		//  Colored Lighting Lookup Table
-void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
+void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 {
 	int		lcount;
-
+	int		lsfrac, ltfrac;
+	byte	*lpdest;
+	byte	*lptex;
+	int		llight;
+	int		lzi;
+	short	*lpz;
+	int			forg;			// leilei - fog
 	unsigned char *pix24;	// leilei - colored lighting
-	int trans [3];			// leilei - colored lighting
+	int trans[3];			// leilei - colored lighting
 	int		llightrgb[3];	// leilei - colored lighting
 	vec3_t	lpcolor;
 
-		//R_LightPointColor(currententity->origin, lpcolor);
-		lpcolor[0] = lightin[0];
-		lpcolor[1] = lightin[1];
-		lpcolor[2] = lightin[2];
+	//R_LightPointColor(currententity->origin, lpcolor);
+	lpcolor[0] = lightin[0];
+	lpcolor[1] = lightin[1];
+	lpcolor[2] = lightin[2];
 	do
 	{
 		lcount = d_aspancount - pspanpackage->count;
@@ -1106,13 +1136,6 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 
 		if (lcount)
 		{
-			int		lsfrac, ltfrac;
-			byte	*lpdest;
-			byte	*lptex;
-			int		llight;
-			int		lzi;
-			short	*lpz;
-
 			lpdest = pspanpackage->pdest;
 			lptex = pspanpackage->ptex;
 			lpz = pspanpackage->pz;
@@ -1120,42 +1143,46 @@ void R_PolysetDrawSpans8_Opaque (spanpackage_t *pspanpackage)
 			ltfrac = pspanpackage->tfrac;
 			llight = pspanpackage->light;
 			lzi = pspanpackage->zi;
-			if(coloredlights){
-			llightrgb[0] = pspanpackage->lightr;
-			llightrgb[1] = pspanpackage->lightg;
-			llightrgb[2] = pspanpackage->lightb;
-		//	llightrgb[0] = 84;
-		//	llightrgb[1] = 54;
-		//	llightrgb[2] = 122;
-	//			llight = 16384;
+			if (coloredlights){
+				llightrgb[0] = pspanpackage->lightr;
+				llightrgb[1] = pspanpackage->lightg;
+				llightrgb[2] = pspanpackage->lightb;
 			}
 			do
 			{
+
+				if (r_fogenable)
+				{
+					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
+					*lptex = host_fogmap[*lptex + (forg >> 2 & 0xFF00)];
+
+				} // leilei - fog FIXME- dumb math
 				if ((lzi >> 16) >= *lpz)
 				{
-//PGM
-					if(r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
+					//PGM
+					if (r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
 						*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
 					// leilei - colored lights begin
 					else if (coloredlights){
-						pix24 = (unsigned char *)&d_8to24table[*lptex];	
-				//		trans[0] = (pix24[0] * (16384 - llightrgb[0])) >> 15;
-				//		trans[1] = (pix24[1] * (16384 - llightrgb[1])) >> 15;
-				//		trans[2] = (pix24[2] * (16384 - llightrgb[2])) >> 15;
-				//		trans[0] = (int)(pix24[0] * 16384 * lpcolor[0]) >> 15;
-				//		trans[1] = (int)(pix24[1] * 16384 * lpcolor[1]) >> 15;
-				//		trans[2] = (int)(pix24[2] * 16384 * lpcolor[2]) >> 15;	// leilei - temporarily use lightpoint... until we properly have model lights
+						pix24 = (unsigned char *)&d_8to24table[*lptex];
+						//		trans[0] = (pix24[0] * (16384 - llightrgb[0])) >> 15;
+						//		trans[1] = (pix24[1] * (16384 - llightrgb[1])) >> 15;
+						//		trans[2] = (pix24[2] * (16384 - llightrgb[2])) >> 15;
+						//		trans[0] = (int)(pix24[0] * 16384 * lpcolor[0]) >> 15;
+						//		trans[1] = (int)(pix24[1] * 16384 * lpcolor[1]) >> 15;
+						//		trans[2] = (int)(pix24[2] * 16384 * lpcolor[2]) >> 15;	// leilei - temporarily use lightpoint... until we properly have model lights
 						trans[0] = (int)(pix24[0] * (llight * lpcolor[0])) >> 15;
 						trans[1] = (int)(pix24[1] * (llight * lpcolor[1])) >> 15;
 						trans[2] = (int)(pix24[2] * (llight * lpcolor[2])) >> 15;	// leilei - temporarily use lightpoint... until we properly have model lights
 						if (trans[0] < 0) trans[0] = 0;	if (trans[1] < 0) trans[1] = 0;	if (trans[2] < 0) trans[2] = 0;
-						if (trans[0] > 63) trans[0] = 63; if (trans[1] > 63) trans[1] = 63;	if (trans[2] > 63) trans[2] = 63;	
+						if (trans[0] > 63) trans[0] = 63; if (trans[1] > 63) trans[1] = 63;	if (trans[2] > 63) trans[2] = 63;
 						*lpdest = palmap2[trans[0]][trans[1]][trans[2]];
 					}
 					else
-					// leilei - colored lights end
-					*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)];
-//PGM
+						// leilei - colored lights end
+						*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)];
+					//PGM
 					*lpz = lzi >> 16;
 				}
 				lpdest++;

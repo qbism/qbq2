@@ -39,7 +39,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define ROLL    2
 
 
-// leilei - colored lighting
+//qb: leilei - colored lighting and fog
+
+extern qboolean r_fogenable;
+extern byte	*host_fogmap;
+extern int		r_fogmodel;  //qb: will parse this, but not used in ref_soft at the moment.
+extern float	r_fogdensity;
+extern float	r_fognear;
+extern float	r_fogfar;
+extern float	r_fogColor[4];
+
+void SetFogMap(void);
+byte BestColor(int r, int g, int b, int start, int stop);
+int FindColor(int r, int g, int b);
 
 #define	COLMODEL
 
@@ -586,7 +598,7 @@ extern cvar_t   *sw_reportedgeout;
 extern cvar_t   *sw_stipplealpha;
 extern cvar_t   *sw_surfcacheoverride;
 extern cvar_t   *sw_waterwarp;
-extern cvar_t   *sw_texturesmooth; // texture dither
+extern cvar_t   *sw_transmooth; // texture dither on transparencies
 
 extern cvar_t   *r_fullbright;
 extern cvar_t	*r_lefthand;
@@ -606,6 +618,7 @@ extern cvar_t  *r_customwidth;
 extern cvar_t  *r_customheight;
 extern cvar_t   *r_coloredlights; // leilei
 extern int		coloredlights;	// leilei
+extern cvar_t   *r_transquality; // leilei
 
 extern  clipplane_t     view_clipplanes[4];
 extern int              *pfrustum_indexes[4];

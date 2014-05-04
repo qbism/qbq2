@@ -127,7 +127,8 @@ cvar_t	*sw_reportsurfout;
 cvar_t  *sw_stipplealpha;
 cvar_t	*sw_surfcacheoverride;
 cvar_t	*sw_waterwarp;
-cvar_t  *sw_texturesmooth; // texture dither
+cvar_t  *sw_transmooth; // texture dither //qb: was sw_texturesmooth, but just transparencies
+cvar_t  *r_transquality; //qb: from engoo - selects which table to use.
 
 cvar_t	*r_drawworld;
 cvar_t	*r_drawentities;
@@ -200,6 +201,114 @@ unsigned int	d_zwidth;
 
 byte	r_notexture_buffer[1024];
 
+//qb: - kmq2 fog variables////////////////////////
+// global fog vars w/ defaults
+int FogModels[3] = { 1,2,3 }; //qb: in gl mode it is GL_LINEAR, GL_EXP, GL_EXP2
+
+qboolean r_fogenable;
+int		r_fogmodel;
+float	r_fogdensity;
+float	r_fognear;
+float	r_fogfar;
+float	r_fogColor[4];
+
+/*
+================
+R_SetFog
+================
+*/
+void R_SetFog(void)
+{
+	if (!r_fogenable)	// engine fog not enabled
+		return;			// leave fog enabled if set by game DLL
+
+	r_fogColor[3] = 1.0;
+
+	/* qb: gl stuff, do some sw stuff instead
+	qglEnable(GL_FOG);
+	qglClearColor(r_fogColor[0], r_fogColor[1], r_fogColor[2], r_fogColor[3]); // Clear the background color to the fog color
+	qglFogi(GL_FOG_MODE, r_fogmodel);
+	qglFogfv(GL_FOG_COLOR, r_fogColor);
+	if (r_fogmodel == GL_LINEAR)
+	{
+		qglFogf(GL_FOG_START, r_fognear);
+		qglFogf(GL_FOG_END, r_fogfar);
+	}
+	else
+		qglFogf(GL_FOG_DENSITY, r_fogdensity / 10000.f);
+	qglHint(GL_FOG_HINT, GL_NICEST);
+	*/
+}
+
+/*
+================
+R_InitFogVars
+================
+*/
+void R_InitFogVars(void)
+{
+	r_fogenable = false; //qb: debug-  false;
+	r_fogmodel = 1; // GL_LINEAR;
+	r_fogdensity = 30.0;
+	r_fognear = 150.0;
+	r_fogfar = 2000.0;
+	r_fogColor[0] = 110.0;
+	r_fogColor[1] = 110.0;
+	r_fogColor[2] = 140.0;
+}
+
+/*
+================
+R_SetFogVars
+================
+*/
+void R_SetFogVars(qboolean enable, int model, int density,
+	int start, int end, int red, int green, int blue)
+{
+	int	temp;
+
+	//VID_Printf( PRINT_ALL, "Setting fog variables: model %i density %i near %i far %i red %i green %i blue %i\n",
+	//	model, density, start, end, red, green, blue );
+
+	// Skip this if QGL subsystem is already down
+//	if (!qglDisable)	return;
+
+	r_fogenable = enable;
+//	if (!r_fogenable) { // recieved fog disable message
+//		qglDisable(GL_FOG);
+//		return;
+//	}
+	temp = model;
+	if ((temp > 2) || (temp < 0)) temp = 0;
+	r_fogmodel = FogModels[temp];
+	r_fogdensity = (float)density;
+	if (temp == 0) {	// GL_LINEAR
+		r_fognear = (float)start;
+		r_fogfar = (float)end;
+	}
+	r_fogColor[0] = ((float)red); //qb: in ref_soft use 0-255.  / 255.0;
+	r_fogColor[1] = ((float)green);
+	r_fogColor[2] = ((float)blue);
+
+	// clamp vars
+	r_fogdensity = max(r_fogdensity, 0.0);
+	r_fogdensity = min(r_fogdensity, 100.0);
+	r_fognear = max(r_fognear, 0.0f);
+	r_fognear = min(r_fognear, 10000.0 - 64.0);
+	r_fogfar = max(r_fogfar, r_fognear + 64.0);
+	r_fogfar = min(r_fogfar, 10000.0);
+	r_fogColor[0] = max(r_fogColor[0], 0.0);
+	r_fogColor[0] = min(r_fogColor[0], 255.0);
+	r_fogColor[1] = max(r_fogColor[1], 0.0);
+	r_fogColor[1] = min(r_fogColor[1], 255.0);
+	r_fogColor[2] = max(r_fogColor[2], 0.0);
+	r_fogColor[2] = min(r_fogColor[2], 255.0);
+
+	//VID_Printf( PRINT_ALL, "Set fog variables: model %i density %f near %f far %f red %f green %f blue %f\n",
+	//	model, r_fogdensity, r_fognear, r_fogfar, r_fogColor[0], r_fogColor[1], r_fogColor[2] );
+}
+
+
 /*
 ==================
 R_InitTextures
@@ -271,8 +380,9 @@ void R_Register (void)
 	sw_surfcacheoverride = ri.Cvar_Get ("sw_surfcacheoverride", "0", 0);
 	sw_waterwarp = ri.Cvar_Get ("sw_waterwarp", "1", 0);
 	sw_mode = ri.Cvar_Get( "sw_mode", "4", CVAR_ARCHIVE );
-	sw_texturesmooth = ri.Cvar_Get( "sw_texturesmooth", "1", CVAR_ARCHIVE );
-	
+	sw_transmooth = ri.Cvar_Get("sw_transmooth", "1", CVAR_ARCHIVE);
+	r_transquality = ri.Cvar_Get("r_transquality", "1", CVAR_ARCHIVE);
+
 	r_lefthand = ri.Cvar_Get( "hand", "0", CVAR_USERINFO | CVAR_ARCHIVE );
 	r_speeds = ri.Cvar_Get ("r_speeds", "0", 0);
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", 0);
@@ -320,6 +430,7 @@ R_Init
 */
 int R_Init( void *hInstance, void *wndProc )
 {
+
 	R_InitImages ();
 	Mod_Init ();
 	Draw_InitLocal ();
@@ -349,6 +460,12 @@ int R_Init( void *hInstance, void *wndProc )
 	R_Register ();
 	Draw_GetPalette ();
 	Draw_InitRGBMap();		// leilei - colored lights	
+
+	//qb: engoo fog
+	host_fogmap = malloc(16384);
+	R_InitFogVars();
+	FogTableRefresh();
+
 	if (SWimp_Init( hInstance, wndProc ) == false)
 		return -1;
 

@@ -24,12 +24,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "r_dither.h"
 
+
 unsigned char	*r_turb_pbase, *r_turb_pdest;
 fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
 int				*r_turb_turb;
 int				r_turb_spancount;
 
-void D_DrawTurbulent8Span (espan_t *pspan);
+void D_DrawTurbulent8Span(espan_t *pspan);
+
+//qb: engoo fog /////////////////////////////////////////
+//	leilei - turning fogmap into a static = faster by an average of a few frames
+//  so we do it here, we do it now, we do it forever! (or not)
+static byte    *foggmap;
+void SetFogMap(void)
+{
+	foggmap = (byte *)host_fogmap;
+};
+
+
 
 /*
 =============
@@ -101,42 +113,42 @@ void D_WarpScreen(void)
 D_DrawTurbulent8Span
 =============
 */
-void D_DrawTurbulent8Span (espan_t *pspan)
+void D_DrawTurbulent8Span(espan_t *pspan)
 {
 	int		sturb, tturb;
 	//  float ditht, diths;
 
 	do
 	{
-		if (sw_texturesmooth->value /*> 1*/)
+		if (sw_transmooth->value /*> 1*/)
 		{
-/*#if 0
-			diths = ((float)r_turb_s + (float)r_turb_turb[(r_turb_t>>16)&(CYCLE-1)]) / 65536;
-			ditht = ((float)r_turb_t + (float)r_turb_turb[(r_turb_s>>16)&(CYCLE-1)]) / 65536;
-#else
-			diths = ((float)r_turb_s + (float)r_turb_turb[(r_turb_t>>16)&(CYCLE-1)]) * .00001526;
-			ditht = ((float)r_turb_t + (float)r_turb_turb[(r_turb_s>>16)&(CYCLE-1)]) * .00001526;
+			/*#if 0
+						diths = ((float)r_turb_s + (float)r_turb_turb[(r_turb_t>>16)&(CYCLE-1)]) / 65536;
+						ditht = ((float)r_turb_t + (float)r_turb_turb[(r_turb_s>>16)&(CYCLE-1)]) / 65536;
+						#else
+						diths = ((float)r_turb_s + (float)r_turb_turb[(r_turb_t>>16)&(CYCLE-1)]) * .00001526;
+						ditht = ((float)r_turb_t + (float)r_turb_turb[(r_turb_s>>16)&(CYCLE-1)]) * .00001526;
 
-#endif
-			DitherKernel(&diths, &ditht, pspan->u + r_turb_spancount, pspan->v);
+						#endif
+						DitherKernel(&diths, &ditht, pspan->u + r_turb_spancount, pspan->v);
 
-			tturb = (int)ditht&63;
-			sturb = (int)diths&63;*/
+						tturb = (int)ditht&63;
+						sturb = (int)diths&63;*/
 
-			sturb = r_turb_s + r_turb_turb[(r_turb_t>>16)&(CYCLE-1)];
-			tturb = r_turb_t + r_turb_turb[(r_turb_s>>16)&(CYCLE-1)];
-			
+			sturb = r_turb_s + r_turb_turb[(r_turb_t >> 16)&(CYCLE - 1)];
+			tturb = r_turb_t + r_turb_turb[(r_turb_s >> 16)&(CYCLE - 1)];
+
 			DitherKernel2(sturb, tturb, pspan->u + r_turb_spancount, pspan->v);
-		
-			tturb = (tturb>>16)&63;
-			sturb = (sturb>>16)&63;
+
+			tturb = (tturb >> 16) & 63;
+			sturb = (sturb >> 16) & 63;
 		}
 		else
 		{
-		sturb = ((r_turb_s + r_turb_turb[(r_turb_t >> 16)&(CYCLE - 1)]) >> 16) & 63;
-		tturb = ((r_turb_t + r_turb_turb[(r_turb_s >> 16)&(CYCLE - 1)]) >> 16) & 63;
+			sturb = ((r_turb_s + r_turb_turb[(r_turb_t >> 16)&(CYCLE - 1)]) >> 16) & 63;
+			tturb = ((r_turb_t + r_turb_turb[(r_turb_s >> 16)&(CYCLE - 1)]) >> 16) & 63;
 		}
-		
+
 		*r_turb_pdest++ = *(r_turb_pbase + (tturb << 6) + sturb);
 		r_turb_s += r_turb_sstep;
 		r_turb_t += r_turb_tstep;
@@ -268,7 +280,7 @@ void Turbulent8(espan_t *pspan)
 			r_turb_s = r_turb_s & ((CYCLE << 16) - 1);
 			r_turb_t = r_turb_t & ((CYCLE << 16) - 1);
 
-			D_DrawTurbulent8Span (pspan);
+			D_DrawTurbulent8Span(pspan);
 
 			r_turb_s = snext;
 			r_turb_t = tnext;
@@ -404,7 +416,7 @@ void NonTurbulent8(espan_t *pspan)
 			r_turb_s = r_turb_s & ((CYCLE << 16) - 1);
 			r_turb_t = r_turb_t & ((CYCLE << 16) - 1);
 
-			D_DrawTurbulent8Span (pspan);
+			D_DrawTurbulent8Span(pspan);
 
 			r_turb_s = snext;
 			r_turb_t = tnext;
@@ -439,13 +451,17 @@ static float        sdivzstepu, tdivzstepu, zistepu;
 static int		    izi, izistep; // mankrip
 static short		*pz; // mankrip
 
+
 //qbism: pointer to pbase and macroize idea from mankrip
-#define WRITEPDEST(i) { pdest[i] = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s+=sstep; t+=tstep;}
+#define WRITEPDEST(i)   { pdest[i] = *(pbase + (s >> 16) + (t >> 16) * cachewidth); s+=sstep; t+=tstep;}
+#define WRITEFOGDEST(i) { pdest[i] = foggmap[pbase[(s >> 16) + (t >> 16) * cachewidth] + (forg >> 2 & 0xFF00)]; s += sstep; t += tstep;}
+
 
 void D_DrawSpans16(espan_t *pspan) //qb: up it from 8 to 16.  This + unroll = big speed gain!
 {
 	sstep = 0;   // keep compiler happy
 	tstep = 0;   // ditto
+	int			forg = 0;	// leilei - fog
 
 	pbase = (byte *)cacheblock;
 	sdivzstepu = d_sdivzstepu * 16;
@@ -494,24 +510,47 @@ void D_DrawSpans16(espan_t *pspan) //qb: up it from 8 to 16.  This + unroll = bi
 			sstep = (snext - s) >> 4;
 			tstep = (tnext - t) >> 4;
 			pdest += 16;
+			if (r_fogenable)
+			{
+				forg = (int)(z / 1024);
+				if (forg > 32762)	forg = 32762;
+				WRITEFOGDEST(-16);
+				WRITEFOGDEST(-15);
+				WRITEFOGDEST(-14);
+				WRITEFOGDEST(-13);
+				WRITEFOGDEST(-12);
+				WRITEFOGDEST(-11);
+				WRITEFOGDEST(-10);
+				WRITEFOGDEST(-9);
+				WRITEFOGDEST(-8);
+				WRITEFOGDEST(-7);
+				WRITEFOGDEST(-6);
+				WRITEFOGDEST(-5);
+				WRITEFOGDEST(-4);
+				WRITEFOGDEST(-3);
+				WRITEFOGDEST(-2);
+				WRITEFOGDEST(-1);
 
-			WRITEPDEST(-16);
-			WRITEPDEST(-15);
-			WRITEPDEST(-14);
-			WRITEPDEST(-13);
-			WRITEPDEST(-12);
-			WRITEPDEST(-11);
-			WRITEPDEST(-10);
-			WRITEPDEST(-9);
-			WRITEPDEST(-8);
-			WRITEPDEST(-7);
-			WRITEPDEST(-6);
-			WRITEPDEST(-5);
-			WRITEPDEST(-4);
-			WRITEPDEST(-3);
-			WRITEPDEST(-2);
-			WRITEPDEST(-1);
-
+			} // leilei - fog
+			else
+			{
+				WRITEPDEST(-16);
+				WRITEPDEST(-15);
+				WRITEPDEST(-14);
+				WRITEPDEST(-13);
+				WRITEPDEST(-12);
+				WRITEPDEST(-11);
+				WRITEPDEST(-10);
+				WRITEPDEST(-9);
+				WRITEPDEST(-8);
+				WRITEPDEST(-7);
+				WRITEPDEST(-6);
+				WRITEPDEST(-5);
+				WRITEPDEST(-4);
+				WRITEPDEST(-3);
+				WRITEPDEST(-2);
+				WRITEPDEST(-1);
+			}
 			s = snext;
 			t = tnext;
 		}
@@ -539,41 +578,85 @@ void D_DrawSpans16(espan_t *pspan) //qb: up it from 8 to 16.  This + unroll = bi
 
 			pdest += spancount;
 
-			switch (spancount)
+			if (r_fogenable)
 			{
-			case 16:
-				WRITEPDEST(-16);
-			case 15:
-				WRITEPDEST(-15);
-			case 14:
-				WRITEPDEST(-14);
-			case 13:
-				WRITEPDEST(-13);
-			case 12:
-				WRITEPDEST(-12);
-			case 11:
-				WRITEPDEST(-11);
-			case 10:
-				WRITEPDEST(-10);
-			case  9:
-				WRITEPDEST(-9);
-			case  8:
-				WRITEPDEST(-8);
-			case  7:
-				WRITEPDEST(-7);
-			case  6:
-				WRITEPDEST(-6);
-			case  5:
-				WRITEPDEST(-5);
-			case  4:
-				WRITEPDEST(-4);
-			case  3:
-				WRITEPDEST(-3);
-			case  2:
-				WRITEPDEST(-2);
-			case  1:
-				WRITEPDEST(-1);
-				break;
+				forg = (int)(z / 1024);
+				if (forg > 32762)	forg = 32762;
+				switch (spancount)
+				{
+				case 16:
+					WRITEFOGDEST(-16);
+				case 15:
+					WRITEFOGDEST(-15);
+				case 14:
+					WRITEFOGDEST(-14);
+				case 13:
+					WRITEFOGDEST(-13);
+				case 12:
+					WRITEFOGDEST(-12);
+				case 11:
+					WRITEFOGDEST(-11);
+				case 10:
+					WRITEFOGDEST(-10);
+				case  9:
+					WRITEFOGDEST(-9);
+				case  8:
+					WRITEFOGDEST(-8);
+				case  7:
+					WRITEFOGDEST(-7);
+				case  6:
+					WRITEFOGDEST(-6);
+				case  5:
+					WRITEFOGDEST(-5);
+				case  4:
+					WRITEFOGDEST(-4);
+				case  3:
+					WRITEFOGDEST(-3);
+				case  2:
+					WRITEFOGDEST(-2);
+				case  1:
+					WRITEFOGDEST(-1);
+					break;
+				}
+			}
+			else
+			{
+				switch (spancount)
+				{
+				case 16:
+					WRITEPDEST(-16);
+				case 15:
+					WRITEPDEST(-15);
+				case 14:
+					WRITEPDEST(-14);
+				case 13:
+					WRITEPDEST(-13);
+				case 12:
+					WRITEPDEST(-12);
+				case 11:
+					WRITEPDEST(-11);
+				case 10:
+					WRITEPDEST(-10);
+				case  9:
+					WRITEPDEST(-9);
+				case  8:
+					WRITEPDEST(-8);
+				case  7:
+					WRITEPDEST(-7);
+				case  6:
+					WRITEPDEST(-6);
+				case  5:
+					WRITEPDEST(-5);
+				case  4:
+					WRITEPDEST(-4);
+				case  3:
+					WRITEPDEST(-3);
+				case  2:
+					WRITEPDEST(-2);
+				case  1:
+					WRITEPDEST(-1);
+					break;
+				}
 			}
 		}
 	} while ((pspan = pspan->pnext) != NULL);

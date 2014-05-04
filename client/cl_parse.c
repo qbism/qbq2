@@ -48,6 +48,7 @@ char *svc_strings[256] =
 	"svc_frame"
 };
 
+
 //=============================================================================
 
 void CL_DownloadFileName(char *dest, int destlen, char *fn)
