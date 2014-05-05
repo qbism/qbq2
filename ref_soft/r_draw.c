@@ -25,6 +25,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 image_t		*draw_chars;				// 8*8 graphic characters
 
+#define COLORLEVELS 64
+#define PALBRIGHTS 0  //qb: wow, Q2 doesn't have fullbrights?
+
 const byte q2_palette[256 * 3] =
 {
 	0, 0, 0, 15, 15, 15, 31, 31, 31, 47, 47, 47, 63, 63, 63,
@@ -85,7 +88,7 @@ const byte q2_palette[256 * 3] =
 //=============================================================================
 
 //qb: engoo fog //////////////////////////////////////////////
-byte	*host_fogmap;
+byte	*fogmap;
 
 
 
@@ -100,8 +103,6 @@ void FogTableRefresh(void)
 	float	farc;
 	byte *colmap;
 	int RANGE = 1;
-	int COLORLEVELS = 64;
-	int PALBRIGHTS;
 
 	RANGE = 1;
 	ugly = (int)r_transquality->value;
@@ -112,9 +113,8 @@ void FogTableRefresh(void)
 	//	fogcolb = 0;
 	//	fogthick= 100; // thickness of fog (100 = opaque, 50 = half... ok well you get it)
 	fogthik = r_fogdensity * 0.01;
-	PALBRIGHTS = 0;
-	//	Con_Printf ("Fog generating with %f %f %f %f", fogthick, fogcolr, fogcolg, fogcolb);
-	colmap = host_fogmap;
+		//	Con_Printf ("Fog generating with %f %f %f %f", fogthick, fogcolr, fogcolg, fogcolb);
+	colmap = fogmap;
 
 	for (l = COLORLEVELS; l>0; l--)
 	{
@@ -375,6 +375,70 @@ void Draw_InitRGBMap (void)
 
 }
 
+void GrabAlphamap(void) //qb: based on Engoo
+{
+	int c, l, r, g, b;
+	float ay, ae;
+	byte *colmap;
+
+	ay = 0.666667;
+	ae = 1.0 - ay;				// base pixels
+	colmap = vid.alphamap; // alphamap;
+
+	for (l = 0; l<256; l++)
+	{
+		for (c = 0; c<256; c++)
+		{
+			r = (int)(((float)q2_palette[c * 3] * ae) + ((float)q2_palette[l * 3] * ay));
+			g = (int)(((float)q2_palette[c * 3 + 1] * ae) + ((float)q2_palette[l * 3 + 1] * ay));
+			b = (int)(((float)q2_palette[c * 3 + 2] * ae) + ((float)q2_palette[l * 3 + 2] * ay));
+			*colmap++ = BestColor(r, g, b, 0, 254); // High quality color tables get best color
+		}
+	}
+}
+
+
+void GrabColormap(void)  //qb: from super8
+{
+	int		l, c, red, green, blue;
+	float	frac, fracscaled;
+	float   rscaled, gscaled, bscaled;
+	byte *colmap;
+
+	colmap = vid.colormap; // host_colormap;
+
+	// identity lump
+	//   for (l=0 ; l<256 ; l++)
+	//       *colmap++ = l;
+
+	// shaded levels
+	for (l = 0; l<COLORLEVELS; l++)
+	{
+		frac = (float)l / (COLORLEVELS - 1);
+		frac = 1.0 - (frac);
+
+		for (c = 0; c<256 - PALBRIGHTS; c++)
+		{
+			red = (int)((float)q2_palette[c * 3] * frac); //+ rscaled);
+			green = (int)((float)q2_palette[c * 3 + 1] * frac); //+ gscaled);
+			blue = (int)((float)q2_palette[c * 3 + 2] * frac); // + bscaled);
+
+			//
+			// note: 254 instead of 255 because 255 is the transparent color, and we
+			// don't want anything remapping to that
+			//
+			*colmap++ = BestColor(red, green, blue, 0, 254);
+		}
+		for (; c<256; c++)
+		{
+			red = (int)q2_palette[c * 3];
+			green = (int)q2_palette[c * 3 + 1];
+			blue = (int)q2_palette[c * 3 + 2];
+
+			*colmap++ = BestColor(red, green, blue, 0, 254);
+		}
+	}
+}
 
 
 

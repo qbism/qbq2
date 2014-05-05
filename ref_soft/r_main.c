@@ -249,12 +249,12 @@ void R_InitFogVars(void)
 {
 	r_fogenable = false; //qb: debug-  false;
 	r_fogmodel = 1; // GL_LINEAR;
-	r_fogdensity = 30.0;
-	r_fognear = 150.0;
-	r_fogfar = 2000.0;
-	r_fogColor[0] = 110.0;
-	r_fogColor[1] = 110.0;
-	r_fogColor[2] = 140.0;
+	r_fogdensity = 40.0;
+	r_fognear = 2.0;
+	r_fogfar = 1100.0;
+	r_fogColor[0] = 80.0;
+	r_fogColor[1] = 80.0;
+	r_fogColor[2] = 65.0;
 }
 
 /*
@@ -462,7 +462,7 @@ int R_Init( void *hInstance, void *wndProc )
 	Draw_InitRGBMap();		// leilei - colored lights	
 
 	//qb: engoo fog
-	host_fogmap = malloc(16384);
+	fogmap = malloc(16384);
 	R_InitFogVars();
 	FogTableRefresh();
 
@@ -1534,6 +1534,9 @@ void Draw_GetPalette (void)
 	if (!vid.colormap)
 		ri.Sys_Error (ERR_FATAL, "Couldn't load pics/colormap.pcx");
 	vid.alphamap = vid.colormap + 64*256;
+	//qb: hack these in here for now
+	GrabColormap();
+	GrabAlphamap();
 
 	out = (byte *)d_8to24table;
 	for (i=0 ; i<256 ; i++, out+=4)

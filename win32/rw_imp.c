@@ -185,7 +185,7 @@ void SWimp_EndFrame(void)
 /*
 ** SWimp_SetMode
 */
-rserr_t SWimp_SetMode(int *pwidth, int *pheight, int mode)
+rserr_t SWimp_SetMode(unsigned int *pwidth, unsigned int *pheight, int mode)
 {
 	const char *win_fs[] = { "W", "FS" };
 	rserr_t retval = rserr_ok;

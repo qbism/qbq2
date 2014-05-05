@@ -90,8 +90,6 @@ qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 	dibinfo_t   dibheader;
 	BITMAPINFO *pbmiDIB = (BITMAPINFO *)&dibheader;
 	DEVMODE	gdevmode;  //qb: for fullscreen
-	RECT		WindowRect;  //qb: for fullscreen
-	DWORD		WindowStyle, ExWindowStyle;  //qb: for fullscreen
 	int i;
 
 	memset(&dibheader, 0, sizeof(dibheader));
@@ -190,7 +188,7 @@ qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 		RECT		WindowRect;
 		DWORD		WindowStyle, ExWindowStyle;
 
-		int			window_center_x, window_center_y, window_x, window_y, window_width, window_height;
+		int			window_x, window_y, window_width, window_height;
 		RECT		window_rect;
 
 		WindowRect.top = WindowRect.left = 0;
@@ -231,7 +229,6 @@ qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 	/*
 	** clear the DIB memory buffer
 	*/
-windowmode:
 	memset(sww_state.pDIBBase, 0x00, vid.width * vid.height);  //qb: do black, was 0xff
 
 	if ((sww_state.hdcDIBSection = CreateCompatibleDC(sww_state.hDC)) == NULL)

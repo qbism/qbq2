@@ -24,8 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "r_local.h"
 
-#define LIGHT_MIN	5		// lowest light value we'll allow, to avoid the
-							//  need for inner-loop light clamping
 
 //PGM
 extern byte iractive;
@@ -798,8 +796,8 @@ void R_AliasTransformFinalVerts( int numpoints, finalvert_t *fv, dtrivertx_t *ol
 
 			// clamp; because we limited the minimum ambient and shading light, we
 			// don't have to clamp low light, just bright
-			if (temp < 0)
-				temp = 0;
+			if (temp < LIGHT_MIN) //qb: was 0
+				temp = LIGHT_MIN;
 		}
 
 		fv->l = temp;
@@ -978,9 +976,9 @@ void R_AliasSetupLighting (void)
 	if (r_ambientlight < LIGHT_MIN)
 		r_ambientlight = LIGHT_MIN;
 
-	if (r_coloredlights->value){
-	
-		r_ambientlight = 276; //qb: tried 416, originally 276;	// leilei - for lightpoint interrim hack
+	if (r_coloredlights->value)
+	{
+		r_ambientlight = 276;	// leilei - for lightpoint interrim hack
 	r_ambientlight *= VID_GRADES;
 	}
 	else

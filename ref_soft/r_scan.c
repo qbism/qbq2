@@ -38,7 +38,7 @@ void D_DrawTurbulent8Span(espan_t *pspan);
 static byte    *foggmap;
 void SetFogMap(void)
 {
-	foggmap = (byte *)host_fogmap;
+	foggmap = (byte *)fogmap;
 };
 
 

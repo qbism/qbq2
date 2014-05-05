@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "../client/ref.h"
 
-
+#define	COLMODEL //qb: tnq2
 #define REF_VERSION     "KolorSoft"  //qb: LOL
 
 // up / down
@@ -38,22 +38,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // fall over
 #define ROLL    2
 
-
-//qb: leilei - colored lighting and fog
-
-extern qboolean r_fogenable;
-extern byte	*host_fogmap;
-extern int		r_fogmodel;  //qb: will parse this, but not used in ref_soft at the moment.
-extern float	r_fogdensity;
-extern float	r_fognear;
-extern float	r_fogfar;
-extern float	r_fogColor[4];
-
-void SetFogMap(void);
-byte BestColor(int r, int g, int b, int start, int stop);
-int FindColor(int r, int g, int b);
-
-#define	COLMODEL
 
 /*
 
@@ -248,6 +232,9 @@ extern oldrefdef_t      r_refdef;
 #define AMP             8*0x10000
 #define AMP2    3
 #define SPEED   20
+
+#define LIGHT_MIN	5		// lowest light value we'll allow, to avoid the
+//  need for inner-loop light clamping
 
 
 /*
@@ -491,6 +478,27 @@ void D_WarpScreen (void);
 void R_PolysetUpdateTables (void);
 
 extern void *acolormap; // FIXME: should go away
+
+//qb: leilei - colored lighting and fog
+
+extern qboolean r_fogenable;
+extern byte	*fogmap;
+extern byte	palmap2[64][64][64];		//  Colored Lighting Lookup Table
+extern int		r_fogmodel;  //qb: will parse this, but not used in ref_soft at the moment.
+extern float	r_fogdensity;
+extern float	r_fognear;
+extern float	r_fogfar;
+extern float	r_fogColor[4];
+
+void SetFogMap(void);
+void GrabAlphamap(void);
+void GrabColormap(void);
+byte BestColor(int r, int g, int b, int start, int stop);
+int FindColor(int r, int g, int b);
+void Draw_InitRGBMap(void);
+void FogTableRefresh(void);
+void R_AliasClipTriangleRGB(finalvert_t *index0, finalvert_t *index1, finalvert_t *index2);
+
 
 //=======================================================================//
 
