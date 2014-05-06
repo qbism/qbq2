@@ -226,4 +226,16 @@ typedef struct
 // this is the only function actually exported at the linker level
 typedef	refexport_t	(*GetRefAPI_t) (refimport_t);
 
+
+//qb: - kmq2 fog variables////////////////////////
+// global fog vars w/ defaults
+extern int FogModels[3]; //qb: in gl mode it is GL_LINEAR, GL_EXP, GL_EXP2
+
+extern qboolean r_fogenable;
+extern int		r_fogmodel;
+extern float	r_fogdensity;
+extern float	r_fognear;
+extern float	r_fogfar;
+extern float	r_fogColor[4];
+
 #endif // __REF_H

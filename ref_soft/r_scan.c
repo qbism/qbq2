@@ -122,19 +122,6 @@ void D_DrawTurbulent8Span(espan_t *pspan)
 	{
 		if (sw_transmooth->value /*> 1*/)
 		{
-			/*#if 0
-						diths = ((float)r_turb_s + (float)r_turb_turb[(r_turb_t>>16)&(CYCLE-1)]) / 65536;
-						ditht = ((float)r_turb_t + (float)r_turb_turb[(r_turb_s>>16)&(CYCLE-1)]) / 65536;
-						#else
-						diths = ((float)r_turb_s + (float)r_turb_turb[(r_turb_t>>16)&(CYCLE-1)]) * .00001526;
-						ditht = ((float)r_turb_t + (float)r_turb_turb[(r_turb_s>>16)&(CYCLE-1)]) * .00001526;
-
-						#endif
-						DitherKernel(&diths, &ditht, pspan->u + r_turb_spancount, pspan->v);
-
-						tturb = (int)ditht&63;
-						sturb = (int)diths&63;*/
-
 			sturb = r_turb_s + r_turb_turb[(r_turb_t >> 16)&(CYCLE - 1)];
 			tturb = r_turb_t + r_turb_turb[(r_turb_s >> 16)&(CYCLE - 1)];
 

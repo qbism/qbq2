@@ -61,7 +61,7 @@ typedef struct {
 
 aliastriangleparms_t aliastriangleparms;
 
-int	r_p0[6], r_p1[6], r_p2[6];
+int	r_p0[9], r_p1[9], r_p2[9];
 
 byte		*d_pcolormap;
 
@@ -264,8 +264,8 @@ void R_DrawTriangle(void)
 		r_p2[3] = aliastriangleparms.c->t;
 		r_p2[4] = aliastriangleparms.c->l;
 		r_p2[5] = aliastriangleparms.c->zi;
-		/* // i crash fixme
-			//	if (coloredlights){
+		 // i crash fixme
+				if (coloredlights){
 			r_p0[6] = aliastriangleparms.a->l;		// lightr
 			r_p0[7] = aliastriangleparms.a->l;		// lightg
 			r_p0[8] = aliastriangleparms.a->l;		// lightb
@@ -275,9 +275,7 @@ void R_DrawTriangle(void)
 			r_p2[6] = aliastriangleparms.c->l;		// lightr
 			r_p2[7] = aliastriangleparms.c->l;		// lightg
 			r_p2[8] = aliastriangleparms.c->l;		// lightb
-			//		}
-
-			*/
+					}
 
 		R_PolysetSetEdgeTable();
 		R_RasterizeAliasPolySmooth();
@@ -1208,15 +1206,16 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 					if (r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
 						*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
 					// leilei - colored lights begin
-					else if (coloredlights){
+					else if (coloredlights)
+					{
 						pix24 = (unsigned char *)&d_8to24table[*lptex];
 						//pix24 = (unsigned char *)&d_8to24table[((byte *)vid.colormap)[*lptex + (llight & 0xFF00)]];
-						//trans[0] = (pix24[0] * (16384 - llightrgb[0])) >> 15;
-						//trans[1] = (pix24[1] * (16384 - llightrgb[1])) >> 15;
-						//trans[2] = (pix24[2] * (16384 - llightrgb[2])) >> 15;
-						trans[0] = (int)(pix24[0] * (llight * lpcolor[0])) >> 15;
-						trans[1] = (int)(pix24[1] * (llight * lpcolor[1])) >> 15;
-						trans[2] = (int)(pix24[2] * (llight * lpcolor[2])) >> 15;	// leilei - temporarily use 
+						trans[0] = ((pix24[0] + (byte )lpcolor[0]) * (16384 - llightrgb[0])) >> 15;
+						trans[1] = ((pix24[1] + (byte )lpcolor[1])  * (16384 - llightrgb[1])) >> 15;
+						trans[2] = ((pix24[2] + (byte )lpcolor[2])  * (16384 - llightrgb[2])) >> 15;
+						//trans[0] = (int)(pix24[0] * (llight * lpcolor[0])) >> 15;
+						//trans[1] = (int)(pix24[1] * (llight * lpcolor[1])) >> 15;
+						//trans[2] = (int)(pix24[2] * (llight * lpcolor[2])) >> 15;	// leilei - temporarily use 
 						if (trans[0] < 0) trans[0] = 0;
 						if (trans[1] < 0) trans[1] = 0;
 						if (trans[2] < 0) trans[2] = 0;

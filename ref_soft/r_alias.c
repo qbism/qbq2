@@ -55,6 +55,8 @@ float	aliastransform[3][4];
 float   aliasworldtransform[3][4];
 float   aliasoldworldtransform[3][4];
 
+float	shadelight[3]; // leilei - colored light
+
 static float	s_ziscale;
 static vec3_t	s_alias_forward, s_alias_right, s_alias_up;
 
@@ -796,8 +798,8 @@ void R_AliasTransformFinalVerts( int numpoints, finalvert_t *fv, dtrivertx_t *ol
 
 			// clamp; because we limited the minimum ambient and shading light, we
 			// don't have to clamp low light, just bright
-			if (temp < LIGHT_MIN) //qb: was 0
-				temp = LIGHT_MIN;
+			if (temp < 0)
+				temp = 0;
 		}
 
 		fv->l = temp;
