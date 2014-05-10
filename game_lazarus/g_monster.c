@@ -573,7 +573,7 @@ void monster_use (edict_t *self, edict_t *other, edict_t *activator)
 	{
 		self->spawnflags &= ~SF_MONSTER_GOODGUY;
 		self->monsterinfo.aiflags &= ~(AI_GOOD_GUY + AI_FOLLOW_LEADER);
-		if(self->dmgteam && !Q_stricmp(self->dmgteam,"player"))
+		if(self->dmgteam && !Q_strcasecmp(self->dmgteam,"player"))
 			self->dmgteam = NULL;
 	}
 
@@ -1220,7 +1220,7 @@ int PatchMonsterModel (char *modelname)
 		for(k=0; k<numitems && !data; k++)
 		{
 			fread(&pakitem,1,sizeof(pak_item_t),fpak);
-			if(!stricmp(pakitem.name,modelname))
+			if(!Q_strcasecmp(pakitem.name,modelname))
 			{
 				fseek(fpak,pakitem.start,SEEK_SET);
 				fread(&model, sizeof(dmdl_t), 1, fpak);
@@ -1377,7 +1377,7 @@ int HintTestStart (edict_t *self)
 			e = &g_edicts[i];
 			if(!e->inuse)
 				continue;
-			if(Q_stricmp(e->classname,"hint_path"))
+			if(Q_strcasecmp(e->classname,"hint_path"))
 				continue;
 			if(!visible(self,e))
 				continue;

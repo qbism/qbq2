@@ -97,7 +97,8 @@ __inline int Q_vsnprintf (char *Dest, size_t Count, const char *Format, va_list 
 // per-level limits
 //
 #define	MAX_CLIENTS			256		// absolute limit
-//qb: look at CL_ParseStartSoundPacket- shaves 3 bits off short, leaving 13 bits = 8192... right?  or additional bit for flag = 4196?
+//qb: look at CL_ParseStartSoundPacket- shaves 3 bits off short, leaving 13 bits = 8192... right?
+// ...or additional bit for flag = 4096?  4096 is 'enough' anyway.
 #define	MAX_EDICTS			4096	//qb: was 1024	// must change protocol to increase more
 #define	MAX_LIGHTSTYLES		256
 #define	MAX_MODELS			256		// these are sent over the net as bytes
@@ -247,7 +248,7 @@ void Com_PageInMemory (byte *buffer, int size);
 //=============================================
 
 // portable case insensitive compare
-int Q_stricmp (char *s1, char *s2);
+int Q_strcasecmp (char *s1, char *s2);
 int Q_strcasecmp (char *s1, char *s2);
 int Q_strncasecmp (char *s1, char *s2, int n);
 

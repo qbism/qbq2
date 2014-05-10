@@ -83,7 +83,7 @@ void CL_ClipMoveToEntities ( vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end,
 
 	for (i=0 ; i<cl.frame.num_entities ; i++)
 	{
-		num = (cl.frame.parse_entities + i)&(MAX_PARSE_ENTITIES-1);
+		num = (cl.frame.parse_entities + i)&PARSE_ENTITIES_MASK;
 		ent = &cl_parse_entities[num];
 
 		if (!ent->solid)
@@ -172,7 +172,7 @@ int		CL_PMpointcontents (vec3_t point)
 
 	for (i=0 ; i<cl.frame.num_entities ; i++)
 	{
-		num = (cl.frame.parse_entities + i)&(MAX_PARSE_ENTITIES-1);
+		num = (cl.frame.parse_entities + i)&PARSE_ENTITIES_MASK;
 		ent = &cl_parse_entities[num];
 
 		if (ent->solid != 31) // special value for bmodel

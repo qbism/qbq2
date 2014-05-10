@@ -316,7 +316,8 @@ extern	cdlight_t	cl_dlights[MAX_DLIGHTS];
 // the cl_parse_entities must be large enough to hold UPDATE_BACKUP frames of
 // entities, so that when a delta compressed message arives from the server
 // it can be un-deltad from the original 
-#define	MAX_PARSE_ENTITIES	1024
+#define	MAX_PARSE_ENTITIES		4096 //qb: like kmq2, was 1024
+#define PARSE_ENTITIES_MASK		( MAX_PARSE_ENTITIES - 1 ) //qb: from aprq2, not sure if it really matters in speed
 extern	entity_state_t	cl_parse_entities[MAX_PARSE_ENTITIES];
 
 //=============================================================================

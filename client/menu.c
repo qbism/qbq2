@@ -2362,7 +2362,7 @@ void JoinServerFunc( void *self )
 
 	index = ( menuaction_s * ) self - s_joinserver_server_actions;
 
-	if ( Q_stricmp( local_server_names[index], NO_SERVER_STRING ) == 0 )
+	if ( Q_strcasecmp( local_server_names[index], NO_SERVER_STRING ) == 0 )
 		return;
 
 	if (index >= m_num_servers)
@@ -2581,21 +2581,21 @@ void StartServerActionFunc( void *self )
 	spot = NULL;
 	if (s_rules_box.curvalue == 1)		// PGM
 	{
- 		if(Q_stricmp(startmap, "bunk1") == 0)
+ 		if(Q_strcasecmp(startmap, "bunk1") == 0)
   			spot = "start";
- 		else if(Q_stricmp(startmap, "mintro") == 0)
+ 		else if(Q_strcasecmp(startmap, "mintro") == 0)
   			spot = "start";
- 		else if(Q_stricmp(startmap, "fact1") == 0)
+ 		else if(Q_strcasecmp(startmap, "fact1") == 0)
   			spot = "start";
- 		else if(Q_stricmp(startmap, "power1") == 0)
+ 		else if(Q_strcasecmp(startmap, "power1") == 0)
   			spot = "pstart";
- 		else if(Q_stricmp(startmap, "biggun") == 0)
+ 		else if(Q_strcasecmp(startmap, "biggun") == 0)
   			spot = "bstart";
- 		else if(Q_stricmp(startmap, "hangar1") == 0)
+ 		else if(Q_strcasecmp(startmap, "hangar1") == 0)
   			spot = "unitstart";
- 		else if(Q_stricmp(startmap, "city1") == 0)
+ 		else if(Q_strcasecmp(startmap, "city1") == 0)
   			spot = "unitstart";
- 		else if(Q_stricmp(startmap, "boss1") == 0)
+ 		else if(Q_strcasecmp(startmap, "boss1") == 0)
 			spot = "bosstart";
 	}
 
@@ -3799,7 +3799,7 @@ qboolean PlayerConfig_MenuInit( void )
 	for ( i = 0; i < s_numplayermodels; i++ )
 	{
 		s_pmnames[i] = s_pmi[i].displayname;
-		if ( Q_stricmp( s_pmi[i].directory, currentdirectory ) == 0 )
+		if ( Q_strcasecmp( s_pmi[i].directory, currentdirectory ) == 0 )
 		{
 			int j;
 
@@ -3807,7 +3807,7 @@ qboolean PlayerConfig_MenuInit( void )
 
 			for ( j = 0; j < s_pmi[i].nskins; j++ )
 			{
-				if ( Q_stricmp( s_pmi[i].skindisplaynames[j], currentskin ) == 0 )
+				if ( Q_strcasecmp( s_pmi[i].skindisplaynames[j], currentskin ) == 0 )
 				{
 					currentskinindex = j;
 					break;

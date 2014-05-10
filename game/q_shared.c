@@ -1178,7 +1178,7 @@ void Com_PageInMemory (byte *buffer, int size)
 ============================================================================
 */
 
-// FIXME: replace all Q_stricmp with Q_strcasecmp
+// FIXME: replace all Q_stricmp with Q_strcasecmp  //qb: OK.
 int Q_stricmp (char *s1, char *s2)
 {
 #if defined(WIN32)

@@ -45,7 +45,7 @@ typedef struct
 	int		h_count[512];
 } cinematics_t;
 
-cinematics_t	cin;
+static cinematics_t	cin;  //qb: from aprq2, more statics
 
 /*
 =================================================================
@@ -61,7 +61,7 @@ PCX LOADING
 SCR_LoadPCX
 ==============
 */
-void SCR_LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *height)
+static void SCR_LoadPCX (const char *filename, byte **pic, byte **palette, int *width, int *height)
 {
 	byte	*raw;
 	pcx_t	*pcx;
@@ -93,6 +93,7 @@ void SCR_LoadPCX (char *filename, byte **pic, byte **palette, int *width, int *h
 		|| pcx->ymax >= 480)
 	{
 		Com_Printf ("Bad pcx file %s\n", filename);
+		FS_FreeFile (pcx); //qb: from aprq2
 		return;
 	}
 
@@ -310,6 +311,7 @@ cblock_t Huff1Decompress (cblock_t in)
 	count = in.data[0] + (in.data[1]<<8) + (in.data[2]<<16) + (in.data[3]<<24);
 	input = in.data + 4;
 	out_p = out.data = Z_Malloc (count);
+	memset(out_p, 0, count);
 
 	// read bits
 
@@ -605,8 +607,11 @@ void SCR_PlayCinematic (char *arg)
 	int		old_khz;
 
 	// make sure CD isn't playing music
+#ifdef CD_AUDIO
 	CDAudio_Stop();
+#endif
 
+	palette = NULL;
 	cl.cinematicframe = 0;
 	dot = strstr (arg, ".");
 	if (dot && !strcmp (dot, ".pcx"))

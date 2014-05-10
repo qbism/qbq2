@@ -700,12 +700,12 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		fire_frames, fire);
 
 	// run the weapon frame again if hasted
-	if (stricmp(ent->client->pers.weapon->pickup_name, "Grapple") == 0 &&
+	if (Q_strcasecmp(ent->client->pers.weapon->pickup_name, "Grapple") == 0 &&
 		ent->client->weaponstate == WEAPON_FIRING)
 		return;
 
 	if ((CTFApplyHaste(ent) ||
-		(Q_stricmp(ent->client->pers.weapon->pickup_name, "Grapple") == 0 &&
+		(Q_strcasecmp(ent->client->pers.weapon->pickup_name, "Grapple") == 0 &&
 		ent->client->weaponstate != WEAPON_FIRING))
 		&& oldstate == ent->client->weaponstate)
 	{

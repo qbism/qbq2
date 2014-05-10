@@ -18,6 +18,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+#define CD_AUDIO //qb: from aprq2, planning for mobile devices
+
+#ifdef CD_AUDIO
 int		CDAudio_Init(void);
 void	CDAudio_Shutdown(void);
 void	CDAudio_Play(int track, qboolean looping);
@@ -25,3 +28,4 @@ void	CDAudio_Stop(void);
 void	CDAudio_Update(void);
 void	CDAudio_Activate (qboolean active);
 qboolean CDAudio_Active (void); // Knightmare added
+#endif

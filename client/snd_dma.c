@@ -881,7 +881,7 @@ void S_AddLoopSounds (void)
 
 	for (i=0 ; i<cl.frame.num_entities ; i++)
 	{
-		num = (cl.frame.parse_entities + i)&(MAX_PARSE_ENTITIES-1);
+		num = (cl.frame.parse_entities + i)&PARSE_ENTITIES_MASK;
 		ent = &cl_parse_entities[num];
 		sounds[i] = ent->sound;
 	}
@@ -898,7 +898,7 @@ void S_AddLoopSounds (void)
 		if (!sc)
 			continue;
 
-		num = (cl.frame.parse_entities + i)&(MAX_PARSE_ENTITIES-1);
+		num = (cl.frame.parse_entities + i)&PARSE_ENTITIES_MASK;
 		ent = &cl_parse_entities[num];
 
 		// Knightmare- find correct origin for bmodels without origin brushes
@@ -934,7 +934,7 @@ void S_AddLoopSounds (void)
 				continue;
 			sounds[j] = 0;	// don't check this again later
 
-			num = (cl.frame.parse_entities + j)&(MAX_PARSE_ENTITIES-1);
+			num = (cl.frame.parse_entities + j)&PARSE_ENTITIES_MASK;
 			ent = &cl_parse_entities[num];
 
 			S_SpatializeOrigin (origin_v, 255.0, SOUND_LOOPATTENUATE,  // Knightmare changed, was ent->origin

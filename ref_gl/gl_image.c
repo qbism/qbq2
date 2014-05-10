@@ -222,7 +222,7 @@ void GL_TextureAlphaMode (char *string)
 
 	for (i=0; i< NUM_GL_ALPHA_MODES; i++)
 	{
-		if ( !Q_stricmp( gl_alpha_modes[i].name, string ) )
+		if ( !Q_strcasecmp( gl_alpha_modes[i].name, string ) )
 			break;
 	}
 
@@ -246,7 +246,7 @@ void GL_TextureSolidMode (char *string)
 
 	for (i=0; i< NUM_GL_SOLID_MODES; i++)
 	{
-		if ( !Q_stricmp( gl_solid_modes[i].name, string ) )
+		if ( !Q_strcasecmp( gl_solid_modes[i].name, string ) )
 			break;
 	}
 
@@ -306,7 +306,7 @@ void GL_TextureMode( char *string )
 
 	for (i=0 ; i< NUM_GL_MODES ; i++)
 	{
-		if ( !Q_stricmp( modes[i].name, string ) )
+		if ( !Q_strcasecmp( modes[i].name, string ) )
 			break;
 	}
 

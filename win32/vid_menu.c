@@ -259,12 +259,12 @@ static void ApplyChanges( void *unused )
 	** update appropriate stuff if we're running OpenGL and gamma
 	** has been modified
 	*/
-	if ( stricmp( Cvar_VariableString("vid_ref"), "gl" ) == 0 )
+	if ( Q_strcasecmp( Cvar_VariableString("vid_ref"), "gl" ) == 0 )
 	{
 		if ( vid_gamma->modified )
 		{
 			vid_ref->modified = true;
-			if ( stricmp( Cvar_VariableString("gl_driver"), "3dfxgl" ) == 0 )
+			if ( Q_strcasecmp( Cvar_VariableString("gl_driver"), "3dfxgl" ) == 0 )
 			{
 				char envbuffer[1024];
 				float g;

@@ -622,7 +622,7 @@ void Cmd_Give_f (edict_t *ent)
 
 	name = gi.args();
 
-	if(!Q_stricmp(name,"jetpack"))
+	if(!Q_strcasecmp(name,"jetpack"))
 	{
 		if(!developer->value)
 		{
@@ -638,10 +638,10 @@ void Cmd_Give_f (edict_t *ent)
 	}
 	if(!developer->value)
 	{
-		if( !Q_stricmp(name,"flashlight")      ||
-			!Q_stricmp(name,"fuel")            ||
-			!Q_stricmp(name,"homing missiles") ||
-			!Q_stricmp(name,"stasis generator")   )
+		if( !Q_strcasecmp(name,"flashlight")      ||
+			!Q_strcasecmp(name,"fuel")            ||
+			!Q_strcasecmp(name,"homing missiles") ||
+			!Q_strcasecmp(name,"stasis generator")   )
 		{
 
 			safe_cprintf(ent, PRINT_HIGH, "%s not available via give cheat\n",name);
@@ -649,12 +649,12 @@ void Cmd_Give_f (edict_t *ent)
 		}
 	}
 
-	if (Q_stricmp(name, "all") == 0)
+	if (Q_strcasecmp(name, "all") == 0)
 		give_all = true;
 	else
 		give_all = false;
 
-	if (give_all || Q_stricmp(gi.argv(1), "health") == 0)
+	if (give_all || Q_strcasecmp(gi.argv(1), "health") == 0)
 	{
 		if (gi.argc() == 3)
 			ent->health = atoi(gi.argv(2));
@@ -664,7 +664,7 @@ void Cmd_Give_f (edict_t *ent)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "weapons") == 0)
+	if (give_all || Q_strcasecmp(name, "weapons") == 0)
 	{
 		for (i=0 ; i<game.num_items ; i++)
 		{
@@ -679,7 +679,7 @@ void Cmd_Give_f (edict_t *ent)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "ammo") == 0)
+	if (give_all || Q_strcasecmp(name, "ammo") == 0)
 	{
 		for (i=0 ; i<game.num_items ; i++)
 		{
@@ -688,9 +688,9 @@ void Cmd_Give_f (edict_t *ent)
 				continue;
 			if (!(it->flags & IT_AMMO))
 				continue;
-			if (it->classname && !Q_stricmp(it->classname,"ammo_fuel") && !developer->value)
+			if (it->classname && !Q_strcasecmp(it->classname,"ammo_fuel") && !developer->value)
 				continue;
-			if (it->classname && !Q_stricmp(it->classname,"ammo_homing_missiles") && !developer->value)
+			if (it->classname && !Q_strcasecmp(it->classname,"ammo_homing_missiles") && !developer->value)
 				continue;
 			Add_Ammo (ent, it, 1000);
 		}
@@ -698,7 +698,7 @@ void Cmd_Give_f (edict_t *ent)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "armor") == 0)
+	if (give_all || Q_strcasecmp(name, "armor") == 0)
 	{
 		gitem_armor_t	*info;
 
@@ -716,7 +716,7 @@ void Cmd_Give_f (edict_t *ent)
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "Power Shield") == 0)
+	if (give_all || Q_strcasecmp(name, "Power Shield") == 0)
 	{
 		it = FindItem("Power Shield");
 		it_ent = G_Spawn();
@@ -739,11 +739,11 @@ void Cmd_Give_f (edict_t *ent)
 				continue;
 			if (it->flags & (IT_ARMOR|IT_WEAPON|IT_AMMO|IT_TECH)) // exclude ctf techs
 				continue;
-			if (it->classname && !Q_stricmp(it->classname,"item_jetpack") && !developer->value)
+			if (it->classname && !Q_strcasecmp(it->classname,"item_jetpack") && !developer->value)
 				continue;
-			if (it->classname && !Q_stricmp(it->classname,"item_flashlight") && !developer->value)
+			if (it->classname && !Q_strcasecmp(it->classname,"item_flashlight") && !developer->value)
 				continue;
-			if (it->classname && !Q_stricmp(it->classname,"item_freeze") && !developer->value)
+			if (it->classname && !Q_strcasecmp(it->classname,"item_freeze") && !developer->value)
 				continue;
 			ent->client->pers.inventory[i] = 1;
 		}
@@ -919,7 +919,7 @@ void Cmd_Use_f (edict_t *ent)
 	}
 	index = ITEM_INDEX(it);
 #ifdef JETPACK_MOD
-	if(!stricmp(s,"jetpack"))
+	if(!Q_strcasecmp(s,"jetpack"))
 	{
 		// Special case - turns on/off
 		if(!ent->client->jetpack)
@@ -941,7 +941,7 @@ void Cmd_Use_f (edict_t *ent)
 		return;
 	}
 #endif
-	if (!stricmp(s,"stasis generator"))
+	if (!Q_strcasecmp(s,"stasis generator"))
 	{
 		// Special case - turn freeze off if already on
 		if(level.freeze)
@@ -975,12 +975,12 @@ void Cmd_Drop_f (edict_t *ent)
 	char		*s;
 
 //ZOID--special case for tech powerups
-	if (Q_stricmp(gi.args(), "tech") == 0 && (it = CTFWhat_Tech(ent)) != NULL) {
+	if (Q_strcasecmp(gi.args(), "tech") == 0 && (it = CTFWhat_Tech(ent)) != NULL) {
 		it->drop (ent, it);
 		return;
 	}
 //ZOID
-	if (Q_stricmp(gi.args(), "flag") == 0 && (it = CTFWhat_Flag(ent)) != NULL) {
+	if (Q_strcasecmp(gi.args(), "flag") == 0 && (it = CTFWhat_Flag(ent)) != NULL) {
 		it->drop (ent, it);
 		return;
 	}
@@ -1101,7 +1101,7 @@ void Cmd_InvUse_f (edict_t *ent)
 	}
 
 #ifdef JETPACK_MOD
-	if(!stricmp(it->classname,"item_jetpack"))
+	if(!Q_strcasecmp(it->classname,"item_jetpack"))
 	{
 		if(!ent->client->jetpack)
 		{
@@ -1883,7 +1883,7 @@ void ForcewallOff(edict_t *player)
 	AngleVectors(player->client->v_angle,forward,NULL,NULL);
 	VectorMA(start,8192,forward,point);
 	tr = gi.trace(start,NULL,NULL,point,player,MASK_SHOT);
-	if(Q_stricmp(tr.ent->classname,"forcewall"))
+	if(Q_strcasecmp(tr.ent->classname,"forcewall"))
 	{
 		safe_cprintf(player,PRINT_HIGH,"Not a forcewall!\n");
 		return;
@@ -1922,27 +1922,27 @@ void ClientCommand (edict_t *ent)
 	else
 		parm = gi.argv(1);
 
-	if (Q_stricmp (cmd, "players") == 0)
+	if (Q_strcasecmp (cmd, "players") == 0)
 	{
 		Cmd_Players_f (ent);
 		return;
 	}
-	if (Q_stricmp (cmd, "say") == 0)
+	if (Q_strcasecmp (cmd, "say") == 0)
 	{
 		Cmd_Say_f (ent, false, false);
 		return;
 	}
-	if (Q_stricmp (cmd, "say_team") == 0)
+	if (Q_strcasecmp (cmd, "say_team") == 0)
 	{
 		Cmd_Say_f (ent, true, false);
 		return;
 	}
-	if (Q_stricmp (cmd, "score") == 0)
+	if (Q_strcasecmp (cmd, "score") == 0)
 	{
 		Cmd_Score_f (ent);
 		return;
 	}
-	if (Q_stricmp (cmd, "help") == 0)
+	if (Q_strcasecmp (cmd, "help") == 0)
 	{
 		Cmd_Help_f (ent);
 		return;
@@ -1951,49 +1951,49 @@ void ClientCommand (edict_t *ent)
 	if (level.intermissiontime)
 		return;
 
-	if (Q_stricmp (cmd, "use") == 0)
+	if (Q_strcasecmp (cmd, "use") == 0)
 		Cmd_Use_f (ent);
-	else if (Q_stricmp (cmd, "drop") == 0)
+	else if (Q_strcasecmp (cmd, "drop") == 0)
 		Cmd_Drop_f (ent);
-	else if (Q_stricmp (cmd, "give") == 0)
+	else if (Q_strcasecmp (cmd, "give") == 0)
 		Cmd_Give_f (ent);
-	else if (Q_stricmp (cmd, "god") == 0)
+	else if (Q_strcasecmp (cmd, "god") == 0)
 		Cmd_God_f (ent);
-	else if (Q_stricmp (cmd, "notarget") == 0)
+	else if (Q_strcasecmp (cmd, "notarget") == 0)
 		Cmd_Notarget_f (ent);
-	else if (Q_stricmp (cmd, "noclip") == 0)
+	else if (Q_strcasecmp (cmd, "noclip") == 0)
 		Cmd_Noclip_f (ent);
-	else if (Q_stricmp (cmd, "inven") == 0)
+	else if (Q_strcasecmp (cmd, "inven") == 0)
 		Cmd_Inven_f (ent);
-	else if (Q_stricmp (cmd, "invnext") == 0)
+	else if (Q_strcasecmp (cmd, "invnext") == 0)
 		SelectNextItem (ent, -1);
-	else if (Q_stricmp (cmd, "invprev") == 0)
+	else if (Q_strcasecmp (cmd, "invprev") == 0)
 		SelectPrevItem (ent, -1);
-	else if (Q_stricmp (cmd, "invnextw") == 0)
+	else if (Q_strcasecmp (cmd, "invnextw") == 0)
 		SelectNextItem (ent, IT_WEAPON);
-	else if (Q_stricmp (cmd, "invprevw") == 0)
+	else if (Q_strcasecmp (cmd, "invprevw") == 0)
 		SelectPrevItem (ent, IT_WEAPON);
-	else if (Q_stricmp (cmd, "invnextp") == 0)
+	else if (Q_strcasecmp (cmd, "invnextp") == 0)
 		SelectNextItem (ent, IT_POWERUP);
-	else if (Q_stricmp (cmd, "invprevp") == 0)
+	else if (Q_strcasecmp (cmd, "invprevp") == 0)
 		SelectPrevItem (ent, IT_POWERUP);
-	else if (Q_stricmp (cmd, "invuse") == 0)
+	else if (Q_strcasecmp (cmd, "invuse") == 0)
 		Cmd_InvUse_f (ent);
-	else if (Q_stricmp (cmd, "invdrop") == 0)
+	else if (Q_strcasecmp (cmd, "invdrop") == 0)
 		Cmd_InvDrop_f (ent);
-	else if (Q_stricmp (cmd, "weapprev") == 0)
+	else if (Q_strcasecmp (cmd, "weapprev") == 0)
 		Cmd_WeapPrev_f (ent);
-	else if (Q_stricmp (cmd, "weapnext") == 0)
+	else if (Q_strcasecmp (cmd, "weapnext") == 0)
 		Cmd_WeapNext_f (ent);
-	else if (Q_stricmp (cmd, "weaplast") == 0)
+	else if (Q_strcasecmp (cmd, "weaplast") == 0)
 		Cmd_WeapLast_f (ent);
-	else if (Q_stricmp (cmd, "kill") == 0)
+	else if (Q_strcasecmp (cmd, "kill") == 0)
 		Cmd_Kill_f (ent);
-	else if (Q_stricmp (cmd, "putaway") == 0)
+	else if (Q_strcasecmp (cmd, "putaway") == 0)
 		Cmd_PutAway_f (ent);
-	else if (Q_stricmp (cmd, "wave") == 0)
+	else if (Q_strcasecmp (cmd, "wave") == 0)
 		Cmd_Wave_f (ent);
-	else if (Q_stricmp(cmd, "playerlist") == 0)
+	else if (Q_strcasecmp(cmd, "playerlist") == 0)
 	{
 		if (ctf->value)
 			CTFPlayerList(ent);
@@ -2001,32 +2001,32 @@ void ClientCommand (edict_t *ent)
 			Cmd_PlayerList_f(ent);
 	}
 //ZOID
-	else if (Q_stricmp (cmd, "team") == 0)
+	else if (Q_strcasecmp (cmd, "team") == 0)
 		CTFTeam_f (ent);
-	else if (Q_stricmp(cmd, "id") == 0)
+	else if (Q_strcasecmp(cmd, "id") == 0)
 		CTFID_f (ent);
-	else if (Q_stricmp(cmd, "yes") == 0)
+	else if (Q_strcasecmp(cmd, "yes") == 0)
 		CTFVoteYes(ent);
-	else if (Q_stricmp(cmd, "no") == 0)
+	else if (Q_strcasecmp(cmd, "no") == 0)
 		CTFVoteNo(ent);
-	else if (Q_stricmp(cmd, "ready") == 0)
+	else if (Q_strcasecmp(cmd, "ready") == 0)
 		CTFReady(ent);
-	else if (Q_stricmp(cmd, "notready") == 0)
+	else if (Q_strcasecmp(cmd, "notready") == 0)
 		CTFNotReady(ent);
-	else if (Q_stricmp(cmd, "ghost") == 0)
+	else if (Q_strcasecmp(cmd, "ghost") == 0)
 		CTFGhost(ent);
-	else if (Q_stricmp(cmd, "admin") == 0)
+	else if (Q_strcasecmp(cmd, "admin") == 0)
 		CTFAdmin(ent);
-	else if (Q_stricmp(cmd, "stats") == 0)
+	else if (Q_strcasecmp(cmd, "stats") == 0)
 		CTFStats(ent);
-	else if (Q_stricmp(cmd, "warp") == 0)
+	else if (Q_strcasecmp(cmd, "warp") == 0)
 		CTFWarp(ent);
-	else if (Q_stricmp(cmd, "boot") == 0)
+	else if (Q_strcasecmp(cmd, "boot") == 0)
 		CTFBoot(ent);
-	else if (Q_stricmp(cmd, "observer") == 0)
+	else if (Q_strcasecmp(cmd, "observer") == 0)
 		CTFObserver(ent);
 	// Knightmare added
-	else if (Q_stricmp(cmd, "ctfmenu") == 0)
+	else if (Q_strcasecmp(cmd, "ctfmenu") == 0)
 	{
 		if (!ctf->value)
 			return;
@@ -2039,38 +2039,38 @@ void ClientCommand (edict_t *ent)
 				CTFOpenJoinMenu(ent);
 		}
 	}
-	else if (Q_stricmp(cmd, "techcount") == 0)
+	else if (Q_strcasecmp(cmd, "techcount") == 0)
 		Cmd_TechCount_f(ent);
 
 //ZOID
 #ifdef FLASHLIGHT_MOD
 #if FLASHLIGHT_USE==POWERUP_USE_ITEM
-	else if (Q_stricmp (cmd, "flashlight") == 0)
+	else if (Q_strcasecmp (cmd, "flashlight") == 0)
 		Use_Flashlight_f (ent, (gitem_t *)NULL);
 #endif
 #endif
 
 	// ==================== fog stuff =========================
-	else if (developer->value && !Q_stricmp(cmd,"fog"))
+	else if (developer->value && !Q_strcasecmp(cmd,"fog"))
 		Cmd_Fog_f(ent);
 	else if (developer->value && !Q_strncasecmp(cmd, "fog_", 4))
 		Cmd_Fog_f(ent);
 	// ================ end fog stuff =========================
 
 	// tpp
-	else if (Q_stricmp (cmd, "thirdperson") == 0) {
+	else if (Q_strcasecmp (cmd, "thirdperson") == 0) {
 		Cmd_Chasecam_Toggle (ent);
 		tpp->value = ent->client->chasetoggle;
 	}
 
 	// alternate attack mode
-	/*else if (!Q_stricmp(cmd,"attack2_off"))
+	/*else if (!Q_strcasecmp(cmd,"attack2_off"))
 		Cmd_attack2_f(ent,false);
-	else if (!Q_stricmp(cmd,"attack2_on"))
+	else if (!Q_strcasecmp(cmd,"attack2_on"))
 		Cmd_attack2_f(ent,true);*/
 
 	// zoom
-	else if (!Q_stricmp(cmd, "zoomin")) {
+	else if (!Q_strcasecmp(cmd, "zoomin")) {
 		if(!deathmatch->value && !coop->value && !ent->client->chasetoggle) {
 			if(ent->client->ps.fov > 5) {
 				if(cl_gun->value)
@@ -2081,7 +2081,7 @@ void ClientCommand (edict_t *ent)
 			}
 		}
 	}
-	else if (!Q_stricmp(cmd, "zoomout")) {
+	else if (!Q_strcasecmp(cmd, "zoomout")) {
 		if(!deathmatch->value && !coop->value && !ent->client->chasetoggle) {
 			if(ent->client->ps.fov < ent->client->original_fov) {
 				if(cl_gun->value)
@@ -2092,7 +2092,7 @@ void ClientCommand (edict_t *ent)
 			}
 		}
 	}
-	else if (!Q_stricmp(cmd, "zoom")) {
+	else if (!Q_strcasecmp(cmd, "zoom")) {
 		if (!deathmatch->value && !coop->value && !ent->client->chasetoggle)
 		{
 			if (!parm)
@@ -2113,7 +2113,7 @@ void ClientCommand (edict_t *ent)
 			}
 		}
 	}
-	else if (!Q_stricmp(cmd, "zoomoff")) {
+	else if (!Q_strcasecmp(cmd, "zoomoff")) {
 		if (!deathmatch->value && !coop->value && !ent->client->chasetoggle) {
 			if (ent->client->zoomed && !ent->client->zooming) {
 				ent->client->ps.fov = ent->client->original_fov;
@@ -2123,7 +2123,7 @@ void ClientCommand (edict_t *ent)
 			}
 		}
 	}
-	else if (!Q_stricmp(cmd, "zoomon")) {
+	else if (!Q_strcasecmp(cmd, "zoomon")) {
 		if (!deathmatch->value && !coop->value && !ent->client->chasetoggle) {
 			if (!ent->client->zoomed && !ent->client->zooming) {
 				ent->client->ps.fov = zoomsnap->value;
@@ -2136,7 +2136,7 @@ void ClientCommand (edict_t *ent)
 			}
 		}
 	}
-	else if (!Q_stricmp(cmd, "zoominstop")) {
+	else if (!Q_strcasecmp(cmd, "zoominstop")) {
 		if (!deathmatch->value && !coop->value && !ent->client->chasetoggle) {
 			if (ent->client->zooming > 0) {
 				ent->client->zooming = 0;
@@ -2150,7 +2150,7 @@ void ClientCommand (edict_t *ent)
 			}
 		}
 	}
-	else if (!Q_stricmp(cmd, "zoomoutstop")) {
+	else if (!Q_strcasecmp(cmd, "zoomoutstop")) {
 		if (!deathmatch->value && !coop->value && !ent->client->chasetoggle) {
 			if (ent->client->zooming < 0) {
 				ent->client->zooming = 0;
@@ -2165,7 +2165,7 @@ void ClientCommand (edict_t *ent)
 		}
 	}
 
-	else if(!Q_stricmp(cmd, "entlist")) {
+	else if(!Q_strcasecmp(cmd, "entlist")) {
 		if(parm) {
 			edict_t	*e;
 			FILE	*f;
@@ -2232,7 +2232,7 @@ void ClientCommand (edict_t *ent)
 					if(e->classname)
 					{
 						// class-specific output
-						if(!Q_stricmp(e->classname,"target_changelevel"))
+						if(!Q_strcasecmp(e->classname,"target_changelevel"))
 							fprintf(f,"map=%s\n",e->map);
 					}
 					fprintf(f,"movetype=%d, solid=%d, clipmask=0x%08x\n",e->movetype,e->solid,e->clipmask);
@@ -2249,7 +2249,7 @@ void ClientCommand (edict_t *ent)
 			gi.dprintf("syntax: entlist <filename>\n");
 		}
 	}
-	else if(!Q_stricmp(cmd, "properties"))
+	else if(!Q_strcasecmp(cmd, "properties"))
 	{
 		if(parm) {
 			char	filename[_MAX_PATH];
@@ -2273,7 +2273,7 @@ void ClientCommand (edict_t *ent)
 			gi.dprintf("syntax: properties <filename>\n");
 		}
 	}
-	else if(!Q_stricmp(cmd,"go"))
+	else if(!Q_strcasecmp(cmd,"go"))
 	{
 		edict_t *viewing;
 		float	range;
@@ -2289,7 +2289,7 @@ void ClientCommand (edict_t *ent)
 			return;
 		actor_moveit(ent,viewing);
 	}
-	else if(!Q_stricmp(cmd,"hud"))
+	else if(!Q_strcasecmp(cmd,"hud"))
 	{
 		if(parm)
 		{
@@ -2303,7 +2303,7 @@ void ClientCommand (edict_t *ent)
 		else
 			Cmd_ToggleHud();
 	}
-	else if(!Q_stricmp(cmd,"whatsit"))
+	else if(!Q_strcasecmp(cmd,"whatsit"))
 	{
 		if(parm)
 		{
@@ -2317,7 +2317,7 @@ void ClientCommand (edict_t *ent)
 			world->effects ^= FX_WORLDSPAWN_WHATSIT;
 	}
 
-/*	else if(!Q_stricmp(cmd,"lsight"))
+/*	else if(!Q_strcasecmp(cmd,"lsight"))
 	{
 		if(ent->client->laser_sight)
 		{
@@ -2342,7 +2342,7 @@ void ClientCommand (edict_t *ent)
 			laser->think(laser);
 		}
 	} */
-	else if(!Q_stricmp(cmd,"whereis"))
+	else if(!Q_strcasecmp(cmd,"whereis"))
 	{
 		if(parm)
 		{
@@ -2353,7 +2353,7 @@ void ClientCommand (edict_t *ent)
 			for(i=1; i<globals.num_edicts; i++)
 			{
 				e = &g_edicts[i];
-				if(e->classname && !Q_stricmp(parm,e->classname))
+				if(e->classname && !Q_strcasecmp(parm,e->classname))
 				{
 					count++;
 					gi.dprintf("%d. %s\n",count,vtos(e->s.origin));
@@ -2367,19 +2367,19 @@ void ClientCommand (edict_t *ent)
 	}
 	// debugging/developer stuff
 	else if(developer->value) {
-		if (!Q_stricmp(cmd,"lightswitch"))
+		if (!Q_strcasecmp(cmd,"lightswitch"))
 			ToggleLights();
-		else if (!Q_stricmp(cmd,"bbox"))
+		else if (!Q_strcasecmp(cmd,"bbox"))
 			Cmd_Bbox_f (ent);
-		else if(!Q_stricmp(cmd,"forcewall"))
+		else if(!Q_strcasecmp(cmd,"forcewall"))
 		{
 			SpawnForcewall(ent);
 		}
-		else if(!Q_stricmp(cmd,"forcewall_off"))
+		else if(!Q_strcasecmp(cmd,"forcewall_off"))
 		{
 			ForcewallOff(ent);
 		}
-		else if (!Q_stricmp(cmd,"freeze"))
+		else if (!Q_strcasecmp(cmd,"freeze"))
 		{
 			if(level.freeze)
 				level.freeze = false;
@@ -2391,7 +2391,7 @@ void ClientCommand (edict_t *ent)
 					level.freeze = true;
 			}
 		}
-		else if (!Q_stricmp(cmd,"hint_test"))
+		else if (!Q_strcasecmp(cmd,"hint_test"))
 		{
 			edict_t *viewing;
 			int		result;
@@ -2426,7 +2426,7 @@ void ClientCommand (edict_t *ent)
 			default: gi.dprintf("Unknown error\n");
 			}
 		}
-		else if (!Q_stricmp(cmd,"entid")) {
+		else if (!Q_strcasecmp(cmd,"entid")) {
 			edict_t *viewing;
 			vec3_t	origin;
 			float	range;
@@ -2440,29 +2440,29 @@ void ClientCommand (edict_t *ent)
 			gi.dprintf("absmin,absmax,size=%s, %s, %s, range=%g\n",vtos(viewing->absmin),vtos(viewing->absmax),vtos(viewing->size),range);
 			gi.dprintf("groundentity=%s\n",(viewing->groundentity ? viewing->groundentity->classname : "NULL"));
 		}
-		else if (!Q_stricmp(cmd, "item_left"))
+		else if (!Q_strcasecmp(cmd, "item_left"))
 			ShiftItem(ent,1);
-		else if (!Q_stricmp(cmd, "item_right"))
+		else if (!Q_strcasecmp(cmd, "item_right"))
 			ShiftItem(ent,2);
-		else if (!Q_stricmp(cmd, "item_forward"))
+		else if (!Q_strcasecmp(cmd, "item_forward"))
 			ShiftItem(ent,4);
-		else if (!Q_stricmp(cmd, "item_back"))
+		else if (!Q_strcasecmp(cmd, "item_back"))
 			ShiftItem(ent,8);
-		else if (!Q_stricmp(cmd, "item_up"))
+		else if (!Q_strcasecmp(cmd, "item_up"))
 			ShiftItem(ent,16);
-		else if (!Q_stricmp(cmd, "item_down"))
+		else if (!Q_strcasecmp(cmd, "item_down"))
 			ShiftItem(ent,32);
-		else if (!Q_stricmp(cmd, "item_drop"))
+		else if (!Q_strcasecmp(cmd, "item_drop"))
 			ShiftItem(ent,64);
-		else if (!Q_stricmp(cmd, "item_pitch"))
+		else if (!Q_strcasecmp(cmd, "item_pitch"))
 			ShiftItem(ent,128);
-		else if (!Q_stricmp(cmd, "item_yaw"))
+		else if (!Q_strcasecmp(cmd, "item_yaw"))
 			ShiftItem(ent,256);
-		else if (!Q_stricmp(cmd, "item_roll"))
+		else if (!Q_strcasecmp(cmd, "item_roll"))
 			ShiftItem(ent,512);
-		else if (!Q_stricmp(cmd, "item_release"))
+		else if (!Q_strcasecmp(cmd, "item_release"))
 			ent->client->shift_dir = 0;
-		else if(!Q_stricmp(cmd,"medic_test"))
+		else if(!Q_strcasecmp(cmd,"medic_test"))
 		{
 			extern	int	medic_test;
 			if(parm)
@@ -2489,17 +2489,17 @@ void ClientCommand (edict_t *ent)
 			}
 			else
 			{
-				if(!Q_stricmp(cmd,"muzzlex"))
+				if(!Q_strcasecmp(cmd,"muzzlex"))
 					viewing->muzzle[0] = atof(gi.argv(1));
-				else if(!Q_stricmp(cmd,"muzzley"))
+				else if(!Q_strcasecmp(cmd,"muzzley"))
 					viewing->muzzle[1] = atof(gi.argv(1));
-				else if(!Q_stricmp(cmd,"muzzlez"))
+				else if(!Q_strcasecmp(cmd,"muzzlez"))
 					viewing->muzzle[2] = atof(gi.argv(1));
 				else
 					gi.dprintf("Syntax: muzzle[x|y|z] <value>\n");
 			}
 		}
-		else if(!Q_stricmp(cmd,"range"))
+		else if(!Q_strcasecmp(cmd,"range"))
 		{
 			vec3_t	forward, point, start;
 			trace_t	tr;
@@ -2512,7 +2512,7 @@ void ClientCommand (edict_t *ent)
 			VectorSubtract(tr.endpos,start,point);
 			gi.dprintf("range=%g\n",VectorLength(point));
 		}
-		else if (!Q_stricmp(cmd,"setskill")) {
+		else if (!Q_strcasecmp(cmd,"setskill")) {
 			if(gi.argc() < 2)
 				gi.dprintf("Syntax: setskill X\n");
 			else
@@ -2521,7 +2521,7 @@ void ClientCommand (edict_t *ent)
 				gi.cvar_forceset("skill", va("%i", s));
 			}
 		}
-		else if (!Q_stricmp(cmd,"sk")) {
+		else if (!Q_strcasecmp(cmd,"sk")) {
 			edict_t *viewing;
 			int		skinnum;
 
@@ -2538,7 +2538,7 @@ void ClientCommand (edict_t *ent)
 				gi.dprintf("Currently using skin #%i\n",viewing->s.skinnum);
 
 		}
-		else if(!Q_stricmp(cmd,"spawn"))
+		else if(!Q_strcasecmp(cmd,"spawn"))
 		{
 			edict_t	*e;
 			vec3_t	forward;
@@ -2556,7 +2556,7 @@ void ClientCommand (edict_t *ent)
 			e->s.angles[YAW] = ent->s.angles[YAW];
 			ED_CallSpawn(e);
 		}
-		else if(!Q_stricmp(cmd,"spawngoodguy"))
+		else if(!Q_strcasecmp(cmd,"spawngoodguy"))
 		{
 			edict_t	*e;
 			vec3_t	forward;
@@ -2579,7 +2579,7 @@ void ClientCommand (edict_t *ent)
 			ED_CallSpawn(e);
 			actor_files();
 		}
-		else if(!Q_stricmp(cmd,"spawnself"))
+		else if(!Q_strcasecmp(cmd,"spawnself"))
 		{
 			edict_t	*decoy;
 			vec3_t	forward;
@@ -2610,7 +2610,7 @@ void ClientCommand (edict_t *ent)
 			VectorCopy(ent->maxs,decoy->maxs);
 			gi.linkentity (decoy); 
 		}
-		else if (!Q_stricmp(cmd,"switch")) {
+		else if (!Q_strcasecmp(cmd,"switch")) {
 			extern mmove_t	actor_move_switch;
 			edict_t *viewing;
 
@@ -2625,7 +2625,7 @@ void ClientCommand (edict_t *ent)
 			viewing->monsterinfo.currentmove = &actor_move_switch;
 		}
 #ifndef KMQUAKE2_ENGINE_MOD // these functions moved clientside in engine
-		else if(!Q_stricmp(cmd,"texture")) {
+		else if(!Q_strcasecmp(cmd,"texture")) {
 			trace_t	tr;
 			vec3_t	forward, start, end;
 
@@ -2647,7 +2647,7 @@ void ClientCommand (edict_t *ent)
 					gi.dprintf("Texture=%s, surface=0x%08x, value=%d\n",tr.surface->name,tr.surface->flags,tr.surface->value);
 			}
 		}
-		else if(!Q_stricmp(cmd,"surf")) {
+		else if(!Q_strcasecmp(cmd,"surf")) {
 			trace_t	tr;
 			vec3_t	forward, start, end;
 			int		s;

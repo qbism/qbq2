@@ -686,7 +686,7 @@ void GLimp_EndFrame (void)
 		GL_PrintError (err, "GLimp_EndFrame");
 	// end Knightmare
 
-	if ( stricmp( gl_drawbuffer->string, "GL_BACK" ) == 0 )
+	if ( Q_strcasecmp( gl_drawbuffer->string, "GL_BACK" ) == 0 )
 	{
 		if ( !qwglSwapBuffers( glw_state.hDC ) )
 			ri.Sys_Error( ERR_FATAL, "GLimp_EndFrame() - SwapBuffers() failed!\n" );

@@ -1551,7 +1551,7 @@ int R_Init ( void *hinstance, void *hWnd )
 	// Knightmare- whether to use GL_RGBA textures & GL_BGRA lightmaps
 	// If using one of the mini-drivers, a Voodoo w/ WickedGL, or pre-1.2 driver,
 	// use the texture formats determined by gl_texturesolidmode and gl_texturealphamode.
-	if ( Q_stricmp(gl_driver->string, "opengl32") || gl_config.renderer == GL_RENDERER_VOODOO
+	if ( Q_strcasecmp(gl_driver->string, "opengl32") || gl_config.renderer == GL_RENDERER_VOODOO
 		|| (gl_config.version_major < 2 && gl_config.version_minor < 2) 
 		|| (!gl_newtextureformat || !gl_newtextureformat->value) )
 	{
@@ -1886,7 +1886,7 @@ void R_BeginFrame( float camera_separation )
 
 		if ( gl_state.camera_separation == 0 || !gl_state.stereo_enabled )
 		{
-			if ( Q_stricmp( gl_drawbuffer->string, "GL_FRONT" ) == 0 )
+			if ( Q_strcasecmp( gl_drawbuffer->string, "GL_FRONT" ) == 0 )
 				qglDrawBuffer( GL_FRONT );
 			else
 				qglDrawBuffer( GL_BACK );

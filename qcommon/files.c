@@ -138,7 +138,7 @@ unsigned int FS_TypeFlagForPakItem(char *itemName)
 	tmp = COM_FileExtension(itemName);
 	strncpy(extension, tmp, sizeof(extension));
 	for (i = 0; type_extensions[i]; i++) {
-		if (!Q_stricmp(extension, type_extensions[i]))
+		if (!Q_strcasecmp(extension, type_extensions[i]))
 			return (1 << i);
 	}
 	return 0;
@@ -293,7 +293,7 @@ int FS_FindPackItem(pack_t *pack, char *itemName, long itemHash)
 	for (i = smin; i<smax; i++)
 	{	// make sure this entry is not blacklisted & compare filenames
 		if (pack->files[i].hash == itemHash && !pack->files[i].ignore
-			&& !Q_stricmp(pack->files[i].name, itemName))
+			&& !Q_strcasecmp(pack->files[i].name, itemName))
 			return i;
 	}
 	return -1;
