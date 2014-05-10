@@ -216,11 +216,13 @@ int RecursiveLightPoint (mnode_t *node, vec3_t start, vec3_t end)
 	return RecursiveLightPoint (node->children[!side], mid, end);
 }
 
+
 /*
 ===============
 R_LightPoint
 ===============
 */
+
 void R_LightPoint (vec3_t p, vec3_t color)
 {
 	vec3_t		end;

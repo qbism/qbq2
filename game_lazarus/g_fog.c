@@ -19,59 +19,29 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
+//qb: fixme... started cleanup to work with engine fog but currently non-functional.  Could be mod, engine, or both.
+
 #include "g_local.h"
-
-//#define DISABLE_FOG
-
-/*#ifdef KMQUAKE2_ENGINE_MOD
-#define NEW_FOGSYS
-#endif*/
-
-#ifdef DISABLE_FOG
-void Fog_Init()
-{
-}
-void Fog(vec3_t viewpoint)
-{
-}
-void Fog_Off()
-{
-}
-void SP_trigger_fog(edict_t *self)
-{
-	G_FreeEdict(self);
-}
-void SP_trigger_fog_bbox(edict_t *self)
-{
-	G_FreeEdict(self);
-}
-void SP_target_fog(edict_t *self)
-{
-	G_FreeEdict(self);
-}
-void Cmd_Fog_f(edict_t *ent)
-{
-}
-#else // DISABLE_FOG
-
-
-/*
-=================================================
-NEW FOG SYSTEM
-=================================================
-*/
-#ifdef NEW_FOGSYS
-// new multi-client fog code here
 
 fog_t		gfogs[MAX_FOGS];
 
-fog_t		trig_fade_fog[MAX_CLIENTS];
-fog_t		fade_fog[MAX_CLIENTS];
-fog_t		*pfog[MAX_CLIENTS];
+fog_t		trig_fade_fog;
+fog_t		fade_fog;
+fog_t		*pfog;
 
-qboolean	InTriggerFog[MAX_CLIENTS];
+qboolean	InTriggerFog;
+float		last_software_frame;
+float		last_opengl_frame;
 
-int GLModels[3] = {GL_LINEAR, GL_EXP, GL_EXP2};
+#define FOG_ON       1
+#define FOG_TOGGLE   2
+#define FOG_TURNOFF  4
+#define FOG_STARTOFF 8
+
+#define COLOR(r,g,b) ((((BYTE)(b)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(r))<<16)))
+
+void fog_fade(edict_t *self);
+
 
 #define FOG_ON       1
 #define FOG_TOGGLE   2
@@ -92,86 +62,13 @@ void fog_fade (edict_t *self);
 // gi.WriteByte (fog_blue); // 0-255
 // gi.unicast (player_ent, true); 
 
-void Fog_Off (edict_t *player_ent)
-{
-	if (!player_ent->client || player_ent->is_bot)
-		return;
-	
-	gi.WriteByte (svc_fog); // svc_fog = 21
-	gi.WriteByte (0); // disable message, remaining paramaters are ignored
-	gi.WriteByte (0); // 0, 1, or 2
-	gi.WriteByte (0); // 1-100
-	gi.WriteShort (0); // >0, <fog_far
-	gi.WriteShort (0); // >fog_near-64, < 5000
-	gi.WriteByte (0); // 0-255
-	gi.WriteByte (0); // 0-255
-	gi.WriteByte (0); // 0-255
-	gi.unicast (player_ent, true); 
-}
-
-#else // NEW_FOGSYS 
-
-/*
-=================================================
-OLD FOG SYSTEM
-=================================================
-*/
-#include <windows.h>
-#define __MSC__
-#include <gl/gl.h>
-
-fog_t		gfogs[MAX_FOGS];
-
-fog_t		trig_fade_fog;
-fog_t		fade_fog;
-fog_t		*pfog;
-
-HMODULE		hOpenGL;
-
-qboolean	InTriggerFog;
-float		last_software_frame;
-float		last_opengl_frame;
-
-int GLModels[3] = {GL_LINEAR, GL_EXP, GL_EXP2};
-
-
-typedef void (WINAPI *GLCLEARCOLOR) (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
-typedef void (WINAPI *GLDISABLE) (GLenum cap);
-typedef void (WINAPI *GLENABLE) (GLenum cap);
-typedef void (WINAPI *GLFOGF) (GLenum pname, GLfloat param);
-typedef void (WINAPI *GLFOGFV) (GLenum pname, const GLfloat *params);
-typedef void (WINAPI *GLFOGI) (GLenum pname, GLint param);
-typedef void (WINAPI *GLHINT) (GLenum target, GLenum mode);
-GLCLEARCOLOR GL_glClearColor;
-GLDISABLE GL_glDisable;
-GLENABLE GL_glEnable;
-GLFOGF GL_glFogf;
-GLFOGFV GL_glFogfv;
-GLFOGI GL_glFogi;
-GLHINT GL_glHint;
-
-#define FOG_ON       1
-#define FOG_TOGGLE   2
-#define FOG_TURNOFF  4
-#define FOG_STARTOFF 8
-
-#define COLOR(r,g,b) ((((BYTE)(b)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(r))<<16)))
-
-void fog_fade (edict_t *self);
 
 void Fog_Off()
 {
 	if (deathmatch->value || coop->value)
 		return;
 
-/*#ifdef KMQUAKE2_ENGINE_MOD // engine fog
-	{
-		edict_t	*player_ent = &g_edicts[1];
-
-		if (!player_ent->client || player_ent->is_bot)
-			return;
-
-		gi.WriteByte (svc_fog); // svc_fog = 21
+	gi.WriteByte (svc_fog); // svc_fog = 21
 		gi.WriteByte (0); // disable message, remaining paramaters are ignored
 		gi.WriteByte (0); // 0, 1, or 2
 		gi.WriteByte (0); // 1-100
@@ -180,28 +77,6 @@ void Fog_Off()
 		gi.WriteByte (0); // 0-255
 		gi.WriteByte (0); // 0-255
 		gi.WriteByte (0); // 0-255
-		gi.unicast (player_ent, true);
-	}
-
-#else // old fog
-*/
-	if (gl_driver && vid_ref)
-	{
-		//Knightmare- also ref_kmgl.dll
-		if (!strcmp(vid_ref->string,"gl") || !strcmp(vid_ref->string,"kmgl"))
-		{
-			if (hOpenGL) GL_glDisable (GL_FOG);
-		}
-		else
-		{
-			edict_t	*player;
-
-			player = &g_edicts[1];
-			player->client->fadein = 0;
-		}
-	}
-
-//#endif
 }
 
 void Fog_ConsoleFog()
@@ -222,6 +97,16 @@ void Fog_ConsoleFog()
 		pfog->Near=64;
 		pfog->Far=1024;
 	}
+
+	 gi.WriteByte (svc_fog); // svc_fog = 21
+	 gi.WriteByte (1); // 1 = on, 0 = off
+	 gi.WriteByte(pfog->Model); // 0, 1, or 2
+	 gi.WriteByte(pfog->Density); // 1-100
+	 gi.WriteShort(pfog->Near); // >0, <fog_far
+	 gi.WriteShort(pfog->Far); // >fog_near-64, < 5000
+	 gi.WriteByte(pfog->Color[0]); // 0-255
+	 gi.WriteByte(pfog->Color[1]); // 0-255
+	 gi.WriteByte(pfog->Color[2]); // 0-255
 }
 
 void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0);
@@ -357,10 +242,6 @@ void Cmd_Fog_f(edict_t *ent)
 			level.active_fog = level.active_target_fog = 1;
 			//fog->Model = max(0,min(2,atoi(parm)));
 			fog->Model = max(0,min(3,atoi(parm)));
-			if(fog->Model == 3)
-				fog->GL_Model = GLModels[2];
-			else
-				fog->GL_Model = GLModels[fog->Model];
 			Fog_ConsoleFog();
 		}
 	}
@@ -396,93 +277,6 @@ void Cmd_Fog_f(edict_t *ent)
 		Cmd_Say_f (ent, false, true);
 }
 
-/*
-void SoftwareFog()
-{
-	edict_t	*player = &g_edicts[1];
-
-	player->client->fadein       = level.framenum - 1;
-	player->client->fadehold     = level.framenum + 2;
-	player->client->fadeout      = 0;
-	player->client->fadecolor[0] = pfog->Color[0];
-	player->client->fadecolor[1] = pfog->Color[1];
-	player->client->fadecolor[2] = pfog->Color[2];
-
-	if(pfog->Model == 0)
-		player->client->fadealpha = pfog->Far/256.;
-	else if(pfog->Model == 1)
-		player->client->fadealpha = pfog->Density/30;
-	else
-		player->client->fadealpha = pfog->Density/15;
-
-	if(player->client->fadealpha > 0.9)
-		player->client->fadealpha = 0.9;
-
-	last_software_frame = level.framenum;
-
-}
-*/
-
-
-void GLFog()
-{
-/*#ifdef KMQUAKE2_ENGINE_MOD // engine fog
-	edict_t	*player_ent = &g_edicts[1];
-	int fog_model, fog_density, fog_near, fog_far;
-	int fog_red, fog_green, fog_blue;
-	
-	if (!player_ent->client || player_ent->is_bot)
-		return;
-
-	if (pfog->GL_Model == GL_EXP)
-		fog_model = 1;
-	else if (pfog->GL_Model == GL_EXP2)
-		fog_model = 2;
-	else // GL_LINEAR
-		fog_model = 0;
-
-	fog_density = (int)(pfog->Density);
-	fog_near = (int)(pfog->Near);
-	fog_far = (int)(pfog->Far);
-	fog_red = (int)(pfog->Color[0]*255);
-	fog_green = (int)(pfog->Color[1]*255);
-	fog_blue = (int)(pfog->Color[2]*255);
-
-	gi.WriteByte (svc_fog);			// svc_fog = 21
-	gi.WriteByte (1);				// enable message
-	gi.WriteByte (fog_model);	// model 0, 1, or 2
-	gi.WriteByte (fog_density);	// density 1-100
-	gi.WriteShort (fog_near);		// near >0, <fog_far
-	gi.WriteShort (fog_far);		// far >fog_near-64, < 5000
-	gi.WriteByte (fog_red);	// red	0-255
-	gi.WriteByte (fog_green);	// green	0-255
-	gi.WriteByte (fog_blue);	// blue	0-255
-	gi.unicast (player_ent, true); 
-
-#else // old fog
-*/
-	GLfloat fogColor[4];
-	if(!hOpenGL) return;
-	fogColor[0] = pfog->Color[0];
-	fogColor[1] = pfog->Color[1];
-	fogColor[2] = pfog->Color[2];
-	fogColor[3] = 1.0;
-	GL_glEnable (GL_FOG);                               // turn on fog, otherwise you won't see any
-	GL_glClearColor ( fogColor[0], fogColor[1], fogColor[2], fogColor[3]); // Clear the background color to the fog color
-	GL_glFogi (GL_FOG_MODE, pfog->GL_Model);
-	GL_glFogfv (GL_FOG_COLOR, fogColor);
-	if(pfog->GL_Model == GL_LINEAR)
-	{
-		GL_glFogf (GL_FOG_START, pfog->Near);
-		GL_glFogf (GL_FOG_END, pfog->Far);
-	}
-	else
-		GL_glFogf (GL_FOG_DENSITY, pfog->Density/10000.f);
-    GL_glHint (GL_FOG_HINT, GL_NICEST);
-//#endif
-
-	last_opengl_frame = level.framenum;
-}
 
 void trig_fog_fade (edict_t *self)
 {
@@ -512,7 +306,6 @@ void trig_fog_fade (edict_t *self)
 		trig_fade_fog.Color[0] += (gfogs[index].Color[0] - trig_fade_fog.Color[0])/frames;
 		trig_fade_fog.Color[1] += (gfogs[index].Color[1] - trig_fade_fog.Color[1])/frames;
 		trig_fade_fog.Color[2] += (gfogs[index].Color[2] - trig_fade_fog.Color[2])/frames;
-		trig_fade_fog.GL_Model = GLModels[trig_fade_fog.Model];
 		self->nextthink = level.time + FRAMETIME;
 		gi.linkentity(self);
 	}
@@ -666,34 +459,13 @@ void Fog (edict_t *ent) //vec3_t viewpoint)
 			pfog->Density = density;
 		}
 	}
-	GLFog();
 	level.last_active_fog = level.active_fog;
 }
 
 void Fog_Init()
 {
-	char	GL_Lib[64];
-
-	if(gl_driver_fog && strlen(gl_driver_fog->string))
-		strcpy(GL_Lib,gl_driver_fog->string);
-	else
-		strcpy(GL_Lib,"opengl32");
-	strcat(GL_Lib,".dll");
-	hOpenGL = LoadLibrary(GL_Lib);
-	if(hOpenGL)
-	{
-		GL_glClearColor = (GLCLEARCOLOR)GetProcAddress(hOpenGL,"glClearColor");
-		GL_glDisable    = (GLDISABLE)GetProcAddress(hOpenGL,"glDisable");
-		GL_glEnable     = (GLENABLE)GetProcAddress(hOpenGL,"glEnable");
-		GL_glFogf       = (GLFOGF)GetProcAddress(hOpenGL,"glFogf");
-		GL_glFogfv      = (GLFOGFV)GetProcAddress(hOpenGL,"glFogfv");
-		GL_glFogi       = (GLFOGI)GetProcAddress(hOpenGL,"glFogi");
-		GL_glHint       = (GLHINT)GetProcAddress(hOpenGL,"glHint");
-	}
-
 	gfogs[0].Color[0] = gfogs[0].Color[1] = gfogs[0].Color[2] = 0.5;
 	gfogs[0].Model    = 1;
-	gfogs[0].GL_Model = GLModels[1];
 	gfogs[0].Density  = 20.;
 	gfogs[0].Trigger  = false;
 }
@@ -722,7 +494,6 @@ void fog_fade (edict_t *self)
 		fade_fog.Color[0] += (gfogs[index].Color[0] - fade_fog.Color[0])/frames;
 		fade_fog.Color[1] += (gfogs[index].Color[1] - fade_fog.Color[1])/frames;
 		fade_fog.Color[2] += (gfogs[index].Color[2] - fade_fog.Color[2])/frames;
-		fade_fog.GL_Model = GLModels[fade_fog.Model];
 		self->nextthink = level.time + FRAMETIME;
 		if(!InTriggerFog)
 			memcpy(&level.fog,&fade_fog,sizeof(fog_t));
@@ -735,8 +506,6 @@ void fog_fade (edict_t *self)
 			level.active_fog = level.active_target_fog = 0;
 	}
 }
-
-#endif // NEW_FOGSYS
 
 // The fog entity code works for both systems
 
@@ -882,7 +651,6 @@ void SP_target_fog (edict_t *self)
 	fog->Trigger = false;
 	fog->Model   = self->fog_model;
 	if(fog->Model < 0 || fog->Model > 2) fog->Model = 0;
-	fog->GL_Model = GLModels[fog->Model];
 	VectorCopy(self->fog_color,fog->Color);
 	if(self->spawnflags & FOG_TURNOFF)
 	{
@@ -983,7 +751,6 @@ void SP_trigger_fog (edict_t *self)
 	fog->Trigger = true;
 	fog->Model   = self->fog_model;
 	if(fog->Model < 0 || fog->Model > 2) fog->Model = 0;
-	fog->GL_Model = GLModels[fog->Model];
 	VectorCopy(self->fog_color,fog->Color);
 	if(self->spawnflags & FOG_TURNOFF)
 	{
@@ -1071,7 +838,6 @@ void SP_trigger_fog_bbox (edict_t *self)
 	fog->Trigger = true;
 	fog->Model   = self->fog_model;
 	if(fog->Model < 0 || fog->Model > 2) fog->Model = 0;
-	fog->GL_Model = GLModels[fog->Model];
 	VectorCopy(self->fog_color,fog->Color);
 	if(self->spawnflags & FOG_TURNOFF)
 	{
@@ -1114,4 +880,3 @@ void SP_trigger_fog_bbox (edict_t *self)
 	gi.linkentity(self);
 }
 
-#endif // DISABLE_FOG
