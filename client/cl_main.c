@@ -1882,7 +1882,9 @@ void CL_Frame (int msec)
 	// update audio
 	S_Update (cl.refdef.vieworg, cl.v_forward, cl.v_right, cl.v_up);
 	
+#ifdef CD_AUDIO
 	CDAudio_Update();
+#endif
 
 	// advance local effects for next frame
 	CL_RunDLights ();
@@ -1933,8 +1935,10 @@ void CL_Init (void)
 #if defined __linux__ || defined __sgi
 	S_Init ();	
 	VID_Init ();
+	Con_CheckResize();
 #else
 	VID_Init ();
+	Con_CheckResize();
 	S_Init ();	// sound must be initialized after window is created
 #endif
 	
@@ -1948,7 +1952,9 @@ void CL_Init (void)
 	SCR_Init ();
 	cls.disable_screen = true;	// don't draw yet
 
+#ifdef CD_AUDIO
 	CDAudio_Init ();
+#endif
 	CL_InitLocal ();
 	IN_Init ();
 
@@ -1973,14 +1979,16 @@ void CL_Shutdown(void)
 	
 	if (isdown)
 	{
-		printf ("recursive shutdown\n");
+		//printf ("recursive shutdown\n");
 		return;
 	}
 	isdown = true;
 
 	CL_WriteConfiguration ("config");	// Knightmare- changed to take config name as a parameter
 
+#ifdef CD_AUDIO
 	CDAudio_Shutdown ();
+#endif
 	S_Shutdown();
 	IN_Shutdown ();
 	VID_Shutdown();

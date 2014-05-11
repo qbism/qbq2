@@ -38,7 +38,7 @@ void vectoangles2 (vec3_t value1, vec3_t angles)
 {
 	float	forward;
 	float	yaw, pitch;
-	
+
 	if (value1[1] == 0 && value1[0] == 0)
 	{
 		yaw = 0;
@@ -60,7 +60,7 @@ void vectoangles2 (vec3_t value1, vec3_t angles)
 		if (yaw < 0)
 			yaw += 360;
 
-		forward = sqrt (value1[0]*value1[0] + value1[1]*value1[1]);
+		forward = sqrt(value1[0] * value1[0] + value1[1] * value1[1]);
 		pitch = (atan2(value1[2], forward) * 180 / M_PI);
 		if (pitch < 0)
 			pitch += 360;
@@ -70,6 +70,7 @@ void vectoangles2 (vec3_t value1, vec3_t angles)
 	angles[YAW] = yaw;
 	angles[ROLL] = 0;
 }
+
 
 //=============
 //=============
@@ -753,9 +754,6 @@ void CL_ParticleSteamEffect (vec3_t org, vec3_t dir, int color, int count, int m
 	float		d;
 	vec3_t		r, u;
 
-//	vectoangles2 (dir, angle_dir);
-//	AngleVectors (angle_dir, f, r, u);
-
 	MakeNormalVectors (dir, r, u);
 
 	for (i=0 ; i<count ; i++)
@@ -797,9 +795,6 @@ void CL_ParticleSteamEffect2 (cl_sustain_t *self)
 	float		d;
 	vec3_t		r, u;
 	vec3_t		dir;
-
-//	vectoangles2 (dir, angle_dir);
-//	AngleVectors (angle_dir, f, r, u);
 
 	VectorCopy (self->dir, dir);
 	MakeNormalVectors (dir, r, u);

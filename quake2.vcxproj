@@ -144,7 +144,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CD_AUDIO;USE_CURL;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>.\debug\</AssemblerListingLocation>
       <BrowseInformation>true</BrowseInformation>
       <PrecompiledHeaderOutputFile>.\debug\quake2.pch</PrecompiledHeaderOutputFile>
@@ -188,7 +188,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>None</DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CD_AUDIO;USE_CURL;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE</PreprocessorDefinitions>
       <AssemblerListingLocation>.\release\</AssemblerListingLocation>
       <PrecompiledHeaderOutputFile>.\release\quake2.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>.\release\</ObjectFileName>

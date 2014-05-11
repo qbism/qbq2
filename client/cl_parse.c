@@ -144,7 +144,19 @@ qboolean	CL_CheckOrDownloadFile(char *filename)
 
 	if (strstr(filename, ".."))
 	{
-		Com_Printf("Refusing to download a path with ..\n");
+		Com_Printf("Refusing to download a path with .. (%s)\n", filename);
+		return true;
+	}
+
+	if (strchr(filename, ' ')) //qb: more exceptions from aprq2
+	{
+		Com_Printf("Refusing to check a path containing spaces (%s)\n", filename);
+		return true;
+	}
+
+	if (strchr(filename, ':'))
+	{
+		Com_Printf("Refusing to check a path containing a colon (%s)\n", filename);
 		return true;
 	}
 
@@ -648,7 +660,9 @@ void CL_PlayBackgroundTrack(void)
 		Com_sprintf(name, sizeof(name), "music/%s.ogg", cl.configstrings[CS_CDTRACK]);
 		if (FS_LoadFile(name, NULL) != -1)
 		{
+#ifdef CD_AUDIO
 			CDAudio_Stop();
+#endif
 			S_StartBackgroundTrack(name, name);
 			return;
 		}
@@ -659,7 +673,9 @@ void CL_PlayBackgroundTrack(void)
 	if (track == 0)
 	{	// Stop any playing track
 		Com_DPrintf("CL_PlayBackgroundTrack: stopping\n");	// debug
+#ifdef CD_AUDIO
 		CDAudio_Stop();
+#endif
 		S_StopBackgroundTrack();
 		return;
 	}
@@ -670,8 +686,10 @@ void CL_PlayBackgroundTrack(void)
 		Com_DPrintf("CL_PlayBackgroundTrack: playing track %s\n", name);	// debug
 		S_StartBackgroundTrack(name, name);
 	}
+#ifdef CD_AUDIO
 	else
 		CDAudio_Play(track, true);
+#endif
 }
 
 #else

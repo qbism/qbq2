@@ -290,7 +290,7 @@ int FS_FindPackItem(pack_t *pack, char *itemName, long itemHash)
 			break;
 		//	counter++;
 	}
-	for (i = smin; i<smax; i++)
+	for (i = smin; i < smax; i++)
 	{	// make sure this entry is not blacklisted & compare filenames
 		if (pack->files[i].hash == itemHash && !pack->files[i].ignore
 			&& !Q_strcasecmp(pack->files[i].name, itemName))
@@ -480,53 +480,18 @@ int FS_FOpenFile(char *filename, FILE **file)
 #endif
 
 
-/*
-=================
-FS_Read
 
-Properly handles partial reads
-=================
-*/
-void CDAudio_Stop(void);
-#define	MAX_READ	0x10000		// read in blocks of 64k
-void FS_Read(void *buffer, int len, FILE *f)
+void FS_Read(void *buffer, int len, FILE *f)  //qb: speed up, clean up
 {
-	int		block, remaining;
-	int		read;
-	byte	*buf;
-	int		tries;
+	static int		read;
 
-	buf = (byte *)buffer;
+	read = fread(buffer, 1, len, f);
+	if (read == 0)
+		Com_Error(ERR_FATAL, "FS_Read: 0 bytes read");
 
-	// read in chunks for progress bar
-	remaining = len;
-	tries = 0;
-	while (remaining)
-	{
-		block = remaining;
-		if (block > MAX_READ)
-			block = MAX_READ;
-		read = fread(buf, 1, block, f);
-		if (read == 0)
-		{
-			// we might have been trying to read from a CD
-			if (!tries)
-			{
-				tries = 1;
-				CDAudio_Stop();
-			}
-			else
-				Com_Error(ERR_FATAL, "FS_Read: 0 bytes read");
-		}
+	if (read == -1)
+		Com_Error(ERR_FATAL, "FS_Read: read error");
 
-		if (read == -1)
-			Com_Error(ERR_FATAL, "FS_Read: -1 bytes read");
-
-		// do some progress bar thing here...
-
-		remaining -= read;
-		buf += read;
-	}
 }
 
 
@@ -562,7 +527,9 @@ int FS_FRead(void *buffer, int size, int count, FILE *f)
 			{
 				if (!tried)
 				{	// We might have been trying to read from a CD
+#ifdef CD_AUDIO
 					CDAudio_Stop();
+#endif
 					tried = true;
 				}
 				else {
@@ -929,7 +896,7 @@ void FS_AddGameDirectory(char *dir)
 	//
 	// add any pak files in the format pak0.pak pak1.pak, ...
 	//
-	for (i = 0; i<100; i++) // Knightmare- go up to pak99
+	for (i = 0; i < 100; i++) // Knightmare- go up to pak99
 	{
 		Com_sprintf(pakfile, sizeof(pakfile), "%s/pak%i.pak", dir, i);
 		pak = FS_LoadPackFile(pakfile);
@@ -944,38 +911,38 @@ void FS_AddGameDirectory(char *dir)
 
 	//VoiD -S- *.pack support //qb: from BES 3.22
 
-			// Standard Quake II pack file '.pak' 
-			Com_sprintf(findname, sizeof(findname), "%s/%s", dir, "*.pak");  //qb: was a typo in BES, ".pak" (no asterisk)
+	// Standard Quake II pack file '.pak' 
+	Com_sprintf(findname, sizeof(findname), "%s/%s", dir, "*.pak");  //qb: was a typo in BES, ".pak" (no asterisk)
 
-		tmp = findname;
-		while (*tmp != 0)
-		{
-			if (*tmp == '\\')
-				*tmp = '/';
-			tmp++;
-		}
-		if ((dirnames = FS_ListFiles(findname, &ndirs, 0, 0)) != 0)
-		{
-			int i;
+	tmp = findname;
+	while (*tmp != 0)
+	{
+		if (*tmp == '\\')
+			*tmp = '/';
+		tmp++;
+	}
+	if ((dirnames = FS_ListFiles(findname, &ndirs, 0, 0)) != 0)
+	{
+		int i;
 
-			for (i = 0; i < ndirs - 1; i++)
+		for (i = 0; i < ndirs - 1; i++)
+		{
+			if (strrchr(dirnames[i], '/'))
 			{
-				if (strrchr(dirnames[i], '/'))
-				{
-					pak = FS_LoadPackFile(dirnames[i]);
-					if (!pak)
-						continue;
-					search = Z_Malloc(sizeof(searchpath_t));
-					search->pack = pak;
-					search->next = fs_searchpaths;
-					fs_searchpaths = search;
-				}
-				free(dirnames[i]);
+				pak = FS_LoadPackFile(dirnames[i]);
+				if (!pak)
+					continue;
+				search = Z_Malloc(sizeof(searchpath_t));
+				search->pack = pak;
+				search->next = fs_searchpaths;
+				fs_searchpaths = search;
 			}
-			free(dirnames);
-
+			free(dirnames[i]);
 		}
-		//VoiD -E- *.pack support 
+		free(dirnames);
+
+	}
+	//VoiD -E- *.pack support 
 }
 
 /*
@@ -1351,7 +1318,7 @@ char **FS_ListPak(char *find, int *num)
 		pak = search->pack;
 
 		// now find and build list
-		for (i = 0; i<pak->numfiles; i++)
+		for (i = 0; i < pak->numfiles; i++)
 			nfiles++;
 	}
 
@@ -1366,7 +1333,7 @@ char **FS_ListPak(char *find, int *num)
 		pak = search->pack;
 
 		// now find and build list
-		for (i = 0; i<pak->numfiles; i++)
+		for (i = 0; i < pak->numfiles; i++)
 		{
 			if (strstr(pak->files[i].name, find))
 			{
@@ -1414,7 +1381,7 @@ qboolean FS_ItemInList(char *check, int num, char **list)
 
 	if (!check || !list)
 		return false;
-	for (i = 0; i<num; i++)
+	for (i = 0; i < num; i++)
 	{
 		if (!list[i])
 			continue;
@@ -1438,7 +1405,7 @@ void FS_InsertInList(char **list, char *insert, int len, int start)
 	if (len < 1 || start < 0) return;
 	if (start >= len) return;
 
-	for (i = start; i<len; i++)
+	for (i = start; i < len; i++)
 	{
 		if (!list[i])
 		{
