@@ -264,8 +264,8 @@ void R_DrawTriangle(void)
 		r_p2[3] = aliastriangleparms.c->t;
 		r_p2[4] = aliastriangleparms.c->l;
 		r_p2[5] = aliastriangleparms.c->zi;
-		 // i crash fixme  //...qb: increased array sizes
-				if (coloredlights){
+		// i crash fixme  //...qb: increased array sizes
+		if (coloredlights){
 			r_p0[6] = aliastriangleparms.a->l;		// lightr
 			r_p0[7] = aliastriangleparms.a->l;		// lightg
 			r_p0[8] = aliastriangleparms.a->l;		// lightb
@@ -275,7 +275,7 @@ void R_DrawTriangle(void)
 			r_p2[6] = aliastriangleparms.c->l;		// lightr
 			r_p2[7] = aliastriangleparms.c->l;		// lightg
 			r_p2[8] = aliastriangleparms.c->l;		// lightb
-					}
+		}
 
 		R_PolysetSetEdgeTable();
 		R_RasterizeAliasPolySmooth();
@@ -452,7 +452,7 @@ R_PolysetCalcGradients
 ================
 */
 #if id386 && !defined __linux__ && !defined __FreeBSD__
-void R_PolysetCalcGradients( int skinwidth )
+void R_PolysetCalcGradients(int skinwidth)
 {
 	static float xstepdenominv, ystepdenominv, t0, t1;
 	static float p01_minus_p21, p11_minus_p21, p00_minus_p20, p10_minus_p20;
@@ -468,18 +468,18 @@ void R_PolysetCalcGradients( int skinwidth )
 	p11_minus_p21 = r_p1[1] - r_p2[1];
 	*/
 
-	__asm mov eax, dword ptr [r_p0+0]
-		__asm mov ebx, dword ptr [r_p0+4]
-		__asm sub eax, dword ptr [r_p2+0]
-		__asm sub ebx, dword ptr [r_p2+4]
+	__asm mov eax, dword ptr[r_p0 + 0]
+		__asm mov ebx, dword ptr[r_p0 + 4]
+		__asm sub eax, dword ptr[r_p2 + 0]
+		__asm sub ebx, dword ptr[r_p2 + 4]
 		__asm mov p00_minus_p20, eax
 	__asm mov p01_minus_p21, ebx
 	__asm fild dword ptr p00_minus_p20
 	__asm fild dword ptr p01_minus_p21
-	__asm mov eax, dword ptr [r_p1+0]
-		__asm mov ebx, dword ptr [r_p1+4]
-		__asm sub eax, dword ptr [r_p2+0]
-		__asm sub ebx, dword ptr [r_p2+4]
+	__asm mov eax, dword ptr[r_p1 + 0]
+		__asm mov ebx, dword ptr[r_p1 + 4]
+		__asm sub eax, dword ptr[r_p2 + 0]
+		__asm sub ebx, dword ptr[r_p2 + 4]
 		__asm fstp p01_minus_p21
 	__asm fstp p00_minus_p20
 	__asm mov p10_minus_p20, eax
@@ -498,13 +498,13 @@ void R_PolysetCalcGradients( int skinwidth )
 	/*
 	** put FPU in single precision ceil mode
 	*/
-	__asm fldcw word ptr [fpu_sp24_ceil_cw]
+	__asm fldcw word ptr[fpu_sp24_ceil_cw]
 		//	__asm fldcw word ptr [fpu_ceil_cw]
 
-		__asm fild  dword ptr d_xdenom    ; d_xdenom
-	__asm fdivr one                   ; 1 / d_xdenom
-	__asm fst   xstepdenominv         ; 
-	__asm fmul  negative_one          ; -( 1 / d_xdenom )
+		__asm fild  dword ptr d_xdenom; d_xdenom
+	__asm fdivr one; 1 / d_xdenom
+	__asm fst   xstepdenominv;
+	__asm fmul  negative_one; -(1 / d_xdenom)
 
 	// ceil () for light so positive steps are exaggerated, negative steps
 	// diminished,  pushing us away from underflow toward overflow. Underflow is
@@ -517,42 +517,42 @@ void R_PolysetCalcGradients( int skinwidth )
 	r_lstepy = (int)
 	ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 	*/
-	__asm mov   eax, dword ptr [r_p0+16]
-		__asm mov   ebx, dword ptr [r_p1+16]
-		__asm sub   eax, dword ptr [r_p2+16]
-		__asm sub   ebx, dword ptr [r_p2+16]
+	__asm mov   eax, dword ptr[r_p0 + 16]
+		__asm mov   ebx, dword ptr[r_p1 + 16]
+		__asm sub   eax, dword ptr[r_p2 + 16]
+		__asm sub   ebx, dword ptr[r_p2 + 16]
 
-		__asm fstp  ystepdenominv       ; (empty)
+		__asm fstp  ystepdenominv; (empty)
 
 	__asm mov   t0_int, eax
 	__asm mov   t1_int, ebx
-	__asm fild  t0_int              ; t0
-	__asm fild  t1_int              ; t1 | t0
-	__asm fxch  st(1)               ; t0 | t1
-	__asm fstp  t0                  ; t1
-	__asm fst   t1                  ; t1
-	__asm fmul  p01_minus_p21       ; t1 * p01_minus_p21
-	__asm fld   t0                  ; t0 | t1 * p01_minus_p21
-	__asm fmul  p11_minus_p21       ; t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fld   t1                  ; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fmul  p00_minus_p20       ; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fld   t0                  ; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fmul  p10_minus_p20       ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fxch  st(2)               ; t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
-	__asm fsubp st(3), st           ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	__asm fsubrp st(1), st          ; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	__asm fxch  st(1)               ; t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
-	__asm fmul  xstepdenominv       ; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fild  t0_int; t0
+	__asm fild  t1_int; t1 | t0
+	__asm fxch  st(1); t0 | t1
+	__asm fstp  t0; t1
+	__asm fst   t1; t1
+	__asm fmul  p01_minus_p21; t1 * p01_minus_p21
+	__asm fld   t0; t0 | t1 * p01_minus_p21
+	__asm fmul  p11_minus_p21; t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t1; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p00_minus_p20; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t0; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p10_minus_p20; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fxch  st(2); t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	__asm fsubp st(3), st; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fsubrp st(1), st; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fxch  st(1); t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  xstepdenominv; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	__asm fxch  st(1)
-	__asm fmul  ystepdenominv       ; r_lstepy | r_lstepx
-	__asm fxch  st(1)               ; r_lstepx | r_lstepy
-	__asm fistp dword ptr [r_lstepx]
-		__asm fistp dword ptr [r_lstepy]
+	__asm fmul  ystepdenominv; r_lstepy | r_lstepx
+	__asm fxch  st(1); r_lstepx | r_lstepy
+	__asm fistp dword ptr[r_lstepx]
+		__asm fistp dword ptr[r_lstepy]
 
 		/*
 		** put FPU back into extended precision chop mode
 		*/
-		__asm fldcw word ptr [fpu_chop_cw]
+		__asm fldcw word ptr[fpu_chop_cw]
 
 		/*
 		t0 = r_p0[2] - r_p2[2];
@@ -562,35 +562,35 @@ void R_PolysetCalcGradients( int skinwidth )
 		r_sstepy = (int)((t1 * p00_minus_p20 - t0* p10_minus_p20) *
 		ystepdenominv);
 		*/
-		__asm mov eax, dword ptr [r_p0+8]
-		__asm mov ebx, dword ptr [r_p1+8]
-		__asm sub eax, dword ptr [r_p2+8]
-		__asm sub ebx, dword ptr [r_p2+8]
+		__asm mov eax, dword ptr[r_p0 + 8]
+		__asm mov ebx, dword ptr[r_p1 + 8]
+		__asm sub eax, dword ptr[r_p2 + 8]
+		__asm sub ebx, dword ptr[r_p2 + 8]
 		__asm mov   t0_int, eax
 	__asm mov   t1_int, ebx
-	__asm fild  t0_int              ; t0
-	__asm fild  t1_int              ; t1 | t0
-	__asm fxch  st(1)               ; t0 | t1
-	__asm fstp  t0                  ; t1
-	__asm fst   t1                  ; (empty)
+	__asm fild  t0_int; t0
+	__asm fild  t1_int; t1 | t0
+	__asm fxch  st(1); t0 | t1
+	__asm fstp  t0; t1
+	__asm fst   t1; (empty)
 
-	__asm fmul  p01_minus_p21       ; t1 * p01_minus_p21
-	__asm fld   t0                  ; t0 | t1 * p01_minus_p21
-	__asm fmul  p11_minus_p21       ; t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fld   t1                  ; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fmul  p00_minus_p20       ; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fld   t0                  ; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fmul  p10_minus_p20       ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fxch  st(2)               ; t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
-	__asm fsubp st(3), st           ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	__asm fsubrp st(1), st           ; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	__asm fxch  st(1)               ; t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
-	__asm fmul  xstepdenominv       ; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  p01_minus_p21; t1 * p01_minus_p21
+	__asm fld   t0; t0 | t1 * p01_minus_p21
+	__asm fmul  p11_minus_p21; t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t1; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p00_minus_p20; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t0; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p10_minus_p20; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fxch  st(2); t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	__asm fsubp st(3), st; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fsubrp st(1), st; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fxch  st(1); t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  xstepdenominv; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	__asm fxch  st(1)
-	__asm fmul  ystepdenominv       ; r_lstepy | r_lstepx
-	__asm fxch  st(1)               ; r_lstepx | r_lstepy
-	__asm fistp dword ptr [r_sstepx]
-		__asm fistp dword ptr [r_sstepy]
+	__asm fmul  ystepdenominv; r_lstepy | r_lstepx
+	__asm fxch  st(1); r_lstepx | r_lstepy
+	__asm fistp dword ptr[r_sstepx]
+		__asm fistp dword ptr[r_sstepy]
 
 		/*
 		t0 = r_p0[3] - r_p2[3];
@@ -600,36 +600,36 @@ void R_PolysetCalcGradients( int skinwidth )
 		r_tstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) *
 		ystepdenominv);
 		*/
-		__asm mov eax, dword ptr [r_p0+12]
-		__asm mov ebx, dword ptr [r_p1+12]
-		__asm sub eax, dword ptr [r_p2+12]
-		__asm sub ebx, dword ptr [r_p2+12]
+		__asm mov eax, dword ptr[r_p0 + 12]
+		__asm mov ebx, dword ptr[r_p1 + 12]
+		__asm sub eax, dword ptr[r_p2 + 12]
+		__asm sub ebx, dword ptr[r_p2 + 12]
 
 		__asm mov   t0_int, eax
 	__asm mov   t1_int, ebx
-	__asm fild  t0_int              ; t0
-	__asm fild  t1_int              ; t1 | t0
-	__asm fxch  st(1)               ; t0 | t1
-	__asm fstp  t0                  ; t1
-	__asm fst   t1                  ; (empty)
+	__asm fild  t0_int; t0
+	__asm fild  t1_int; t1 | t0
+	__asm fxch  st(1); t0 | t1
+	__asm fstp  t0; t1
+	__asm fst   t1; (empty)
 
-	__asm fmul  p01_minus_p21       ; t1 * p01_minus_p21
-	__asm fld   t0                  ; t0 | t1 * p01_minus_p21
-	__asm fmul  p11_minus_p21       ; t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fld   t1                  ; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fmul  p00_minus_p20       ; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fld   t0                  ; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fmul  p10_minus_p20       ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fxch  st(2)               ; t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
-	__asm fsubp st(3), st           ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	__asm fsubrp st(1), st           ; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	__asm fxch  st(1)               ; t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
-	__asm fmul  xstepdenominv       ; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  p01_minus_p21; t1 * p01_minus_p21
+	__asm fld   t0; t0 | t1 * p01_minus_p21
+	__asm fmul  p11_minus_p21; t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t1; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p00_minus_p20; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t0; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p10_minus_p20; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fxch  st(2); t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	__asm fsubp st(3), st; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fsubrp st(1), st; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fxch  st(1); t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  xstepdenominv; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	__asm fxch  st(1)
-	__asm fmul  ystepdenominv       ; r_lstepy | r_lstepx
-	__asm fxch  st(1)               ; r_lstepx | r_lstepy
-	__asm fistp dword ptr [r_tstepx]
-		__asm fistp dword ptr [r_tstepy]
+	__asm fmul  ystepdenominv; r_lstepy | r_lstepx
+	__asm fxch  st(1); r_lstepx | r_lstepy
+	__asm fistp dword ptr[r_tstepx]
+		__asm fistp dword ptr[r_tstepy]
 
 		/*
 		t0 = r_p0[5] - r_p2[5];
@@ -639,47 +639,47 @@ void R_PolysetCalcGradients( int skinwidth )
 		r_zistepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) *
 		ystepdenominv);
 		*/
-		__asm mov eax, dword ptr [r_p0+20]
-		__asm mov ebx, dword ptr [r_p1+20]
-		__asm sub eax, dword ptr [r_p2+20]
-		__asm sub ebx, dword ptr [r_p2+20]
+		__asm mov eax, dword ptr[r_p0 + 20]
+		__asm mov ebx, dword ptr[r_p1 + 20]
+		__asm sub eax, dword ptr[r_p2 + 20]
+		__asm sub ebx, dword ptr[r_p2 + 20]
 
 		__asm mov   t0_int, eax
 	__asm mov   t1_int, ebx
-	__asm fild  t0_int              ; t0
-	__asm fild  t1_int              ; t1 | t0
-	__asm fxch  st(1)               ; t0 | t1
-	__asm fstp  t0                  ; t1
-	__asm fst   t1                  ; (empty)
+	__asm fild  t0_int; t0
+	__asm fild  t1_int; t1 | t0
+	__asm fxch  st(1); t0 | t1
+	__asm fstp  t0; t1
+	__asm fst   t1; (empty)
 
-	__asm fmul  p01_minus_p21       ; t1 * p01_minus_p21
-	__asm fld   t0                  ; t0 | t1 * p01_minus_p21
-	__asm fmul  p11_minus_p21       ; t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fld   t1                  ; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fmul  p00_minus_p20       ; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fld   t0                  ; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fmul  p10_minus_p20       ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
-	__asm fxch  st(2)               ; t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
-	__asm fsubp st(3), st           ; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	__asm fsubrp st(1), st           ; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
-	__asm fxch  st(1)               ; t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
-	__asm fmul  xstepdenominv       ; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  p01_minus_p21; t1 * p01_minus_p21
+	__asm fld   t0; t0 | t1 * p01_minus_p21
+	__asm fmul  p11_minus_p21; t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t1; t1 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p00_minus_p20; t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fld   t0; t0 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fmul  p10_minus_p20; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t0 * p11_minus_p21 | t1 * p01_minus_p21
+	__asm fxch  st(2); t0 * p11_minus_p21 | t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21
+	__asm fsubp st(3), st; t0 * p10_minus_p20 | t1 * p00_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fsubrp st(1), st; t1 * p00_minus_p20 - t0 * p10_minus_p20 | t1 * p01_minus_p21 - t0 * p11_minus_p21
+	__asm fxch  st(1); t1 * p01_minus_p21 - t0 * p11_minus_p21 | t1 * p00_minus_p20 - t0 * p10_minus_p20
+	__asm fmul  xstepdenominv; r_lstepx | t1 * p00_minus_p20 - t0 * p10_minus_p20
 	__asm fxch  st(1)
-	__asm fmul  ystepdenominv       ; r_lstepy | r_lstepx
-	__asm fxch  st(1)               ; r_lstepx | r_lstepy
-	__asm fistp dword ptr [r_zistepx]
-		__asm fistp dword ptr [r_zistepy]
+	__asm fmul  ystepdenominv; r_lstepy | r_lstepx
+	__asm fxch  st(1); r_lstepx | r_lstepy
+	__asm fistp dword ptr[r_zistepx]
+		__asm fistp dword ptr[r_zistepy]
 
 		/*
-	#if	id386ALIAS
-	a_sstepxfrac = r_sstepx << 16;
-	a_tstepxfrac = r_tstepx << 16;
-	#else
-	a_sstepxfrac = r_sstepx & 0xFFFF;
-	a_tstepxfrac = r_tstepx & 0xFFFF;
-	#endif
-	*/
-	__asm mov eax, d_pdrawspans
+		#if	id386ALIAS
+		a_sstepxfrac = r_sstepx << 16;
+		a_tstepxfrac = r_tstepx << 16;
+		#else
+		a_sstepxfrac = r_sstepx & 0xFFFF;
+		a_tstepxfrac = r_tstepx & 0xFFFF;
+		#endif
+		*/
+		__asm mov eax, d_pdrawspans
 	__asm cmp eax, offset R_PolysetDrawSpans8_Opaque
 	__asm mov eax, r_sstepx
 	__asm mov ebx, r_tstepx
@@ -689,25 +689,25 @@ void R_PolysetCalcGradients( int skinwidth )
 	__asm shl ebx, 16
 	__asm jmp done_with_steps
 	//#else
-translucent:
+translucent :
 	__asm and eax, 0ffffh
 	__asm and ebx, 0ffffh
 	//#endif
-done_with_steps:
+done_with_steps :
 	__asm mov a_sstepxfrac, eax
-			   __asm mov a_tstepxfrac, ebx
+				__asm mov a_tstepxfrac, ebx
 
-			   /*
-			   a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
-			   */
-			   __asm mov ebx, r_tstepx
-			   __asm mov ecx, r_sstepx
-			   __asm sar ebx, 16
-			   __asm mov eax, skinwidth
-			   __asm mul ebx
-			   __asm sar ecx, 16
-			   __asm add eax, ecx
-			   __asm mov a_ststepxwhole, eax
+				/*
+				a_ststepxwhole = skinwidth * (r_tstepx >> 16) + (r_sstepx >> 16);
+				*/
+				__asm mov ebx, r_tstepx
+				__asm mov ecx, r_sstepx
+				__asm sar ebx, 16
+				__asm mov eax, skinwidth
+				__asm mul ebx
+				__asm sar ecx, 16
+				__asm add eax, ecx
+				__asm mov a_ststepxwhole, eax
 }
 #else
 void R_PolysetCalcGradients(int skinwidth)
@@ -843,13 +843,13 @@ void R_PolysetDrawThreshSpans8(spanpackage_t *pspanpackage)
 
 			do
 			{
-				if (r_fogenable)
+				if (r_fogenabled)
 				{
-					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					forg = 28398.9 - lzi *0.00293; //qb: ... (16384 * 2.6 / 1.5) - (lzi * 3/ 1024);
 					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
 					*lptex = fogmap[*lptex + (forg >> 2 & 0xFF00)];
 
-				} // leilei - fog FIXME- dumb math
+				} // leilei - fog
 				if ((lzi >> 16) >= *lpz)
 				{
 					rand1k_index = (rand1k_index + 1) & MASK_1K;
@@ -926,17 +926,17 @@ void R_PolysetDrawSpans8_33(spanpackage_t *pspanpackage)
 
 			do
 			{
-				if (r_fogenable)
+				int lptemp = *lptex;
+				if (r_fogenabled)
 				{
-					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					forg = forg = 28398.9 - lzi *0.00293; //qb: was lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
 					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
 					*lptex = fogmap[*lptex + (forg >> 2 & 0xFF00)];
 
-				} // leilei - fog FIXME- dumb math
+				} // leilei - fog
 				if ((lzi >> 16) >= *lpz)
 				{
-					int temp = vid.colormap[*lptex + (llight & 0xFF00)];
-
+					int temp = vid.colormap[lptemp + (llight & 0xFF00)];
 					*lpdest = vid.alphamap[temp + *lpdest * 256];
 				}
 				lpdest++;
@@ -991,13 +991,13 @@ void R_PolysetDrawSpansConstant8_33(spanpackage_t *pspanpackage)
 
 			do
 			{
-				if (r_fogenable)
+				if (r_fogenabled)
 				{
-					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					forg = forg = 28398.9 - lzi *0.00293; //qb: was lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
 					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
-					*lpdest = fogmap[*lpdest + (forg >> 2 & 0xFF00)];
+					r_aliasblendcolor = fogmap[*lpdest + (forg >> 2 & 0xFF00)];
 
-				} // leilei - fog FIXME- dumb math
+				} // leilei - fog
 				if ((lzi >> 16) >= *lpz)
 				{
 					*lpdest = vid.alphamap[r_aliasblendcolor + *lpdest * 256];
@@ -1049,17 +1049,17 @@ void R_PolysetDrawSpans8_66(spanpackage_t *pspanpackage)
 			lzi = pspanpackage->zi;
 			do
 			{
-				if (r_fogenable)
+				int lptemp = *lptex; //qb: for fog blending
+				if (r_fogenabled)
 				{
-					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					forg = forg = 28398.9 - lzi *0.00293; //qb: was lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
 					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
 					*lptex = fogmap[*lptex + (forg >> 2 & 0xFF00)];
 
-				} // leilei - fog FIXME- dumb math
+				}
 				if ((lzi >> 16) >= *lpz)
 				{
-					int temp = vid.colormap[*lptex + (llight & 0xFF00)];
-
+					int temp = vid.colormap[lptemp + (llight & 0xFF00)];
 					*lpdest = vid.alphamap[temp * 256 + *lpdest];
 					*lpz = lzi >> 16;
 				}
@@ -1116,13 +1116,13 @@ void R_PolysetDrawSpansConstant8_66(spanpackage_t *pspanpackage)
 
 			do
 			{
-				if (r_fogenable)
+				if (r_fogenabled)
 				{
-					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
+					forg = forg = 28398.9 - lzi *0.00293; //qb: was lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
 					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
 					*lpdest = fogmap[*lpdest + (forg >> 2 & 0xFF00)];
 
-				} // leilei - fog FIXME- dumb math
+				} // leilei - fog
 				if ((lzi >> 16) >= *lpz)
 				{
 					*lpdest = vid.alphamap[r_aliasblendcolor * 256 + *lpdest];
@@ -1149,7 +1149,7 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 	int		llight;
 	int		lzi;
 	short	*lpz;
-	int			forg;			// leilei - fog
+	int		forg;			// leilei - fog
 	unsigned char *pix24;	// leilei - colored lighting
 	int trans[3];			// leilei - colored lighting
 	int		llightrgb[3];	// leilei - colored lighting
@@ -1191,25 +1191,24 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 			}
 			do
 			{
-
-				if (r_fogenable)
-				{
-					forg = lzi / 1024 * -3 + 16384 * (2.6) / 1.5;
-					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
-					*lptex = fogmap[*lptex + (forg >> 2 & 0xFF00)];
-
-				} // leilei - fog FIXME- dumb math
 				if ((lzi >> 16) >= *lpz)
 				{
 					//PGM
 					if (r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
 						*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
 					// leilei - colored lights begin
-					else if (coloredlights)
+					else
 					{
-						pix24 = (unsigned char *)&d_8to24table[*lptex];
+						int lptemp = *lptex;
+						if (r_fogenabled)
+						{
+							forg = 32762 - (int)(lzi / 768);
+							if (forg < 0)	forg = 0;
+							lptemp = fogmap[*lptex + (forg >> 2 & 0xFF00)];
+						}
+						pix24 = (unsigned char *)&d_8to24table[lptemp];
 						//qb: high-contrast- pix24 = (unsigned char *)&d_8to24table[((byte *)vid.colormap)[*lptex + (llight & 0xFF00)]];
-						//qb: works now, but too harsh...  trans[0] = ((pix24[0] + (byte )lpcolor[0]) * (16384 - llightrgb[0])) >> 15;
+						//qb: almost works...  trans[0] = ((pix24[0] + (byte )lpcolor[0]) * (16384 - llightrgb[0])) >> 15;
 						//trans[1] = ((pix24[1] + (byte )lpcolor[1])  * (16384 - llightrgb[1])) >> 15;
 						//trans[2] = ((pix24[2] + (byte )lpcolor[2])  * (16384 - llightrgb[2])) >> 15;
 						trans[0] = (int)(pix24[0] * (llight * lpcolor[0])) >> 15;
@@ -1220,10 +1219,8 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 						if (trans[2] < 0) trans[2] = 0;
 						if (trans[0] > 63) trans[0] = 63; if (trans[1] > 63) trans[1] = 63;	if (trans[2] > 63) trans[2] = 63;
 						*lpdest = palmap2[trans[0]][trans[1]][trans[2]];
-					}
-					else
-						// leilei - colored lights end
-						*lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)];
+					}	// leilei - colored lights end
+
 					//PGM
 					*lpz = lzi >> 16;
 				}

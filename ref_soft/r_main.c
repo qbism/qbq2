@@ -128,7 +128,7 @@ cvar_t  *sw_stipplealpha;
 cvar_t	*sw_surfcacheoverride;
 cvar_t	*sw_waterwarp;
 cvar_t  *sw_transmooth; // texture dither //qb: was sw_texturesmooth, but just transparencies
-cvar_t  *r_transquality; //qb: from engoo - selects which table to use.
+cvar_t  *sw_transquality; //qb: from engoo - selects which table to use.
 
 cvar_t	*r_drawworld;
 cvar_t	*r_drawentities;
@@ -201,49 +201,25 @@ unsigned int	d_zwidth;
 
 byte	r_notexture_buffer[1024];
 
-/*
-================
-R_SetFog
-================
-*/
-void R_SetFog(void)
-{
-	if (!r_fogenable)	// engine fog not enabled
-		return;			// leave fog enabled if set by game DLL
-
-	r_fogColor[3] = 1.0;
-
-	/* qb: gl stuff, do some sw stuff instead
-	qglEnable(GL_FOG);
-	qglClearColor(r_fogColor[0], r_fogColor[1], r_fogColor[2], r_fogColor[3]); // Clear the background color to the fog color
-	qglFogi(GL_FOG_MODE, r_fogmodel);
-	qglFogfv(GL_FOG_COLOR, r_fogColor);
-	if (r_fogmodel == GL_LINEAR)
-	{
-	qglFogf(GL_FOG_START, r_fognear);
-	qglFogf(GL_FOG_END, r_fogfar);
-	}
-	else
-	qglFogf(GL_FOG_DENSITY, r_fogdensity / 10000.f);
-	qglHint(GL_FOG_HINT, GL_NICEST);
-	*/
-}
 
 /*
 ================
-R_InitFogVars
+R_SetFogVars
 ================
 */
-void R_InitFogVars(void)  //qb: fog is OK. Needs more testing and gl fog.  Awesome in Q1 but after seeing it in Q2, kind of 'meh'.
+void R_SetFogVars(int density, int red, int green, int blue)
 {
-	r_fogenable = false; //qb: debug-  true or false;
-	r_fogmodel = 1; // GL_LINEAR;
-	r_fogdensity = 6.0;
-	r_fognear = 100;
-	r_fogfar = 1400;
-	r_fogColor[0] = 200.0;
-	r_fogColor[1] = 120.0;
-	r_fogColor[2] = 120.0;
+	int	temp;
+	r_fogenabled = (density > 0) ? true : false;
+	r_fogdensity = (float)density;
+	r_fogColor[0] = red;
+	r_fogColor[1] = green;
+	r_fogColor[2] = blue;
+
+	// clamp vars
+	r_fogdensity = max(r_fogdensity, 0.0);
+	r_fogdensity = min(r_fogdensity, 100.0);
+	FogTableRefresh();
 }
 
 /*
@@ -318,7 +294,7 @@ void R_Register(void)
 	sw_waterwarp = ri.Cvar_Get("sw_waterwarp", "1", 0);
 	sw_mode = ri.Cvar_Get("sw_mode", "4", CVAR_ARCHIVE);
 	sw_transmooth = ri.Cvar_Get("sw_transmooth", "1", CVAR_ARCHIVE);
-	r_transquality = ri.Cvar_Get("r_transquality", "1", CVAR_ARCHIVE);
+	sw_transquality = ri.Cvar_Get("sw_transquality", "1", CVAR_ARCHIVE);
 
 	r_lefthand = ri.Cvar_Get("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
 	r_speeds = ri.Cvar_Get("r_speeds", "0", 0);
@@ -387,9 +363,9 @@ int R_Init(void *hInstance, void *wndProc)
 
 	// TODO: collect 386-specific code in one place
 #if	id386
-	Sys_MakeCodeWriteable ((long)R_EdgeCodeStart,
+	Sys_MakeCodeWriteable((long)R_EdgeCodeStart,
 		(long)R_EdgeCodeEnd - (long)R_EdgeCodeStart);
-	Sys_SetFPCW ();		// get bit masks for FPCW	(FIXME: is this id386?)
+	Sys_SetFPCW();		// get bit masks for FPCW	(FIXME: is this id386?)
 #endif	// id386
 
 	r_aliasuvscale = 1.0;
@@ -400,8 +376,6 @@ int R_Init(void *hInstance, void *wndProc)
 
 	//qb: engoo fog
 	fogmap = malloc(16384);
-	R_InitFogVars();
-	FogTableRefresh();
 
 	if (SWimp_Init(hInstance, wndProc) == false)
 		return -1;
@@ -1521,6 +1495,7 @@ refexport_t GetRefAPI(refimport_t rimp)
 	re.DrawChar = Draw_Char;
 	re.DrawTileClear = Draw_TileClear;
 	re.DrawFill = Draw_Fill;
+	re.SetFogVars = R_SetFogVars;
 	re.DrawFadeScreen = Draw_FadeScreen;
 
 	re.DrawStretchRaw = Draw_StretchRaw;

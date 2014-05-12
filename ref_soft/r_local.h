@@ -481,14 +481,11 @@ extern void *acolormap; // FIXME: should go away
 
 //qb: leilei - colored lighting and fog
 
-extern qboolean r_fogenable;
+extern qboolean r_fogenabled;
 extern byte	*fogmap;
 extern byte	palmap2[64][64][64];		//  Colored Lighting Lookup Table
-extern int		r_fogmodel;  //qb: will parse this, but not used in ref_soft at the moment.
 extern float	r_fogdensity;
-extern float	r_fognear;
-extern float	r_fogfar;
-extern float	r_fogColor[4];
+extern float	r_fogColor[3];
 
 void SetFogMap(void);
 void GrabAlphamap(void);
@@ -626,7 +623,7 @@ extern cvar_t  *r_customwidth;
 extern cvar_t  *r_customheight;
 extern cvar_t   *r_coloredlights; // leilei
 extern int		coloredlights;	// leilei
-extern cvar_t   *r_transquality; // leilei
+extern cvar_t   *sw_transquality; // leilei
 
 extern  clipplane_t     view_clipplanes[4];
 extern int              *pfrustum_indexes[4];

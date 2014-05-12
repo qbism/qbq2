@@ -61,7 +61,6 @@ typedef struct
 
 extern	viddef_t	vid;
 
-
 /*
 
   skins will be outline flood filled and mip mapped

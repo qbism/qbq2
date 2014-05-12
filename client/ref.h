@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -137,10 +137,10 @@ typedef struct
 	int		api_version;
 
 	// called when the library is loaded
-	qboolean	(*Init) ( void *hinstance, void *wndproc );
+	qboolean(*Init) (void *hinstance, void *wndproc);
 
 	// called before the library is unloaded
-	void	(*Shutdown) (void);
+	void(*Shutdown) (void);
 
 	// All data that will be used in a level should be
 	// registered before rendering any frames to prevent disk hits,
@@ -155,34 +155,35 @@ typedef struct
 	// are flood filled to eliminate mip map edge errors, and pics have
 	// an implicit "pics/" prepended to the name. (a pic name that starts with a
 	// slash will not use the "pics/" prefix or the ".pcx" postfix)
-	void	(*BeginRegistration) (char *map);
+	void(*BeginRegistration) (char *map);
 	struct model_s *(*RegisterModel) (char *name);
 	struct image_s *(*RegisterSkin) (char *name);
 	struct image_s *(*RegisterPic) (char *name);
-	void	(*SetSky) (char *name, float rotate, vec3_t axis);
-	void	(*EndRegistration) (void);
+	void(*SetSky) (char *name, float rotate, vec3_t axis);
+	void(*EndRegistration) (void);
 
-	void	(*RenderFrame) (refdef_t *fd);
+	void(*RenderFrame) (refdef_t *fd);
 
-	void	(*DrawGetPicSize) (int *w, int *h, char *name);	// will return 0 0 if not found
-	void	(*DrawPic) (int x, int y, char *name);
-	void	(*DrawStretchPic) (int x, int y, int w, int h, char *name);
-	void	(*DrawChar) (int x, int y, int c);
-	void	(*DrawTileClear) (int x, int y, int w, int h, char *name);
-	void	(*DrawFill) (int x, int y, int w, int h, int c);
-	void	(*DrawFadeScreen) (void);
+	void(*DrawGetPicSize) (int *w, int *h, char *name);	// will return 0 0 if not found
+	void(*DrawPic) (int x, int y, char *name);
+	void(*DrawStretchPic) (int x, int y, int w, int h, char *name);
+	void(*DrawChar) (int x, int y, int c);
+	void(*DrawTileClear) (int x, int y, int w, int h, char *name);
+	void(*DrawFill) (int x, int y, int w, int h, int c);
+	void(*DrawFadeScreen) (void);
 
 	// Draw images for cinematic rendering (which can have a different palette). Note that calls
-	void	(*DrawStretchRaw) (int x, int y, int w, int h, int cols, int rows, byte *data);
+	void(*DrawStretchRaw) (int x, int y, int w, int h, int cols, int rows, byte *data);
 
 	/*
 	** video mode and refresh state management entry points
 	*/
-	void	(*CinematicSetPalette)( const unsigned char *palette);	// NULL = game palette
-	void	(*BeginFrame)( float camera_separation );
-	void	(*EndFrame) (void);
+	void(*CinematicSetPalette)(const unsigned char *palette);	// NULL = game palette
+	void(*BeginFrame)(float camera_separation);
+	void(*EndFrame) (void);
 
-	void	(*AppActivate)( qboolean activate );
+	void(*AppActivate)(qboolean activate);
+	void(*SetFogVars)(int density, int red, int green, int blue); //qb: fog
 
 } refexport_t;
 
@@ -191,51 +192,39 @@ typedef struct
 //
 typedef struct
 {
-	void	(*Sys_Error) (int err_level, char *str, ...);
+	void(*Sys_Error) (int err_level, char *str, ...);
 
-	void	(*Cmd_AddCommand) (char *name, void(*cmd)(void));
-	void	(*Cmd_RemoveCommand) (char *name);
-	int		(*Cmd_Argc) (void);
+	void(*Cmd_AddCommand) (char *name, void(*cmd)(void));
+	void(*Cmd_RemoveCommand) (char *name);
+	int(*Cmd_Argc) (void);
 	char	*(*Cmd_Argv) (int i);
-	void	(*Cmd_ExecuteText) (int exec_when, char *text);
+	void(*Cmd_ExecuteText) (int exec_when, char *text);
 
-	void	(*Con_Printf) (int print_level, char *str, ...);
+	void(*Con_Printf) (int print_level, char *str, ...);
 
 	// files will be memory mapped read only
 	// the returned buffer may be part of a larger pak file,
 	// or a discrete file from anywhere in the quake search path
 	// a -1 return means the file does not exist
 	// NULL can be passed for buf to just determine existance
-	int		(*FS_LoadFile) (char *name, void **buf);
-	void	(*FS_FreeFile) (void *buf);
+	int(*FS_LoadFile) (char *name, void **buf);
+	void(*FS_FreeFile) (void *buf);
 
 	// gamedir will be the current directory that generated
 	// files should be stored to, ie: "f:\quake\id1"
 	char	*(*FS_Gamedir) (void);
 
 	cvar_t	*(*Cvar_Get) (char *name, char *value, int flags);
-	cvar_t	*(*Cvar_Set)( char *name, char *value );
-	void	 (*Cvar_SetValue)( char *name, float value );
+	cvar_t	*(*Cvar_Set)(char *name, char *value);
+	void(*Cvar_SetValue)(char *name, float value);
 
-	qboolean	(*Vid_GetModeInfo)( int *width, int *height, int mode );
-	void		(*Vid_MenuInit)( void );
-	void		(*Vid_NewWindow)( int width, int height );
+	qboolean(*Vid_GetModeInfo)(int *width, int *height, int mode);
+	void(*Vid_MenuInit)(void);
+	void(*Vid_NewWindow)(int width, int height);
 } refimport_t;
 
 
 // this is the only function actually exported at the linker level
-typedef	refexport_t	(*GetRefAPI_t) (refimport_t);
-
-
-//qb: - kmq2 fog variables////////////////////////
-// global fog vars w/ defaults
-extern int FogModels[3]; //qb: in gl mode it is GL_LINEAR, GL_EXP, GL_EXP2
-
-extern qboolean r_fogenable;
-extern int		r_fogmodel;
-extern float	r_fogdensity;
-extern float	r_fognear;
-extern float	r_fogfar;
-extern float	r_fogColor[4];
+typedef	refexport_t(*GetRefAPI_t) (refimport_t);
 
 #endif // __REF_H

@@ -31,13 +31,8 @@ image_t		*draw_chars;				// 8*8 graphic characters
 //qb: - kmq2 fog variables////////////////////////
 // global fog vars w/ defaults
 int FogModels[3] = { 1, 2, 3 }; //qb: in gl mode it is GL_LINEAR, GL_EXP, GL_EXP2
-
-qboolean r_fogenable;
-int		r_fogmodel;
 float	r_fogdensity;
-float	r_fognear;
-float	r_fogfar;
-float	r_fogColor[4];
+float	r_fogColor[3];
 
 const byte q2_palette[256 * 3] =
 {
@@ -100,7 +95,7 @@ const byte q2_palette[256 * 3] =
 
 //qb: engoo fog //////////////////////////////////////////////
 byte	*fogmap;
-
+qboolean r_fogenabled;
 
 
 void FogTableRefresh(void)
@@ -113,24 +108,17 @@ void FogTableRefresh(void)
 	float	frac2;
 	float	farc;
 	byte *colmap;
-	int RANGE = 1;
 
-	RANGE = 1;
-	ugly = (int)r_transquality->value;
+	ugly = (int)sw_transquality->value;
 
-	// TODO: Feed 'ese
-	//	fogcolr = 0;
-	//	fogcolg = 0;
-	//	fogcolb = 0;
-	//	fogthick= 100; // thickness of fog (100 = opaque, 50 = half... ok well you get it)
 	fogthik = r_fogdensity * 0.01;
 	//	Con_Printf ("Fog generating with %f %f %f %f", fogthick, fogcolr, fogcolg, fogcolb);
 	colmap = fogmap;
 
 	for (l = COLORLEVELS; l > 0; l--)
 	{
-		frac = 2 - 2 * (float)l / (COLORLEVELS);
-		frac2 = RANGE - RANGE / (float)l / (COLORLEVELS);
+		frac = 3 - 3 * (float)l / (COLORLEVELS); //qb: increase density, was frac = 2 - 2 * (float)l / (COLORLEVELS);
+		frac2 = 1 - 1 / (float)l / (COLORLEVELS);
 		farc = 1 - ((frac / 2) * fogthik);
 		if (farc < 0)
 			farc = 0;
@@ -146,9 +134,13 @@ void FogTableRefresh(void)
 			if (green < 0)green = 0;
 			if (blue < 0)blue = 0;
 			if (!ugly)
+			{
 				*colmap++ = FindColor(red, green, blue);
+			}
 			else
-				*colmap++ = BestColor(red, green, blue, 0, 254);
+			{
+				*colmap++ = BestColor(red, green, blue, 1, 254);
+			}
 		}
 	}
 	SetFogMap(); // set the static.
@@ -221,7 +213,7 @@ void	Draw_8to24(unsigned char *palette)
 	// The 15-bit table we use is actually made elsewhere (it's palmap)
 
 	d_8to24tabble[255] &= 0xffffff;	// 255 is transparent
-	d_8to24tabble[0] &= 0x000000;	// black is black
+	//qb: gray is the new black.. d_8to24tabble[0] &= 0x000000;	// black is black
 
 
 }
@@ -381,9 +373,7 @@ void Draw_InitRGBMap(void)
 				}
 			}
 		}
-
 	}
-
 }
 
 void GrabAlphamap(void) //qb: based on Engoo
@@ -403,7 +393,7 @@ void GrabAlphamap(void) //qb: based on Engoo
 			r = (int)(((float)q2_palette[c * 3] * ae) + ((float)q2_palette[l * 3] * ay));
 			g = (int)(((float)q2_palette[c * 3 + 1] * ae) + ((float)q2_palette[l * 3 + 1] * ay));
 			b = (int)(((float)q2_palette[c * 3 + 2] * ae) + ((float)q2_palette[l * 3 + 2] * ay));
-			*colmap++ = BestColor(r, g, b, 0, 254); // High quality color tables get best color
+				*colmap++ = BestColor(r, g, b, 1, 254); // High quality color tables get best color
 		}
 	}
 }
@@ -418,10 +408,6 @@ void GrabColormap(void)  //qb: from super8
 
 	colmap = vid.colormap; // host_colormap;
 
-	// identity lump
-	//   for (l=0 ; l<256 ; l++)
-	//       *colmap++ = l;
-
 	// shaded levels
 	for (l = 0; l < COLORLEVELS; l++)
 	{
@@ -434,19 +420,11 @@ void GrabColormap(void)  //qb: from super8
 			green = (int)((float)q2_palette[c * 3 + 1] * frac); //+ gscaled);
 			blue = (int)((float)q2_palette[c * 3 + 2] * frac); // + bscaled);
 
-			//
 			// note: 254 instead of 255 because 255 is the transparent color, and we
 			// don't want anything remapping to that
-			//
-			*colmap++ = BestColor(red, green, blue, 0, 254);
-		}
-		for (; c < 256; c++)
-		{
-			red = (int)q2_palette[c * 3];
-			green = (int)q2_palette[c * 3 + 1];
-			blue = (int)q2_palette[c * 3 + 2];
 
-			*colmap++ = BestColor(red, green, blue, 0, 254);
+				*colmap++ = BestColor(red, green, blue, 1, 254); // High quality color tables get best color
+
 		}
 	}
 }
@@ -499,9 +477,9 @@ void Draw_Char(int x, int y, int num)
 
 #ifdef PARANOID
 	if (y > vid.height - 8 || x < 0 || x > vid.width - 8)
-		ri.Sys_Error (ERR_FATAL,"Con_DrawCharacter: (%i, %i)", x, y);
+		ri.Sys_Error(ERR_FATAL, "Con_DrawCharacter: (%i, %i)", x, y);
 	if (num < 0 || num > 255)
-		ri.Sys_Error (ERR_FATAL,"Con_DrawCharacter: char %i", num);
+		ri.Sys_Error(ERR_FATAL, "Con_DrawCharacter: char %i", num);
 #endif
 
 	row = num >> 4;

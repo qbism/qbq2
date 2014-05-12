@@ -18,7 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-#define CD_AUDIO //qb: from aprq2, planning for mobile devices
 
 #ifdef CD_AUDIO
 int		CDAudio_Init(void);

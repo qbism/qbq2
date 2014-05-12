@@ -49,73 +49,17 @@ char *svc_strings[256] =
 	"svc_fog" //qb: from kmq2
 };
 
-//qb: - kmq2 fog variables////////////////////////
-// global fog vars w/ defaults
-int FogModels[3] = { 1, 2, 3 }; //qb: in gl mode it is GL_LINEAR, GL_EXP, GL_EXP2
 
-qboolean r_fogenable;
-int		r_fogmodel;
-float	r_fogdensity;
-float	r_fognear;
-float	r_fogfar;
-float	r_fogColor[4];
-
-/*
-================
-R_SetFogVars
-================
-*/
-void R_SetFogVars(qboolean enable, int model, int density, int start, int end, int red, int green, int blue)
+static void CL_ParseFog(void)
 {
-	int	temp;
-
-	r_fogenable = enable;
-
-	temp = model;
-	if ((temp > 2) || (temp < 0)) temp = 0;
-	r_fogmodel = FogModels[temp];
-	r_fogdensity = (float)density;
-	if (temp == 0) {	// GL_LINEAR
-		r_fognear = (float)start;
-		r_fogfar = (float)end;
-	}
-	r_fogColor[0] = ((float)red) / 255.0;
-	r_fogColor[1] = ((float)green) / 255.0;
-	r_fogColor[2] = ((float)blue) / 255.0;
-
-	// clamp vars
-	r_fogdensity = max(r_fogdensity, 0.0);
-	r_fogdensity = min(r_fogdensity, 100.0);
-	r_fognear = max(r_fognear, 0.0f);
-	r_fognear = min(r_fognear, 10000.0 - 64.0);
-	r_fogfar = max(r_fogfar, r_fognear + 64.0);
-	r_fogfar = min(r_fogfar, 10000.0);
-	r_fogColor[0] = max(r_fogColor[0], 0.0);
-	r_fogColor[0] = min(r_fogColor[0], 255.0);
-	r_fogColor[1] = max(r_fogColor[1], 0.0);
-	r_fogColor[1] = min(r_fogColor[1], 255.0);
-	r_fogColor[2] = max(r_fogColor[2], 0.0);
-	r_fogColor[2] = min(r_fogColor[2], 255.0);
-
-}
-
-
-void CL_ParseFog(void)
-{
-	int model, density, start, end,
-		red, green, blue, temp;
-
-	temp = MSG_ReadByte(&net_message);
-	r_fogenable = (temp > 0) ? true : false;
-	model = MSG_ReadByte(&net_message);
-	density = MSG_ReadByte(&net_message);
-	start = MSG_ReadShort(&net_message);
-	end = MSG_ReadShort(&net_message);
+	static int density, red, green, blue;
+	density = MSG_ReadByte(&net_message); //qb: use density to trigger enable.
 	red = MSG_ReadByte(&net_message);
 	green = MSG_ReadByte(&net_message);
 	blue = MSG_ReadByte(&net_message);
 
-	R_SetFogVars(r_fogenable, model, density, start, end, red, green, blue);
+	re.SetFogVars(density, red, green, blue);
+
 }
 
 

@@ -393,7 +393,7 @@ void R_DrawSpanlet33( void )
 
 		btemp = *(s_spanletvars.pbase + (ts) + (tt) * cachewidth);
 
-		if ( btemp != 255 )
+		if (btemp != 255)
 		{
 			if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
 			{
@@ -453,7 +453,7 @@ void R_DrawSpanlet66( void )
 
 		btemp = *(s_spanletvars.pbase + (ts) + (tt) * cachewidth);
 
-		if ( btemp != 255 )
+		if (btemp != 255)
 		{
 			if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
 			{
@@ -527,7 +527,7 @@ void R_DrawSpanlet33Stipple( void )
 
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 			
-			if ( btemp != 255 )
+			if (btemp != 255)
 			{
 				if ( *pz <= ( izi >> 16 ) )
 					*pdest = btemp;
@@ -600,7 +600,7 @@ void R_DrawSpanlet66Stipple( void )
 			
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 
-			if ( btemp != 255 )
+			if (btemp != 255)
 			{
 				if ( *pz <= ( izi >> 16 ) )
 					*pdest = btemp;
@@ -639,7 +639,7 @@ void R_DrawSpanlet66Stipple( void )
 			
 			btemp = *( s_spanletvars.pbase + ( s ) + ( t * cachewidth ) );
 			
-			if ( btemp != 255 )
+			if (btemp != 255)
 			{
 				if ( *pz <= ( izi >> 16 ) )
 					*pdest = btemp;
