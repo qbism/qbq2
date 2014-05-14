@@ -623,7 +623,7 @@ extern cvar_t  *r_customwidth;
 extern cvar_t  *r_customheight;
 extern cvar_t   *r_coloredlights; // leilei
 extern int		coloredlights;	// leilei
-extern cvar_t   *sw_transquality; // leilei
+//extern cvar_t   *sw_transquality; // leilei
 
 extern  clipplane_t     view_clipplanes[4];
 extern int              *pfrustum_indexes[4];

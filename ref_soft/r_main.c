@@ -128,7 +128,7 @@ cvar_t  *sw_stipplealpha;
 cvar_t	*sw_surfcacheoverride;
 cvar_t	*sw_waterwarp;
 cvar_t  *sw_transmooth; // texture dither //qb: was sw_texturesmooth, but just transparencies
-cvar_t  *sw_transquality; //qb: from engoo - selects which table to use.
+//cvar_t  *sw_transquality; //qb: from engoo - selects which table to use.
 
 cvar_t	*r_drawworld;
 cvar_t	*r_drawentities;
@@ -294,7 +294,7 @@ void R_Register(void)
 	sw_waterwarp = ri.Cvar_Get("sw_waterwarp", "1", 0);
 	sw_mode = ri.Cvar_Get("sw_mode", "4", CVAR_ARCHIVE);
 	sw_transmooth = ri.Cvar_Get("sw_transmooth", "1", CVAR_ARCHIVE);
-	sw_transquality = ri.Cvar_Get("sw_transquality", "1", CVAR_ARCHIVE);
+	//sw_transquality = ri.Cvar_Get("sw_transquality", "1", CVAR_ARCHIVE);
 
 	r_lefthand = ri.Cvar_Get("hand", "0", CVAR_USERINFO | CVAR_ARCHIVE);
 	r_speeds = ri.Cvar_Get("r_speeds", "0", 0);

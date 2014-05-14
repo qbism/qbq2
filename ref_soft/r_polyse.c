@@ -1203,7 +1203,7 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 						if (r_fogenabled)
 						{
 							forg = 32762 - (int)(lzi / 768);
-							if (forg < 0)	forg = 0;
+							if (forg < 0)	forg = 0;  if (forg > 32762)	forg = 32762;
 							lptemp = fogmap[*lptex + (forg >> 2 & 0xFF00)];
 						}
 						pix24 = (unsigned char *)&d_8to24table[lptemp];

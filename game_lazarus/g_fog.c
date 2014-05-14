@@ -209,29 +209,25 @@ void Cmd_Fog_f(edict_t *ent)
 		Cmd_Say_f(ent, false, true);
 }
 
-static int fog_density;
-static float fog_red, fog_green, fog_blue;
-
-void GLFog()  //qb: nothing specific to opengl now...
+void FogSend(edict_t *ent)  //qb: serve it up
 {
-	edict_t	*player_ent = &g_edicts[1];
-	if (!player_ent->client || player_ent->is_bot)
+	if (!ent->client || ent->is_bot)
 		return;
-	if ((fog_density == pfog->Density) && (fog_red == pfog->Color[0])
-		&& (fog_green == pfog->Color[1]) && (fog_blue == pfog->Color[2]))
-		return;
+	if ((abs(ent->fog_density - pfog->Density)<3 || pfog->Density == 0) && abs(ent->fog_color[0] - pfog->Color[0])<0.03
+		&& abs(ent->fog_color[1] - pfog->Color[1])<0.03 && abs(ent->fog_color[2] - pfog->Color[2])<0.03)
+		return; //qb: don't bother burning bytes if delta < 3%, or density became zero.
 
-	fog_density = pfog->Density;
-	fog_red = pfog->Color[0];
-	fog_green = pfog->Color[1];
-	fog_blue = pfog->Color[2];
+	ent->fog_density = pfog->Density;
+	ent->fog_color[0] = pfog->Color[0];
+	ent->fog_color[1] = pfog->Color[1];
+	ent->fog_color[2] = pfog->Color[2];
 
 	gi.WriteByte(svc_fog);			// svc_fog = 21
-	gi.WriteByte(fog_density);	// density 1-100
-	gi.WriteByte(fog_red * 255);	// red	0-255
-	gi.WriteByte(fog_green * 255);	// green	0-255
-	gi.WriteByte(fog_blue * 255);	// blue	0-255
-	gi.unicast(player_ent, true);
+	gi.WriteByte(ent->fog_density);	// density 1-100
+	gi.WriteByte(ent->fog_color[0] * 255);	// red	0-255
+	gi.WriteByte(ent->fog_color[1] * 255);	// green	0-255
+	gi.WriteByte(ent->fog_color[2] * 255);	// blue	0-255
+	gi.unicast(ent, true);
 }
 
 void trig_fog_fade(edict_t *self)
@@ -398,7 +394,7 @@ void Fog(edict_t *ent) //vec3_t viewpoint)
 			pfog->Density = density;
 		}
 	}
-	GLFog();
+	FogSend(ent);
 	level.last_active_fog = level.active_fog;
 }
 

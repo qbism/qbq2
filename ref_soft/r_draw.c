@@ -101,15 +101,14 @@ qboolean r_fogenabled;
 void FogTableRefresh(void)
 {
 
-	int ugly;
-	int		l, c, red, green, blue;
-	float	fogthik;
-	float	frac;
-	float	frac2;
-	float	farc;
+	//int ugly;
+	static int		l, c, red, green, blue;
+	static float	fogthik, frac, farc;
+
 	byte *colmap;
 
-	ugly = (int)sw_transquality->value;
+	//qb: pretty wins, but mostly need to speed up this loop for 'real time' fog changes
+	//ugly = (int)sw_transquality->value;
 
 	fogthik = r_fogdensity * 0.01;
 	//	Con_Printf ("Fog generating with %f %f %f %f", fogthick, fogcolr, fogcolg, fogcolb);
@@ -117,30 +116,29 @@ void FogTableRefresh(void)
 
 	for (l = COLORLEVELS; l > 0; l--)
 	{
-		frac = 3 - 3 * (float)l / (COLORLEVELS); //qb: increase density, was frac = 2 - 2 * (float)l / (COLORLEVELS);
-		frac2 = 1 - 1 / (float)l / (COLORLEVELS);
+		frac = (3.01 - 3.01 * (float)l / (COLORLEVELS)) * fogthik; //qb: increase density, was frac = 2 - 2 * (float)l / (COLORLEVELS);
 		farc = 1 - ((frac / 2) * fogthik);
 		if (farc < 0)
 			farc = 0;
 		for (c = 0; c<256 - PALBRIGHTS; c++)
 		{
-			red = ((int)((float)q2_palette[c * 3] * farc) + (r_fogColor[0] / 2 * frac* fogthik));
-			green = ((int)((float)q2_palette[c * 3 + 1] * farc) + (r_fogColor[1] / 2 * frac* fogthik));
-			blue = ((int)((float)q2_palette[c * 3 + 2] * farc) + (r_fogColor[2] / 2 * frac* fogthik));
+			red = ((int)((float)q2_palette[c * 3] * farc) + (r_fogColor[0] / 2 * frac ));
+			green = ((int)((float)q2_palette[c * 3 + 1] * farc) + (r_fogColor[1] / 2 * frac * fogthik));
+			blue = ((int)((float)q2_palette[c * 3 + 2] * farc) + (r_fogColor[2] / 2 * frac * fogthik));
 			if (red>255)red = 255;
 			if (green>255)green = 255;
 			if (blue > 255)blue = 255;
 			if (red < 0)red = 0;
 			if (green < 0)green = 0;
 			if (blue < 0)blue = 0;
-			if (!ugly)
-			{
+			//if (!ugly)
+			//{
 				*colmap++ = FindColor(red, green, blue);
-			}
-			else
-			{
-				*colmap++ = BestColor(red, green, blue, 1, 254);
-			}
+			//}
+			//else
+			//{
+			//	*colmap++ = BestColor(red, green, blue, 1, 254);
+			//}
 		}
 	}
 	SetFogMap(); // set the static.
