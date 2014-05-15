@@ -116,6 +116,7 @@ D_DrawTurbulent8Span
 void D_DrawTurbulent8Span(espan_t *pspan)
 {
 	int		sturb, tturb;
+
 	//  float ditht, diths;
 
 	do
