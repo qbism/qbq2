@@ -38,6 +38,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // fall over
 #define ROLL    2
 
+#define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x))) //qb: handy
 
 /*
 
@@ -646,7 +647,7 @@ extern  vec3_t  modelorg;
 extern  vec3_t  r_entorigin;
 
 
-vec3_t			lightin;	// leilei - model lighting
+float	shadelight[3];  //qb: put it here
 
 extern  float   verticalFieldOfView;
 extern  float   xOrigin, yOrigin;

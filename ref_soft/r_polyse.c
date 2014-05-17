@@ -264,18 +264,17 @@ void R_DrawTriangle(void)
 		r_p2[3] = aliastriangleparms.c->t;
 		r_p2[4] = aliastriangleparms.c->l;
 		r_p2[5] = aliastriangleparms.c->zi;
+
 		// i crash fixme  //...qb: increased array sizes
-		if (coloredlights){
-			r_p0[6] = aliastriangleparms.a->l;		// lightr
-			r_p0[7] = aliastriangleparms.a->l;		// lightg
-			r_p0[8] = aliastriangleparms.a->l;		// lightb
-			r_p1[6] = aliastriangleparms.b->l;		// lightr
-			r_p1[7] = aliastriangleparms.b->l;		// lightg
-			r_p1[8] = aliastriangleparms.b->l;		// lightb
-			r_p2[6] = aliastriangleparms.c->l;		// lightr
-			r_p2[7] = aliastriangleparms.c->l;		// lightg
-			r_p2[8] = aliastriangleparms.c->l;		// lightb
-		}
+		r_p0[6] = aliastriangleparms.a->l;		// lightr
+		r_p0[7] = aliastriangleparms.a->l;		// lightg
+		r_p0[8] = aliastriangleparms.a->l;		// lightb
+		r_p1[6] = aliastriangleparms.b->l;		// lightr
+		r_p1[7] = aliastriangleparms.b->l;		// lightg
+		r_p1[8] = aliastriangleparms.b->l;		// lightb
+		r_p2[6] = aliastriangleparms.c->l;		// lightr
+		r_p2[7] = aliastriangleparms.c->l;		// lightg
+		r_p2[8] = aliastriangleparms.c->l;		// lightb
 
 		R_PolysetSetEdgeTable();
 		R_RasterizeAliasPolySmooth();
@@ -729,54 +728,40 @@ void R_PolysetCalcGradients(int skinwidth)
 	// very visible, overflow is very unlikely, because of ambient lighting
 	t0 = r_p0[4] - r_p2[4];
 	t1 = r_p1[4] - r_p2[4];
-	r_lstepx = (int)
-		ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-	r_lstepy = (int)
-		ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	r_lstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
-	if (coloredlights){
-		t0 = r_p0[6] - r_p2[6];
-		t1 = r_p1[6] - r_p2[6];
-		r_lrstepx = (int)
-			ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-		r_lrstepy = (int)
-			ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	//qb: use ceil
+	t0 = r_p0[6] - r_p2[6];
+	t1 = r_p1[6] - r_p2[6];
+	r_lrstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lrstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
-		t0 = r_p0[7] - r_p2[7];
-		t1 = r_p1[7] - r_p2[7];
-		r_lgstepx = (int)
-			ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-		r_lgstepy = (int)
-			ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+	t0 = r_p0[7] - r_p2[7];
+	t1 = r_p1[7] - r_p2[7];
+	r_lgstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lgstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
-		t0 = r_p0[8] - r_p2[8];
-		t1 = r_p1[8] - r_p2[8];
-		r_lbstepx = (int)
-			ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
-		r_lbstepy = (int)
-			ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
-	}
+	t0 = r_p0[8] - r_p2[8];
+	t1 = r_p1[8] - r_p2[8];
+	r_lbstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_lbstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
+
 
 	t0 = r_p0[2] - r_p2[2];
 	t1 = r_p1[2] - r_p2[2];
-	r_sstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) *
-		xstepdenominv);
-	r_sstepy = (int)((t1 * p00_minus_p20 - t0* p10_minus_p20) *
-		ystepdenominv);
+	r_sstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_sstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 	t0 = r_p0[3] - r_p2[3];
 	t1 = r_p1[3] - r_p2[3];
-	r_tstepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) *
-		xstepdenominv);
-	r_tstepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) *
-		ystepdenominv);
+	r_tstepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_tstepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 	t0 = r_p0[5] - r_p2[5];
 	t1 = r_p1[5] - r_p2[5];
-	r_zistepx = (int)((t1 * p01_minus_p21 - t0 * p11_minus_p21) *
-		xstepdenominv);
-	r_zistepy = (int)((t1 * p00_minus_p20 - t0 * p10_minus_p20) *
-		ystepdenominv);
+	r_zistepx = ceil((t1 * p01_minus_p21 - t0 * p11_minus_p21) * xstepdenominv);
+	r_zistepy = ceil((t1 * p00_minus_p20 - t0 * p10_minus_p20) * ystepdenominv);
 
 	//#if	id386ALIAS
 #if id386
@@ -1152,13 +1137,6 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 	int		forg;			// leilei - fog
 	unsigned char *pix24;	// leilei - colored lighting
 	int trans[3];			// leilei - colored lighting
-	int		llightrgb[3];	// leilei - colored lighting
-	vec3_t	lpcolor;
-
-	//R_LightPointColor(currententity->origin, lpcolor);
-	lpcolor[0] = lightin[0];
-	lpcolor[1] = lightin[1];
-	lpcolor[2] = lightin[2];
 
 	do
 	{
@@ -1184,11 +1162,6 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 			ltfrac = pspanpackage->tfrac;
 			llight = pspanpackage->light;
 			lzi = pspanpackage->zi;
-			if (coloredlights){
-				llightrgb[0] = pspanpackage->lightr;
-				llightrgb[1] = pspanpackage->lightg;
-				llightrgb[2] = pspanpackage->lightb;
-			}
 			do
 			{
 				if ((lzi >> 16) >= *lpz)
@@ -1207,17 +1180,11 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 							lptemp = fogmap[*lptex + (forg >> 2 & 0xFF00)];
 						}
 						pix24 = (unsigned char *)&d_8to24table[lptemp];
-						//qb: high-contrast- pix24 = (unsigned char *)&d_8to24table[((byte *)vid.colormap)[*lptex + (llight & 0xFF00)]];
-						//qb: almost works...  trans[0] = ((pix24[0] + (byte )lpcolor[0]) * (16384 - llightrgb[0])) >> 15;
-						//trans[1] = ((pix24[1] + (byte )lpcolor[1])  * (16384 - llightrgb[1])) >> 15;
-						//trans[2] = ((pix24[2] + (byte )lpcolor[2])  * (16384 - llightrgb[2])) >> 15;
-						trans[0] = (int)(pix24[0] * (llight * lpcolor[0])) >> 15;
-						trans[1] = (int)(pix24[1] * (llight * lpcolor[1])) >> 15;
-						trans[2] = (int)(pix24[2] * (llight * lpcolor[2])) >> 15;	// leilei - temporarily use 
-						if (trans[0] < 0) trans[0] = 0;
-						if (trans[1] < 0) trans[1] = 0;
-						if (trans[2] < 0) trans[2] = 0;
-						if (trans[0] > 63) trans[0] = 63; if (trans[1] > 63) trans[1] = 63;	if (trans[2] > 63) trans[2] = 63;
+						//qb: works now...
+						trans[0] = CLAMP((int)(pix24[0] * (pspanpackage->lightr * shadelight[0])) >> 15, 0, 63);
+						trans[1] = CLAMP((int)(pix24[1] * (pspanpackage->lightg * shadelight[1])) >> 15, 0, 63);
+						trans[2] = CLAMP((int)(pix24[2] * (pspanpackage->lightb * shadelight[2])) >> 15, 0, 63);
+
 						*lpdest = palmap2[trans[0]][trans[1]][trans[2]];
 					}	// leilei - colored lights end
 

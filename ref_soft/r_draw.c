@@ -273,7 +273,6 @@ void R_GetPalette(void)
 // BestColor
 
 
-
 byte BestColor(int r, int g, int b, int start, int stop)
 {
 	int	i;
@@ -283,19 +282,6 @@ byte BestColor(int r, int g, int b, int start, int stop)
 	int	berstcolor;
 	byte	*pal;
 
-	/*
-		gr = r >> 1;
-		gg = g >> 1;
-		gb = b >> 1;
-		gr = pow(gr, 1.3f);
-		gg = pow(gg, 1.3f);
-		gb = pow(gb, 1.3f);
-
-
-		r = gr;
-		g = gg;
-		b = gb;
-		*/
 	//
 	// let any color go to 0 as a last resort
 	//
@@ -391,7 +377,7 @@ void GrabAlphamap(void) //qb: based on Engoo
 			r = (int)(((float)q2_palette[c * 3] * ae) + ((float)q2_palette[l * 3] * ay));
 			g = (int)(((float)q2_palette[c * 3 + 1] * ae) + ((float)q2_palette[l * 3 + 1] * ay));
 			b = (int)(((float)q2_palette[c * 3 + 2] * ae) + ((float)q2_palette[l * 3 + 2] * ay));
-				*colmap++ = BestColor(r, g, b, 1, 254); // High quality color tables get best color
+			*colmap++ = BestColor(r, g, b, 1, 254); // High quality color tables get best color
 		}
 	}
 }
@@ -421,8 +407,7 @@ void GrabColormap(void)  //qb: from super8
 			// note: 254 instead of 255 because 255 is the transparent color, and we
 			// don't want anything remapping to that
 
-				*colmap++ = BestColor(red, green, blue, 1, 254); // High quality color tables get best color
-
+			*colmap++ = BestColor(red, green, blue, 1, 254); // High quality color tables get best color
 		}
 	}
 }
