@@ -171,24 +171,20 @@ image_t *Draw_FindPic(char *name)
 
 
 
-void	Draw_8to24(unsigned char *palette)
+void	Draw_8to24(byte *palette)
 {
 	byte	*pal;
 	unsigned r, g, b;
 	unsigned v;
-	int		r1, g1, b1;
-	int		j, k, l, m, ind;
 	unsigned short i;
-	unsigned	*table;
-	FILE *f;
-	char s[255];
+	byte	*table;
 	float gamma = 0;
 
 	//
 	// 8 8 8 encoding
 	//
 	pal = palette;
-	table = d_8to24tabble;
+	table = (byte *)d_8to24tabble;
 	for (i = 0; i<256; i++)
 	{
 		//		Con_Printf (".");	// loop an indicator
@@ -196,24 +192,18 @@ void	Draw_8to24(unsigned char *palette)
 		g = pal[1];
 		b = pal[2];
 
-
-
 		if (r>255) r = 255;
 		if (g > 255) g = 255;
 		if (b > 255) b = 255;
 		pal += 3;
 		v = (255 << 24) + (r << 0) + (g << 8) + (b << 16);
 		*table++ = v;
-
 	}
-
 
 	// The 15-bit table we use is actually made elsewhere (it's palmap)
 
 	d_8to24tabble[255] &= 0xffffff;	// 255 is transparent
 	//qb: gray is the new black.. d_8to24tabble[0] &= 0x000000;	// black is black
-
-
 }
 
 
@@ -259,25 +249,14 @@ byte		*thepalette;
 
 void R_GetPalette(void)
 {
-	static qboolean modified;
-	byte	palette[256][4], *in, *out;
-	int		i, j;
-	float	alpha, one_minus_alpha;
-	vec3_t	premult;
-	int		v;
-
 	thepalette = (byte *)d_8to24table;
-
 }
-
-// BestColor
 
 
 byte BestColor(int r, int g, int b, int start, int stop)
 {
 	int	i;
 	int	dr, dg, db;
-	float gr, gg, gb;	// leilei - gamma!
 	int	bestdistortion, distortion;
 	int	berstcolor;
 	byte	*pal;
@@ -332,7 +311,7 @@ void Draw_InitRGBMap(void)
 	// TODO: Option to enable this 
 
 	{
-		Draw_8to24(d_8to24table);
+		Draw_8to24((byte *)d_8to24table);
 		for (r = 0; r < 256; r += 4)
 		{
 			for (g = 0; g < 256; g += 4)
@@ -386,8 +365,7 @@ void GrabAlphamap(void) //qb: based on Engoo
 void GrabColormap(void)  //qb: from super8
 {
 	int		l, c, red, green, blue;
-	float	frac, fracscaled;
-	float   rscaled, gscaled, bscaled;
+	float	frac;
 	byte *colmap;
 
 	colmap = vid.colormap; // host_colormap;

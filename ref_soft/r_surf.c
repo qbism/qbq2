@@ -177,10 +177,8 @@ void R_DrawSurface (void)
 	r_numvblocks = r_drawsurf.surfheight >> blockdivshift;
 
 //==============================
-	if (coloredlights)
 	pblockdrawer = surfmiptable8RGB[r_drawsurf.surfmip];	// leilei - colored lights
-		else
-	pblockdrawer = surfmiptable[r_drawsurf.surfmip];
+//	pblockdrawer = surfmiptable[r_drawsurf.surfmip];
 // TODO: only needs to be set when there is a display settings change
 	horzblockstep = blocksize;
 
@@ -205,11 +203,10 @@ void R_DrawSurface (void)
 	for (u=0 ; u<r_numhblocks; u++)
 	{
 			// leilei - colored lights
-	if (coloredlights)	
 		r_lightptr = (int*)blocklights + u * 3;
-	else
+
 	// o^_^o
-		r_lightptr = (int*)blocklights + u;
+	//	r_lightptr = (int*)blocklights + u;
 
 		prowdestbase = pcolumndest;
 
@@ -705,10 +702,8 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 	c_surf++;
 
 	// calculate the lightings
-	if(coloredlights)
 	R_BuildLightMapRGB ();	// leilei - colored lights
-		else
-	R_BuildLightMap ();
+//	R_BuildLightMap ();
 	
 	// rasterize the surface into the cache
 	R_DrawSurface ();

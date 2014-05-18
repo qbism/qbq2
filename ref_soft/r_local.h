@@ -623,7 +623,6 @@ extern	cvar_t	*vid_gamma;
 extern cvar_t  *r_customwidth;
 extern cvar_t  *r_customheight;
 extern cvar_t   *r_coloredlights; // leilei
-extern int		coloredlights;	// leilei
 //extern cvar_t   *sw_transquality; // leilei
 
 extern  clipplane_t     view_clipplanes[4];
@@ -712,6 +711,7 @@ void R_InsertNewEdges (edge_t *edgestoadd, edge_t *edgelist);
 void R_StepActiveU (edge_t *pedge);
 void R_RemoveEdges (edge_t *pedge);
 void R_PushDlights (model_t *model);
+void R_LightPointColor(vec3_t p, vec3_t color); //qb: use this
 
 extern void R_Surf8Start (void);
 extern void R_Surf8End (void);

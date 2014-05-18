@@ -184,12 +184,8 @@ qboolean DIB_Init(unsigned char **ppbuffer, int *ppitch)
 	if (vid_fullscreen->value) //qb: fullscreen dib
 	{
 
-		int			DIBWidth, DIBHeight;
 		RECT		WindowRect;
 		DWORD		WindowStyle, ExWindowStyle;
-
-		int			window_x, window_y, window_width, window_height;
-		RECT		window_rect;
 
 		WindowRect.top = WindowRect.left = 0;
 

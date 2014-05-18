@@ -455,7 +455,7 @@ void R_DrawSpanlet66(void)
 		{
 			if (*s_spanletvars.pz <= (s_spanletvars.izi >> 16))
 				*s_spanletvars.pdest = vid.alphamap[btemp * 256 + *s_spanletvars.pdest];
-		}
+			}
 
 		s_spanletvars.izi += s_spanletvars.izistep;
 		s_spanletvars.pdest++;
@@ -1361,9 +1361,9 @@ void R_DrawAlphaSurfaces(void)
 
 		// PGM - pass down all the texinfo flags, not just SURF_WARP.
 		if (s->texinfo->flags & SURF_TRANS66)
-			R_ClipAndDrawPoly(0.60f, (s->texinfo->flags & (SURF_WARP | SURF_FLOWING)), true);
+			R_ClipAndDrawPoly(0.60f, (s->texinfo->flags & SURF_WARP | SURF_FLOWING), true);
 		else
-			R_ClipAndDrawPoly(0.30f, (s->texinfo->flags & (SURF_WARP | SURF_FLOWING)), true);
+			R_ClipAndDrawPoly(0.30f, (s->texinfo->flags & SURF_WARP | SURF_FLOWING), true);
 		//PGM
 		//=======
 

@@ -183,7 +183,12 @@ typedef struct
 	void(*EndFrame) (void);
 
 	void(*AppActivate)(qboolean activate);
+
+#define VANILLA
+
+#ifdef VANILLA
 	void(*SetFogVars)(int density, int red, int green, int blue); //qb: fog
+#endif
 
 } refexport_t;
 

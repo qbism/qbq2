@@ -151,7 +151,6 @@ cvar_t  *r_customwidth;
 cvar_t  *r_customheight;
 
 cvar_t	*r_coloredlights; // leilei
-int		coloredlights;		// leilei
 
 #define	STRINGER(x) "x"
 
@@ -209,7 +208,6 @@ R_SetFogVars
 */
 void R_SetFogVars(int density, int red, int green, int blue)
 {
-	int	temp;
 	r_fogenabled = (density > 0) ? true : false;
 	r_fogdensity = (float)density;
 	r_fogColor[0] = red;
@@ -341,7 +339,7 @@ void R_UnRegister(void)
 R_Init
 ===============
 */
-int R_Init(void *hInstance, void *wndProc)
+qboolean R_Init(void *hInstance, void *wndProc)
 {
 
 	R_InitImages();
