@@ -630,7 +630,6 @@ void R_ScreenShot_f (void)
 	char		pcxname[80]; 
 	char		checkname[MAX_OSPATH];
 	FILE		*f;
-	byte		palette[768];
 
 	// create the scrnshots directory if it doesn't exist
 	Com_sprintf (checkname, sizeof(checkname), "%s/scrnshot", ri.FS_Gamedir());
@@ -657,20 +656,12 @@ void R_ScreenShot_f (void)
 		return;
 	}
 
-	// turn the current 32 bit palette into a 24 bit palette
-	for (i=0 ; i<256 ; i++)
-	{
-		palette[i*3+0] = sw_state.currentpalette[i*4+0];
-		palette[i*3+1] = sw_state.currentpalette[i*4+1];
-		palette[i*3+2] = sw_state.currentpalette[i*4+2];
-	}
-
 // 
 // save the pcx file 
 // 
 
 	WritePCXfile (checkname, vid.buffer, vid.width, vid.height, vid.rowbytes,
-				  palette);
+		sw_state.currentpalette); //qb: just use it, don't need alpha channel.
 
 	ri.Con_Printf (PRINT_ALL, "Wrote %s\n", checkname);
 } 
