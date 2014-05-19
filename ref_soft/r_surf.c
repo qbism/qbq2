@@ -101,9 +101,6 @@ extern byte	palmap2[64][64][64];		//  Colored Lighting Lookup Table
 
 // leilei - Colored Lights - End
 
-// andrewj - colored lights - start
-extern const byte q2_palette[256 * 3];
-// andrewj - colored lights - end
 void R_BuildLightMap (void);
 //extern	unsigned		blocklights[1024];	// allow some very large lightmaps
 //extern	unsigned		blocklights[1024*3];	// leilei - colored lights
@@ -177,8 +174,11 @@ void R_DrawSurface (void)
 	r_numvblocks = r_drawsurf.surfheight >> blockdivshift;
 
 //==============================
+	if (coloredlights)
 	pblockdrawer = surfmiptable8RGB[r_drawsurf.surfmip];	// leilei - colored lights
-//	pblockdrawer = surfmiptable[r_drawsurf.surfmip];
+	else
+		pblockdrawer = surfmiptable[r_drawsurf.surfmip];
+
 // TODO: only needs to be set when there is a display settings change
 	horzblockstep = blocksize;
 
@@ -203,10 +203,11 @@ void R_DrawSurface (void)
 	for (u=0 ; u<r_numhblocks; u++)
 	{
 			// leilei - colored lights
+		if (coloredlights)
 		r_lightptr = (int*)blocklights + u * 3;
-
+		else
 	// o^_^o
-	//	r_lightptr = (int*)blocklights + u;
+			r_lightptr = (int*)blocklights + u;
 
 		prowdestbase = pcolumndest;
 
@@ -702,8 +703,10 @@ surfcache_t *D_CacheSurface (msurface_t *surface, int miplevel)
 	c_surf++;
 
 	// calculate the lightings
+	if (coloredlights)
 	R_BuildLightMapRGB ();	// leilei - colored lights
-//	R_BuildLightMap ();
+	else
+		R_BuildLightMap();
 	
 	// rasterize the surface into the cache
 	R_DrawSurface ();

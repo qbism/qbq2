@@ -698,9 +698,10 @@ void Mod_LoadFaces (lump_t *l)
 		i = LittleLong(in->lightofs);
 		if (i == -1)
 			out->samples = NULL;
-		else
+		else if (coloredlights)
 			out->samples = loadmodel->lightdata + i;
-//			out->samples = loadmodel->lightdata + i/3;
+		else
+			out->samples = loadmodel->lightdata + i / 3;
 		
 	// set the drawing flags flag
 		
@@ -960,6 +961,7 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 	int			i;
 	dheader_t	*header;
 	dmodel_t 	*bm;
+	coloredlights = r_coloredlights->value; // leilei - colored lights - sanity check
 	
 	loadmodel->type = mod_brush;
 	if (loadmodel != mod_known)
@@ -982,8 +984,10 @@ void Mod_LoadBrushModel (model_t *mod, void *buffer)
 	Mod_LoadVertexes (&header->lumps[LUMP_VERTEXES]);
 	Mod_LoadEdges (&header->lumps[LUMP_EDGES]);
 	Mod_LoadSurfedges (&header->lumps[LUMP_SURFEDGES]);
+	if (coloredlights)
 	Mod_LoadRighting (&header->lumps[LUMP_LIGHTING]);
-	//Mod_LoadLighting (&header->lumps[LUMP_LIGHTING]);
+	else
+		Mod_LoadLighting(&header->lumps[LUMP_LIGHTING]);
 	Mod_LoadPlanes (&header->lumps[LUMP_PLANES]);
 	Mod_LoadTexinfo (&header->lumps[LUMP_TEXINFO]);
 	Mod_LoadFaces (&header->lumps[LUMP_FACES]);

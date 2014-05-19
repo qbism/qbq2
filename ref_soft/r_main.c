@@ -30,6 +30,7 @@ unsigned	d_8to24tabble[256];
 entity_t	r_worldentity;
 
 char		skyname[MAX_QPATH];
+byte		*thepalette;
 float		skyrotate;
 vec3_t		skyaxis;
 image_t		*sky_images[6];
@@ -151,6 +152,8 @@ cvar_t  *r_customwidth;
 cvar_t  *r_customheight;
 
 cvar_t	*r_coloredlights; // leilei
+cvar_t	*r_lightsaturation; //qb: colored light saturation
+int		coloredlights;	  // leilei
 
 #define	STRINGER(x) "x"
 
@@ -323,6 +326,7 @@ void R_Register(void)
 	// leilei - colored lights
 
 	r_coloredlights = ri.Cvar_Get("r_coloredlights", "2", CVAR_ARCHIVE);
+	r_lightsaturation = ri.Cvar_Get("r_lightsaturation", "1", CVAR_ARCHIVE);
 
 	// o^_^o
 }
@@ -1434,32 +1438,25 @@ Draw_GetPalette
 */
 void Draw_GetPalette(void)
 {
-	byte	*pal, *out;
+	byte	*out;
 	int		i;
-	int		r, g, b;
 
 	// get the palette and colormap
-	LoadPCX("pics/colormap.pcx", &vid.colormap, &pal, NULL, NULL);
+	LoadPCX("pics/colormap.pcx", &vid.colormap, &thepalette, NULL, NULL);
 	if (!vid.colormap)
 		ri.Sys_Error(ERR_FATAL, "Couldn't load pics/colormap.pcx");
 	vid.alphamap = vid.colormap + 64 * 256;
-	//qb: hack these in here for now
-	GrabColormap();
-	GrabAlphamap();
 
 	out = (byte *)d_8to24table;
-	for (i = 0; i < 256; i++, out += 4)
+	for (i = 0; i < 256; i++)
 	{
-		r = pal[i * 3 + 0];
-		g = pal[i * 3 + 1];
-		b = pal[i * 3 + 2];
-
-		out[0] = r;
-		out[1] = g;
-		out[2] = b;
+		out[i * 4] = thepalette[i * 3];
+		out[i * 4 + 1] = thepalette[i * 3 + 1];
+		out[i * 4 + 2] = thepalette[i * 3 + 2];
 	}
-
-	free(pal);
+	//qb: eventually will only load the palette
+	GrabColormap();
+	GrabAlphamap();
 }
 
 struct image_s *R_RegisterSkin(char *name);

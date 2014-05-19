@@ -623,6 +623,7 @@ extern	cvar_t	*vid_gamma;
 extern cvar_t  *r_customwidth;
 extern cvar_t  *r_customheight;
 extern cvar_t   *r_coloredlights; // leilei
+extern cvar_t   *r_lightsaturation;
 //extern cvar_t   *sw_transquality; // leilei
 
 extern  clipplane_t     view_clipplanes[4];
@@ -654,6 +655,7 @@ extern  float   xOrigin, yOrigin;
 extern  int             r_visframecount;
 
 extern msurface_t *r_alpha_surfaces;
+extern int		coloredlights; //qb: moved here
 
 //=============================================================================
 

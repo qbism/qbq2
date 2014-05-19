@@ -744,7 +744,7 @@ void R_BuildLightMapRGB (void)
 	lightmap = surf->samples;
 	sample = 65536;
 
-	if (r_coloredlights->value == 2)
+	if (coloredlights == 2)
 			lightmode = 2;
 	else
 			lightmode = 0;

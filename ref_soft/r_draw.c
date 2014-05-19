@@ -22,16 +22,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "r_local.h"
 
-byte *thepalette = (byte *)d_8to24table;
-
 image_t		*draw_chars;				// 8*8 graphic characters
 
 #define COLORLEVELS 64
 #define PALBRIGHTS 0  //qb: wow, Q2 doesn't have fullbrights?
 
-//qb: - kmq2 fog variables////////////////////////
-// global fog vars w/ defaults
-int FogModels[3] = { 1, 2, 3 }; //qb: in gl mode it is GL_LINEAR, GL_EXP, GL_EXP2
+extern byte		*thepalette;
+
+//qb: - fog
 float	r_fogdensity;
 float	r_fogColor[3];
 
@@ -43,14 +41,14 @@ byte	*fogmap;
 qboolean r_fogenabled;
 
 
-void FogTableRefresh(void)
+void FogTableRefresh()
 {
 
 	//int ugly;
 	static int		l, c, red, green, blue;
 	static float	fogthik, frac, farc;
 
-	byte *colmap;
+	byte *colmap, *pal;
 
 	//qb: pretty wins, but mostly need to speed up this loop for 'real time' fog changes
 	//ugly = (int)sw_transquality->value;
@@ -67,9 +65,9 @@ void FogTableRefresh(void)
 			farc = 0;
 		for (c = 0; c<256 - PALBRIGHTS; c++)
 		{
-			red = ((int)((float)thepalette[c * 4] * farc) + (r_fogColor[0] / 2 * frac ));
-			green = ((int)((float)thepalette[c * 4 + 1] * farc) + (r_fogColor[1] / 2 * frac * fogthik));
-			blue = ((int)((float)thepalette[c * 4 + 2] * farc) + (r_fogColor[2] / 2 * frac * fogthik));
+			red = ((int)((float)thepalette[c * 3] * farc) + (r_fogColor[0] / 2 * frac));
+			green = ((int)((float)thepalette[c * 3 + 1] * farc) + (r_fogColor[1] / 2 * frac * fogthik));
+			blue = ((int)((float)thepalette[c * 3 + 2] * farc) + (r_fogColor[2] / 2 * frac * fogthik));
 			if (red>255)red = 255;
 			if (green>255)green = 255;
 			if (blue > 255)blue = 255;
@@ -212,13 +210,12 @@ byte BestColor(int r, int g, int b, int start, int stop)
 	// R_GetPalette();
 	bestdistortion = 256 * 256 * 4;
 	berstcolor = 0;
-
-
+	
 	if (r > 255) r = 255;
 	if (g > 255) g = 255;
 	if (b > 255) b = 255;
 
-	pal = (byte *)thepalette + start * 4;
+	pal = (byte *)d_8to24table + start * 4;
 	for (i = start; i <= stop; i++)
 	{
 		dr = r - (int)pal[0];
@@ -235,11 +232,8 @@ byte BestColor(int r, int g, int b, int start, int stop)
 			berstcolor = i;
 		}
 	}
-
-
 	return berstcolor;
 }
-
 
 void Draw_InitRGBMap(void)
 {
@@ -248,7 +242,7 @@ void Draw_InitRGBMap(void)
 	int		beastcolor;
 	float mypow = 1 / 1.3;
 	float mydiv = 200;
-	float mysat = 1.6;
+	float mysat = r_lightsaturation->value; //qb: change to cvar.  was 1.6;
 
 	// Make the 18-bit lookup table here
 	// This is a HUGE 256kb table, the biggest there is here
@@ -283,7 +277,7 @@ void Draw_InitRGBMap(void)
 	}
 }
 
-void GrabAlphamap(void) //qb: based on Engoo
+void GrabAlphamap() //qb: based on Engoo
 {
 	int c, l, r, g, b;
 	float ay, ae;
@@ -297,16 +291,16 @@ void GrabAlphamap(void) //qb: based on Engoo
 	{
 		for (c = 0; c < 256; c++)
 		{
-			r = (int)(((float)thepalette[c * 4] * ae) + ((float)thepalette[l * 4] * ay));
-			g = (int)(((float)thepalette[c * 4 + 1] * ae) + ((float)thepalette[l * 4 + 1] * ay));
-			b = (int)(((float)thepalette[c * 4 + 2] * ae) + ((float)thepalette[l * 4 + 2] * ay));
+			r = (int)(((float)thepalette[c * 3] * ae) + ((float)thepalette[l * 3] * ay));
+			g = (int)(((float)thepalette[c * 3 + 1] * ae) + ((float)thepalette[l * 3 + 1] * ay));
+			b = (int)(((float)thepalette[c * 3 + 2] * ae) + ((float)thepalette[l * 3 + 2] * ay));
 			*colmap++ = BestColor(r, g, b, 1, 254); // High quality color tables get best color
 		}
 	}
 }
 
 
-void GrabColormap(void)  //qb: from super8
+void GrabColormap()  //qb: from super8
 {
 	int		l, c, red, green, blue;
 	float	frac;

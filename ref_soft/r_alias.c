@@ -316,9 +316,10 @@ void R_AliasPreparePoints(void)
 			}
 			else
 			{
-
+				if (coloredlights)
 					R_AliasClipTriangleRGB(pfv[2], pfv[1], pfv[0]);
-					//R_AliasClipTriangle(pfv[2], pfv[1], pfv[0]);
+				else
+					R_AliasClipTriangle(pfv[2], pfv[1], pfv[0]);
 			}
 		}
 	}
@@ -353,8 +354,10 @@ void R_AliasPreparePoints(void)
 			}
 			else
 			{	// partially clipped
+				if (coloredlights)
 					R_AliasClipTriangleRGB(pfv[0], pfv[1], pfv[2]);
-				//	R_AliasClipTriangle(pfv[0], pfv[1], pfv[2]);
+				else
+					R_AliasClipTriangle(pfv[0], pfv[1], pfv[2]);
 			}
 		}
 	}

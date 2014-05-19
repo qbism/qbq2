@@ -38,7 +38,7 @@ typedef struct
 spanletvars_t s_spanletvars;
 
 static int r_polyblendcolor;
-static int btemp; //qb: faster.  probably.
+static unsigned btemp; //qb: faster.  probably.
 
 static espan_t	*s_polygon_spans;
 
@@ -1361,9 +1361,10 @@ void R_DrawAlphaSurfaces(void)
 
 		// PGM - pass down all the texinfo flags, not just SURF_WARP.
 		if (s->texinfo->flags & SURF_TRANS66)
-			R_ClipAndDrawPoly(0.60f, (s->texinfo->flags & SURF_WARP | SURF_FLOWING), true);
+			R_ClipAndDrawPoly(0.60f, (s->texinfo->flags & (SURF_WARP | SURF_FLOWING)), true);
 		else
-			R_ClipAndDrawPoly(0.30f, (s->texinfo->flags & SURF_WARP | SURF_FLOWING), true);
+			R_ClipAndDrawPoly(0.30f, (s->texinfo->flags & (SURF_WARP | SURF_FLOWING)), true);
+
 		//PGM
 		//=======
 

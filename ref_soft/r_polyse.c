@@ -1170,7 +1170,7 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 					if (r_newrefdef.rdflags & RDF_IRGOGGLES && currententity->flags & RF_IR_VISIBLE)
 						*lpdest = ((byte *)vid.colormap)[irtable[*lptex]];
 					// leilei - colored lights begin
-					else
+					else if (coloredlights)
 					{
 						int lptemp = *lptex;
 						if (r_fogenabled)
@@ -1187,6 +1187,7 @@ void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 
 						*lpdest = palmap2[trans[0]][trans[1]][trans[2]];
 					}	// leilei - colored lights end
+					else *lpdest = ((byte *)vid.colormap)[*lptex + (llight & 0xFF00)];
 
 					//PGM
 					*lpz = lzi >> 16;
