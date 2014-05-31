@@ -132,7 +132,7 @@ typedef struct
 	vec3_t          vieworg;
 	vec3_t          viewangles;
 	
-	int                     ambientlight;
+	unsigned        ambientlight;
 } oldrefdef_t;
 
 extern oldrefdef_t      r_refdef;
@@ -628,6 +628,7 @@ extern cvar_t   *r_lightsaturation;
 
 extern  clipplane_t     view_clipplanes[4];
 extern int              *pfrustum_indexes[4];
+extern byte		*thepalette; //qb: keep the palette around.
 
 
 //=============================================================================
@@ -714,6 +715,10 @@ void R_StepActiveU (edge_t *pedge);
 void R_RemoveEdges (edge_t *pedge);
 void R_PushDlights (model_t *model);
 void R_LightPointColor(vec3_t p, vec3_t color); //qb: use this
+
+byte BestColor(int r, int g, int b, int start, int stop); //for colored light
+int FindColor(int r, int g, int b);
+void Draw_InitRGBMap(void);
 
 extern void R_Surf8Start (void);
 extern void R_Surf8End (void);

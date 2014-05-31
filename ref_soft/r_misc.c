@@ -661,7 +661,7 @@ void R_ScreenShot_f (void)
 // 
 
 	WritePCXfile (checkname, vid.buffer, vid.width, vid.height, vid.rowbytes,
-		sw_state.currentpalette); //qb: just use it, don't need alpha channel.
+				  thepalette);
 
 	ri.Con_Printf (PRINT_ALL, "Wrote %s\n", checkname);
 } 

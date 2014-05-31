@@ -27,8 +27,6 @@ image_t		*draw_chars;				// 8*8 graphic characters
 #define COLORLEVELS 64
 #define PALBRIGHTS 0  //qb: wow, Q2 doesn't have fullbrights?
 
-extern byte		*thepalette;
-
 //qb: - fog
 float	r_fogdensity;
 float	r_fogColor[3];

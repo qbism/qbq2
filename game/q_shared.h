@@ -40,7 +40,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <time.h>
 
 #if (defined _M_IX86 || defined __i386__) && !defined C_ONLY && !defined __sun__
-#define id386	0 //qb: hack, don't use assembly.  was 1
+#define id386	0 //qb: hack asm off for now.
 #else
 #define id386	0
 #endif

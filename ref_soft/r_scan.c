@@ -24,11 +24,22 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "r_local.h"
 #include "r_dither.h"
 
+//qb:  static vars for several functions
+static int          count, spancount;
+static byte         *pbase, *pdest;
+static fixed16_t    s, t, snext, tnext, sstep, tstep;
+static float        sdivz, tdivz, zi, z, du, dv, spancountminus1;
+static float        sdivzstepu, tdivzstepu, zistepu;
+static int		    izi, izistep; // mankrip
+static short		*pz; // mankrip
+
+static byte	*r_turb_pbase, *r_turb_pdest;
+static fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
+static int				r_turb_spancount;
 
 unsigned char	*r_turb_pbase, *r_turb_pdest;
 fixed16_t		r_turb_s, r_turb_t, r_turb_sstep, r_turb_tstep;
 int				*r_turb_turb;
-int				r_turb_spancount;
 
 void D_DrawTurbulent8Span(espan_t *pspan);
 
@@ -53,12 +64,12 @@ the sine warp, to keep the edges from wrapping
 */
 void D_WarpScreen(void)
 {
-	int		w, h;
-	int		u, v, u2, v2;
-	byte	*dest;
-	int		*turb;
-	int		*col;
-	byte	**row;
+	static int		w, h;
+	static int		u, v, u2, v2;
+	static byte		*dest;
+	static int		*turb;
+	static int		*col;
+	static byte		**row;
 
 	static int	cached_width, cached_height;
 	static byte	*rowptr[4200 + AMP2 * 2]; //qb: 4K... was 1200
@@ -76,8 +87,6 @@ void D_WarpScreen(void)
 		for (v = 0; v < h + AMP2 * 2; v++)
 		{
 			v2 = (int)((float)v / (h + AMP2 * 2) * r_refdef.vrect.height);
-			//rowptr[v] = r_warpbuffer + (WARP_WIDTH * v2);
-			//rowptr[v] = r_warpbuffer + (w * v2);
 			rowptr[v] = r_warpbuffer + (r_warpwidth * v2);
 		}
 
@@ -115,7 +124,7 @@ D_DrawTurbulent8Span
 */
 void D_DrawTurbulent8Span(espan_t *pspan)
 {
-	int		sturb, tturb;
+	static int		sturb, tturb;
 
 	//  float ditht, diths;
 
@@ -153,10 +162,6 @@ Turbulent8
 */
 void Turbulent8(espan_t *pspan)
 {
-	int				count;
-	fixed16_t		snext, tnext;
-	float			sdivz, tdivz, zi, z, du, dv, spancountminus1;
-	float			sdivz16stepu, tdivz16stepu, zi16stepu;
 
 	r_turb_turb = sintable + ((int)(r_newrefdef.time*SPEED)&(CYCLE - 1));
 
@@ -165,9 +170,9 @@ void Turbulent8(espan_t *pspan)
 
 	r_turb_pbase = (unsigned char *)cacheblock;
 
-	sdivz16stepu = d_sdivzstepu * 16;
-	tdivz16stepu = d_tdivzstepu * 16;
-	zi16stepu = d_zistepu * 16;
+	sdivzstepu = d_sdivzstepu * 16;
+	tdivzstepu = d_tdivzstepu * 16;
+	zistepu = d_zistepu * 16;
 
 	do
 	{
@@ -211,9 +216,9 @@ void Turbulent8(espan_t *pspan)
 			{
 				// calculate s/z, t/z, zi->fixed s and t at far end of span,
 				// calculate s and t steps across span by shifting
-				sdivz += sdivz16stepu;
-				tdivz += tdivz16stepu;
-				zi += zi16stepu;
+				sdivz += sdivzstepu;
+				tdivz += tdivzstepu;
+				zi += zistepu;
 				z = (float)0x10000 / zi;	// prescale to 16.16 fixed-point
 
 				snext = (int)(sdivz * z) + sadjust;
@@ -288,10 +293,6 @@ but the turbulence is automatically 0.
 */
 void NonTurbulent8(espan_t *pspan)
 {
-	int				count;
-	fixed16_t		snext, tnext;
-	float			sdivz, tdivz, zi, z, du, dv, spancountminus1;
-	float			sdivz16stepu, tdivz16stepu, zi16stepu;
 
 	//	r_turb_turb = sintable + ((int)(r_newrefdef.time*SPEED)&(CYCLE-1));
 	r_turb_turb = blanktable;
@@ -301,9 +302,9 @@ void NonTurbulent8(espan_t *pspan)
 
 	r_turb_pbase = (unsigned char *)cacheblock;
 
-	sdivz16stepu = d_sdivzstepu * 16;
-	tdivz16stepu = d_tdivzstepu * 16;
-	zi16stepu = d_zistepu * 16;
+	sdivzstepu = d_sdivzstepu * 16;
+	tdivzstepu = d_tdivzstepu * 16;
+	zistepu = d_zistepu * 16;
 
 	do
 	{
@@ -347,9 +348,9 @@ void NonTurbulent8(espan_t *pspan)
 			{
 				// calculate s/z, t/z, zi->fixed s and t at far end of span,
 				// calculate s and t steps across span by shifting
-				sdivz += sdivz16stepu;
-				tdivz += tdivz16stepu;
-				zi += zi16stepu;
+				sdivz += sdivzstepu;
+				tdivz += tdivzstepu;
+				zi += zistepu;
 				z = (float)0x10000 / zi;	// prescale to 16.16 fixed-point
 
 				snext = (int)(sdivz * z) + sadjust;
@@ -431,13 +432,6 @@ FIXME: actually make this subdivide by 16 instead of 8!!!  qb:  OK!!!!
 //unrolled- mh, MK, qbism
 //============================================*/
 
-static int          count, spancount;
-static byte         *pbase, *pdest;
-static fixed16_t    s, t, snext, tnext, sstep, tstep;
-static float        sdivz, tdivz, zi, z, du, dv, spancountminus1;
-static float        sdivzstepu, tdivzstepu, zistepu;
-static int		    izi, izistep; // mankrip
-static short		*pz; // mankrip
 
 //qb: this one does a simple motion blur, but leaves artificacts (smears on walls) due to alphamap imperfections.
 //#define WRITEPDEST_MB(i)  { pdest[i] = vid.alphamap[*(pbase + (s >> 16) + (t >> 16) * cachewidth)*256+pdest[i]]; s+=sstep; t+=tstep;}
@@ -482,26 +476,26 @@ void D_DrawSpans16(espan_t *pspan) //qb: up it from 8 to 16.  This + unroll = bi
 		if (t < 0) t = 0;
 		else if (t > bbextentt) t = bbextentt;
 
-		while (count-- > 0) // Manoel Kasimier
+		if (r_fogenabled)
 		{
-			sdivz += sdivzstepu;
-			tdivz += tdivzstepu;
-			zi += zistepu;
-			z = (float)0x10000 / zi;   // prescale to 16.16 fixed-point
-
-			snext = (int)(sdivz * z) + sadjust;
-			if (snext < 16) snext = 16;
-			else if (snext > bbextents) snext = bbextents;
-
-			tnext = (int)(tdivz * z) + tadjust;
-			if (tnext < 16) tnext = 16;
-			else if (tnext > bbextentt) tnext = bbextentt;
-
-			sstep = (snext - s) >> 4;
-			tstep = (tnext - t) >> 4;
-			pdest += 16;
-			if (r_fogenabled)
+			while (count-- > 0) // Manoel Kasimier
 			{
+				sdivz += sdivzstepu;
+				tdivz += tdivzstepu;
+				zi += zistepu;
+				z = (float)0x10000 / zi;   // prescale to 16.16 fixed-point
+
+				snext = (int)(sdivz * z) + sadjust;
+				if (snext < 16) snext = 16;
+				else if (snext > bbextents) snext = bbextents;
+
+				tnext = (int)(tdivz * z) + tadjust;
+				if (tnext < 16) tnext = 16;
+				else if (tnext > bbextentt) tnext = bbextentt;
+
+				sstep = (snext - s) >> 4;
+				tstep = (tnext - t) >> 4;
+				pdest += 16;
 				forg = (int)(z / 1024);
 				if (forg > 32762)	forg = 32762;
 				WRITEFOGDEST(-16);
@@ -521,55 +515,32 @@ void D_DrawSpans16(espan_t *pspan) //qb: up it from 8 to 16.  This + unroll = bi
 				WRITEFOGDEST(-2);
 				WRITEFOGDEST(-1);
 
-			} // leilei - fog
-			else
-			{
-				WRITEPDEST(-16);
-				WRITEPDEST(-15);
-				WRITEPDEST(-14);
-				WRITEPDEST(-13);
-				WRITEPDEST(-12);
-				WRITEPDEST(-11);
-				WRITEPDEST(-10);
-				WRITEPDEST(-9);
-				WRITEPDEST(-8);
-				WRITEPDEST(-7);
-				WRITEPDEST(-6);
-				WRITEPDEST(-5);
-				WRITEPDEST(-4);
-				WRITEPDEST(-3);
-				WRITEPDEST(-2);
-				WRITEPDEST(-1);
+				s = snext;
+				t = tnext;
 			}
-			s = snext;
-			t = tnext;
-		}
-		if (spancount > 0)
-		{
-			spancountminus1 = (float)(spancount - 1);
-			sdivz += d_sdivzstepu * spancountminus1;
-			tdivz += d_tdivzstepu * spancountminus1;
-			zi += d_zistepu * spancountminus1;
-			z = (float)0x10000 / zi;   // prescale to 16.16 fixed-point
-
-			snext = (int)(sdivz * z) + sadjust;
-			if (snext < 16) snext = 16;
-			else if (snext > bbextents) snext = bbextents;
-
-			tnext = (int)(tdivz * z) + tadjust;
-			if (tnext < 16) tnext = 16;
-			else if (tnext > bbextentt) tnext = bbextentt;
-
-			if (spancount > 1)
+			if (spancount > 0)
 			{
-				sstep = (snext - s) / (spancount - 1);
-				tstep = (tnext - t) / (spancount - 1);
-			}
+				spancountminus1 = (float)(spancount - 1);
+				sdivz += d_sdivzstepu * spancountminus1;
+				tdivz += d_tdivzstepu * spancountminus1;
+				zi += d_zistepu * spancountminus1;
+				z = (float)0x10000 / zi;   // prescale to 16.16 fixed-point
 
-			pdest += spancount;
+				snext = (int)(sdivz * z) + sadjust;
+				if (snext < 16) snext = 16;
+				else if (snext > bbextents) snext = bbextents;
 
-			if (r_fogenabled)
-			{
+				tnext = (int)(tdivz * z) + tadjust;
+				if (tnext < 16) tnext = 16;
+				else if (tnext > bbextentt) tnext = bbextentt;
+
+				if (spancount > 1)
+				{
+					sstep = (snext - s) / (spancount - 1);
+					tstep = (tnext - t) / (spancount - 1);
+				}
+
+				pdest += spancount;
 				forg = (int)(z / 1024);
 				if (forg > 32762)	forg = 32762;
 				switch (spancount)
@@ -609,8 +580,70 @@ void D_DrawSpans16(espan_t *pspan) //qb: up it from 8 to 16.  This + unroll = bi
 					break;
 				}
 			}
-			else
+		}
+		else
+		{
+			while (count-- > 0) // Manoel Kasimier
 			{
+				sdivz += sdivzstepu;
+				tdivz += tdivzstepu;
+				zi += zistepu;
+				z = (float)0x10000 / zi;   // prescale to 16.16 fixed-point
+
+				snext = (int)(sdivz * z) + sadjust;
+				if (snext < 16) snext = 16;
+				else if (snext > bbextents) snext = bbextents;
+
+				tnext = (int)(tdivz * z) + tadjust;
+				if (tnext < 16) tnext = 16;
+				else if (tnext > bbextentt) tnext = bbextentt;
+
+				sstep = (snext - s) >> 4;
+				tstep = (tnext - t) >> 4;
+				pdest += 16;
+
+				WRITEPDEST(-16);
+				WRITEPDEST(-15);
+				WRITEPDEST(-14);
+				WRITEPDEST(-13);
+				WRITEPDEST(-12);
+				WRITEPDEST(-11);
+				WRITEPDEST(-10);
+				WRITEPDEST(-9);
+				WRITEPDEST(-8);
+				WRITEPDEST(-7);
+				WRITEPDEST(-6);
+				WRITEPDEST(-5);
+				WRITEPDEST(-4);
+				WRITEPDEST(-3);
+				WRITEPDEST(-2);
+				WRITEPDEST(-1);
+				s = snext;
+				t = tnext;
+			}
+			if (spancount > 0)
+			{
+				spancountminus1 = (float)(spancount - 1);
+				sdivz += d_sdivzstepu * spancountminus1;
+				tdivz += d_tdivzstepu * spancountminus1;
+				zi += d_zistepu * spancountminus1;
+				z = (float)0x10000 / zi;   // prescale to 16.16 fixed-point
+
+				snext = (int)(sdivz * z) + sadjust;
+				if (snext < 16) snext = 16;
+				else if (snext > bbextents) snext = bbextents;
+
+				tnext = (int)(tdivz * z) + tadjust;
+				if (tnext < 16) tnext = 16;
+				else if (tnext > bbextentt) tnext = bbextentt;
+
+				if (spancount > 1)
+				{
+					sstep = (snext - s) / (spancount - 1);
+					tstep = (tnext - t) / (spancount - 1);
+				}
+
+				pdest += spancount;
 				switch (spancount)
 				{
 				case 16:
@@ -664,12 +697,8 @@ D_DrawZSpans
 */
 void D_DrawZSpans(espan_t *pspan)
 {
-	int				count, doublecount, izistep;
-	int				izi;
 	short			*pdest;
 	unsigned		ltemp;
-	float			zi;
-	float			du, dv;
 
 	// FIXME: check for clamping/range problems
 	// we count on FP exceptions being turned off to avoid range problems
@@ -696,7 +725,7 @@ void D_DrawZSpans(espan_t *pspan)
 			count--;
 		}
 
-		if ((doublecount = count >> 1) > 0)
+		if ((spancount = count >> 1) > 0)
 		{
 			do
 			{
@@ -706,7 +735,7 @@ void D_DrawZSpans(espan_t *pspan)
 				izi += izistep;
 				*(int *)pdest = ltemp;
 				pdest += 2;
-			} while (--doublecount > 0);
+			} while (--spancount > 0);
 		}
 
 		if (count & 1)

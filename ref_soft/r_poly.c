@@ -548,6 +548,7 @@ void R_DrawSpanlet66Stipple(void)
 	byte    *pdest = s_spanletvars.pdest;
 	short   *pz = s_spanletvars.pz;
 	int      izi = s_spanletvars.izi;
+unsigned s, t;
 
 	s_spanletvars.pdest += s_spanletvars.spancount;
 	s_spanletvars.pz += s_spanletvars.spancount;
@@ -575,7 +576,6 @@ void R_DrawSpanlet66Stipple(void)
 
 		while (s_spanletvars.spancount > 0)
 		{
-			unsigned s, t;
 			if (sw_transmooth->value)
 			{
 				s = s_spanletvars.s;
@@ -614,7 +614,6 @@ void R_DrawSpanlet66Stipple(void)
 	{
 		while (s_spanletvars.spancount > 0)
 		{
-			unsigned s, t;
 			if (sw_transmooth->value)
 			{
 				s = s_spanletvars.s;

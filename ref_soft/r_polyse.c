@@ -372,8 +372,7 @@ quotient must fit in 32 bits.
 FIXME: GET RID OF THIS! (FloorDivMod)
 ====================
 */
-void FloorDivMod(float numer, float denom, int *quotient,
-	int *rem)
+void	FloorDivMod(float numer, float denom, int *quotient, int *rem)
 {
 	int		q, r;
 	float	x;
@@ -783,6 +782,19 @@ void R_PolysetCalcGradients(int skinwidth)
 }
 #endif
 
+
+//qb: staticized
+static int		lcount;
+static int		lsfrac, ltfrac;
+static byte	*lpdest;
+static byte	*lptex;
+static int		llight;
+static int		lzi;
+static short	*lpz;
+static unsigned char *pix24;	// leilei - colored lighting
+static int trans[3];			// leilei - colored lighting
+static 	int forg; //fog
+
 /*
 ================
 R_PolysetDrawThreshSpans8
@@ -792,14 +804,6 @@ Random fizzle fade rasterizer
 */
 void R_PolysetDrawThreshSpans8(spanpackage_t *pspanpackage)
 {
-	int		lcount;
-	byte	*lpdest;
-	byte	*lptex;
-	int		lsfrac, ltfrac;
-	int		llight;
-	int		lzi;
-	short	*lpz;
-	int forg; //fog
 
 	do
 	{
@@ -828,13 +832,6 @@ void R_PolysetDrawThreshSpans8(spanpackage_t *pspanpackage)
 
 			do
 			{
-				if (r_fogenabled)
-				{
-					forg = 28398.9 - lzi *0.00293; //qb: ... (16384 * 2.6 / 1.5) - (lzi * 3/ 1024);
-					if (forg > 32762)	forg = 32762; if (forg < 0)	forg = 0;
-					*lptex = fogmap[*lptex + (forg >> 2 & 0xFF00)];
-
-				} // leilei - fog
 				if ((lzi >> 16) >= *lpz)
 				{
 					rand1k_index = (rand1k_index + 1) & MASK_1K;
@@ -875,15 +872,6 @@ R_PolysetDrawSpans8
 */
 void R_PolysetDrawSpans8_33(spanpackage_t *pspanpackage)
 {
-	int		lcount;
-	byte	*lpdest;
-	byte	*lptex;
-	int		lsfrac, ltfrac;
-	int		llight;
-	int		lzi;
-	short	*lpz;
-	int forg; //fog
-
 	do
 	{
 		lcount = d_aspancount - pspanpackage->count;
@@ -947,12 +935,6 @@ void R_PolysetDrawSpans8_33(spanpackage_t *pspanpackage)
 
 void R_PolysetDrawSpansConstant8_33(spanpackage_t *pspanpackage)
 {
-	int		lcount;
-	byte	*lpdest;
-	int		lzi;
-	short	*lpz;
-	int		forg;			// leilei - fog
-
 	do
 	{
 		lcount = d_aspancount - pspanpackage->count;
@@ -999,15 +981,6 @@ void R_PolysetDrawSpansConstant8_33(spanpackage_t *pspanpackage)
 
 void R_PolysetDrawSpans8_66(spanpackage_t *pspanpackage)
 {
-	int		lcount;
-	byte	*lpdest;
-	byte	*lptex;
-	int		lsfrac, ltfrac;
-	int		llight;
-	int		lzi;
-	short	*lpz;
-	int		forg;			// leilei - fog
-
 	do
 	{
 		lcount = d_aspancount - pspanpackage->count;
@@ -1072,12 +1045,6 @@ void R_PolysetDrawSpans8_66(spanpackage_t *pspanpackage)
 
 void R_PolysetDrawSpansConstant8_66(spanpackage_t *pspanpackage)
 {
-	int		lcount;
-	byte	*lpdest;
-	int		lzi;
-	short	*lpz;
-	int		forg;			// leilei - fog
-
 	do
 	{
 		lcount = d_aspancount - pspanpackage->count;
@@ -1127,16 +1094,6 @@ void R_PolysetDrawSpansConstant8_66(spanpackage_t *pspanpackage)
 
 void R_PolysetDrawSpans8_Opaque(spanpackage_t *pspanpackage)
 {
-	int		lcount;
-	int		lsfrac, ltfrac;
-	byte	*lpdest;
-	byte	*lptex;
-	int		llight;
-	int		lzi;
-	short	*lpz;
-	int		forg;			// leilei - fog
-	unsigned char *pix24;	// leilei - colored lighting
-	int trans[3];			// leilei - colored lighting
 
 	do
 	{

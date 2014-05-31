@@ -1440,6 +1440,7 @@ void Draw_GetPalette(void)
 {
 	byte	*out;
 	int		i;
+	int		r, g, b;
 
 	// get the palette and colormap
 	LoadPCX("pics/colormap.pcx", &vid.colormap, &thepalette, NULL, NULL);
@@ -1448,15 +1449,16 @@ void Draw_GetPalette(void)
 	vid.alphamap = vid.colormap + 64 * 256;
 
 	out = (byte *)d_8to24table;
-	for (i = 0; i < 256; i++)
+	for (i=0 ; i<256 ; i++, out+=4)
 	{
-		out[i * 4] = thepalette[i * 3];
-		out[i * 4 + 1] = thepalette[i * 3 + 1];
-		out[i * 4 + 2] = thepalette[i * 3 + 2];
+		r = thepalette[i*3+0];
+		g = thepalette[i*3+1];
+		b = thepalette[i*3+2];
+
+        out[0] = r;
+        out[1] = g;
+        out[2] = b;
 	}
-	//qb: eventually will only load the palette
-	GrabColormap();
-	GrabAlphamap();
 }
 
 struct image_s *R_RegisterSkin(char *name);
