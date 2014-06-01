@@ -812,7 +812,7 @@ void Mod_LoadNodes (lump_t *l)
 Mod_LoadLeafs
 =================
 */
-void Mod_LoadLeafs (lump_t *l)
+void Mod_LoadLeafs(lump_t *l)
 {
 	dleaf_t 	*in;
 	mleaf_t 	*out;
@@ -821,42 +821,41 @@ void Mod_LoadLeafs (lump_t *l)
 
 	in = (void *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
-		ri.Sys_Error (ERR_DROP,"MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
+		ri.Sys_Error(ERR_DROP, "MOD_LoadBmodel: funny lump size in %s", loadmodel->name);
 	count = l->filelen / sizeof(*in);
-	out = Hunk_Alloc ( count*sizeof(*out));
+	out = Hunk_Alloc(count*sizeof(*out));
 
 	loadmodel->leafs = out;
 	loadmodel->numleafs = count;
 
-	for ( i=0 ; i<count ; i++, in++, out++)
+	for (i = 0; i<count; i++, in++, out++)
 	{
-		for (j=0 ; j<3 ; j++)
+		for (j = 0; j<3; j++)
 		{
-			out->minmaxs[j] = LittleShort (in->mins[j]);
-			out->minmaxs[3+j] = LittleShort (in->maxs[j]);
+			out->minmaxs[j] = LittleShort(in->mins[j]);
+			out->minmaxs[3 + j] = LittleShort(in->maxs[j]);
 		}
 
-		out->contents = LittleLong(in->contents);
+		out->contents = (int)LittleLong(in->contents);
 		out->cluster = LittleShort(in->cluster);
 		out->area = LittleShort(in->area);
 		// Knightmare added
 		if (loadmodel->vis != NULL) {
 			if (out->cluster < -1 || out->cluster >= loadmodel->vis->numclusters)
-				ri.Sys_Error (ERR_DROP, "Mod_LoadLeafs: bad cluster");
+				ri.Sys_Error(ERR_DROP, "Mod_LoadLeafs: bad cluster");
 		}
 		// end Knightmare
 
 		out->firstmarksurface = loadmodel->marksurfaces +
-			LittleShort(in->firstleafface);
+			(unsigned short)LittleShort(in->firstleafface);   // Knightmare- make sure this doesn't turn negative!
 		out->nummarksurfaces = LittleShort(in->numleaffaces);
 		// Knightmare added
 		lastmarksurface = LittleShort(in->firstleafface) + out->nummarksurfaces;
 		if (lastmarksurface > loadmodel->nummarksurfaces)
-			ri.Sys_Error (ERR_DROP, "Mod_LoadLeafs: bad leaf face index");
+			ri.Sys_Error(ERR_DROP, "Mod_LoadLeafs: bad leaf face index");
 		// end Knightmare
-	}	
+	}
 }
-
 
 /*
 =================

@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
 
-//qb: fixme... started cleanup to work with engine fog but currently non-functional.  Could be mod, engine, or both.
+//qb: fixme... engine fog working but not multiplayer yet.
 
 #include "g_local.h"
 
@@ -213,9 +213,9 @@ void FogSend(edict_t *ent)  //qb: serve it up
 {
 	if (!ent->client || ent->is_bot)
 		return;
-	if ((abs(ent->fog_density - pfog->Density)<3 || pfog->Density == 0) && abs(ent->fog_color[0] - pfog->Color[0])<0.03
+	if ((abs(ent->fog_density - pfog->Density)< 1.0 || pfog->Density == 0) && abs(ent->fog_color[0] - pfog->Color[0])<0.03
 		&& abs(ent->fog_color[1] - pfog->Color[1])<0.03 && abs(ent->fog_color[2] - pfog->Color[2])<0.03)
-		return; //qb: don't bother burning bytes if delta < 3%, or density became zero.
+		return; //qb: don't bother burning bytes if delta is small, unless density became zero.
 
 	ent->fog_density = pfog->Density;
 	ent->fog_color[0] = pfog->Color[0];
